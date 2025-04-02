@@ -1,6 +1,6 @@
-USE Inventory;
+-- USE Inventory;
 
-SET SQL_SAFE_UPDATES = 0;
+-- SET SQL_SAFE_UPDATES = 0;
 
 -- drops all tables
 DROP TABLE IF EXISTS buys;
