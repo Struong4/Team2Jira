@@ -37,6 +37,8 @@ def runSQLScript(sql_file):
 def addNewItem(item_id, item_name, weight_lbs, quantity=0, price=0.00, descript="", quantity_limit=0, origins=[], categories=[]):
     prompt = ""
 
+    item_id = str(item_id)
+
     # checks if the origins is a list 
     if not isinstance(origins, list):
         return f"⚠️ Unable to add {item_name}. Origins must be a list of origin names"
@@ -106,6 +108,57 @@ def addNewItem(item_id, item_name, weight_lbs, quantity=0, price=0.00, descript=
         conn.close()
     return prompt
 
+def removeItem(item_id):
+    item_id = str(item_id)
+    if len(item_id) != 10:
+        return f"⚠️ Unable to remove item {item_id}. Item ID must be a unique 10-digit code"
+    if not item_id.isdigit():
+        return f"⚠️ Unable to remove item {item_id}. Item ID must be a unique 10-digit code"
+
+    prompt = ""
+    # establishes a connection with the sql database
+    conn = sqlite3.connect(INVENTORY)
+
+    # gets the sql cursor
+    cursor = conn.cursor()
+
+    # checks if the item still exists
+    query = f"SELECT COUNT(*) FROM item WHERE item_id = ?"
+    cursor.execute(query, (item_id,))
+    count = cursor.fetchone()[0]
+
+    if count == 1:
+
+        # removes the item
+        cursor.execute("""
+            DELETE FROM item WHERE item_id = ?
+        """, (item_id,))
+
+        # removes category associated with the item
+        cursor.execute("""
+            DELETE FROM category WHERE item_id = ?
+        """, (item_id,))
+
+        # removes origin associated with the item
+        cursor.execute("""
+            DELETE FROM origin WHERE item_id = ?
+        """, (item_id,))
+
+        prompt = f"✅ Item '{item_id}' successfully removed!"
+    else:
+        # displays if item has already been removed
+        prompt = f"⚠️ Unable to remove item {item_id}. Item ID {item_id} doesn't exist"
+
+    conn.commit()
+
+    # closes the cursor
+    cursor.close()
+
+    # closes the connection
+    conn.close()
+
+    return prompt
+
 def displayAllTables():
     # establishes a connection with the sql database
     conn = sqlite3.connect(INVENTORY)
@@ -151,8 +204,8 @@ if __name__ == "__main__":
 
     # edge cases for adding items
     print(addNewItem("4444444444", "banana", 1.0, 1, 0, "an banana"))
-    print(addNewItem("5555555555", "chicken", 1.0, 1, 0, "an chicken"))
-    print(addNewItem("6666666666", "pork", 1.0, 1, 0, "an pork"))
+    print(addNewItem(5555555555, "chicken", 1.0, 1, 0, "an chicken"))
+    print(addNewItem(6666666666, "pork", 1.0, 1, 0, "an pork"))
 
     # error cases for adding items
     # unique constraints
@@ -171,10 +224,29 @@ if __name__ == "__main__":
     print(addNewItem("5555566666", "beef", 1, 1.0, 10, "an beef", 5, "hello", []))
     print(addNewItem("6666677777", "blueberry", 1, 1.0, 10, "an blueberry", 5, [], "hi"))
 
-
-    
     print("AFTER TESTING ADD NEW ITEMS")
     displayAllTables()
+
+    # normal testing cases for removing an item
+    print(removeItem("1111111111"))
+    print(removeItem("2222222222"))
+    print(removeItem("3333333333"))
+
+    # edge testing cases for removing an item
+    print(removeItem(4444444444))
+    print(removeItem(5555555555))
+
+    # error cases for removing an item
+    print(removeItem("1111111111"))
+    print(removeItem("9898989898"))
+    print(removeItem("111111111"))
+    print(removeItem("11111111111"))
+    print(removeItem("11111111a1"))
+    
+    print("AFTER TESTING REMOVE ITEMS")
+    displayAllTables()
+
+
 
     runSQLScript(DROP_SCRIPT)
     pass
