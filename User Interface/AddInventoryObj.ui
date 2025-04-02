@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>527</width>
-    <height>482</height>
+    <width>523</width>
+    <height>375</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,6 +21,12 @@
      </property>
      <item row="1" column="1">
       <widget class="QScrollArea" name="scrollArea">
+       <property name="frameShape">
+        <enum>QFrame::Panel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
        <property name="widgetResizable">
         <bool>true</bool>
        </property>
@@ -28,23 +34,23 @@
         <property name="geometry">
          <rect>
           <x>0</x>
-          <y>0</y>
-          <width>312</width>
-          <height>545</height>
+          <y>-71</y>
+          <width>339</width>
+          <height>695</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_3">
          <item>
           <layout class="QVBoxLayout" name="verticalLayout_2">
            <item>
-            <widget class="QLabel" name="label_2">
+            <widget class="QLabel" name="productNameLabel">
              <property name="text">
               <string>Product Name</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QTextEdit" name="ProductNameText"/>
+            <widget class="QTextEdit" name="productNameText"/>
            </item>
            <item>
             <spacer name="verticalSpacer">
@@ -60,54 +66,219 @@
             </spacer>
            </item>
            <item>
-            <widget class="QLabel" name="label_3">
+            <widget class="QLabel" name="itemIDLabel">
              <property name="text">
               <string>Item ID</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QTextEdit" name="ItemIDText"/>
+            <widget class="QTextEdit" name="itemIDText"/>
            </item>
            <item>
-            <widget class="QLabel" name="label_4">
+            <layout class="QGridLayout" name="gridLayout">
+             <property name="topMargin">
+              <number>6</number>
+             </property>
+             <item row="3" column="2">
+              <widget class="QCheckBox" name="catCheckBox3">
+               <property name="text">
+                <string>Cat 3</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QCheckBox" name="originCheckBox2">
+               <property name="text">
+                <string>MD Food Bank</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="1">
+              <widget class="QCheckBox" name="catCheckBox2">
+               <property name="text">
+                <string>Cat2</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QLabel" name="originLabel">
+               <property name="text">
+                <string>Origin:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="3">
+              <widget class="QCheckBox" name="catCheckBox4">
+               <property name="text">
+                <string>Cat4</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="categoryLabel">
+               <property name="text">
+                <string>Category:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0">
+              <widget class="QCheckBox" name="catCheckBox1">
+               <property name="text">
+                <string>Cat 1</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="3">
+              <spacer name="horizontalSpacer">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item row="1" column="0">
+              <widget class="QCheckBox" name="originCheckBox1">
+               <property name="text">
+                <string>Patel Brothers</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="2">
+              <spacer name="horizontalSpacer_4">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item row="0" column="1">
+              <spacer name="horizontalSpacer_5">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item row="2" column="1">
+              <spacer name="horizontalSpacer_6">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item row="2" column="2">
+              <spacer name="horizontalSpacer_7">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item row="2" column="3">
+              <spacer name="horizontalSpacer_8">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item row="1" column="2">
+              <widget class="QCheckBox" name="originCheckBox3">
+               <property name="text">
+                <string>Origin1</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="3">
+              <widget class="QCheckBox" name="originCheckBox4">
+               <property name="text">
+                <string>Origin 2</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="QLabel" name="priceLabel">
              <property name="text">
               <string>Price</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QTextEdit" name="PriceText"/>
+            <widget class="QTextEdit" name="priceText"/>
            </item>
            <item>
-            <widget class="QLabel" name="label_5">
+            <widget class="QLabel" name="weightLabel">
              <property name="text">
               <string>Weight</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QTextEdit" name="WeightText"/>
+            <widget class="QTextEdit" name="weightText"/>
            </item>
            <item>
-            <widget class="QLabel" name="label_6">
+            <widget class="QLabel" name="descriptionLabel">
              <property name="text">
               <string>Description</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QTextEdit" name="DescriptionText"/>
+            <widget class="QTextEdit" name="descriptionText"/>
            </item>
            <item>
-            <widget class="QLabel" name="label_7">
+            <widget class="QLabel" name="availableQuantityLabel">
              <property name="text">
-              <string>Quantity</string>
+              <string>Available Quantity</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QSpinBox" name="QuantitySpinBox"/>
+            <widget class="QSpinBox" name="availableQuantitySpinBox"/>
+           </item>
+           <item>
+            <widget class="QLabel" name="limitLabel">
+             <property name="text">
+              <string>Quantity Limit</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSpinBox" name="limitSpinBox"/>
            </item>
           </layout>
          </item>
@@ -117,6 +288,19 @@
      </item>
      <item row="2" column="1">
       <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
        <item>
         <widget class="QPushButton" name="confirmButton">
          <property name="styleSheet">
@@ -140,19 +324,6 @@ font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
           <string>Cancel</string>
          </property>
         </widget>
-       </item>
-       <item>
-        <spacer name="horizontalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
        </item>
       </layout>
      </item>
@@ -197,7 +368,7 @@ font: 75 10pt &quot;MS Shell Dlg 2&quot;;</string>
         <number>10</number>
        </property>
        <item>
-        <widget class="QLabel" name="label_8">
+        <widget class="QLabel" name="imageUpload">
          <property name="minimumSize">
           <size>
            <width>150</width>
