@@ -1,9 +1,9 @@
 -- uncomment this to make the database
 -- CREATE DATABASE Inventory;
 
-USE Inventory;
+-- USE Inventory;
 
-SET SQL_SAFE_UPDATES = 0;
+-- SET SQL_SAFE_UPDATES = 0;
 
 -- creates a table for student
 CREATE TABLE IF NOT EXISTS student (
@@ -19,12 +19,13 @@ CREATE TABLE IF NOT EXISTS student (
 CREATE TABLE IF NOT EXISTS item (
 	item_id CHAR(10) NOT NULL,
     item_name VARCHAR(100) NOT NULL,
-    weight DOUBLE NOT NULL,
+    weight_lbs DOUBLE NOT NULL,
     price FLOAT,
     descript VARCHAR(500),
     quantity INT NOT NULL,
+    quantity_limit INT,
     PRIMARY KEY (item_id),
-    CHECK (item_id REGEXP "^\d+$" AND weight >= 0 AND price >= 0 AND quantity >= 0)
+    CHECK (item_id REGEXP "^\d+$" AND weight_lbs >= 0 AND price >= 0 AND quantity >= 0 AND quantity_limit >= 0)
 );
 
 -- creates a table for origin
@@ -78,6 +79,7 @@ CREATE TABLE IF NOT EXISTS updates(
     CHECK (staff_id REGEXP "^[A-Z]{2}\d{5}$" AND item_id REGEXP "^\d+$")
 );
 
+-- creates a table for restock
 CREATE TABLE IF NOT EXISTS restock (
 	staff_id CHAR(7) NOT NULL,
     item_id CHAR(10) NOT NULL,
@@ -88,4 +90,3 @@ CREATE TABLE IF NOT EXISTS restock (
     FOREIGN KEY (item_id) REFERENCES item(item_id),
     CHECK (staff_id REGEXP "^[A-Z]{2}\d{5}$" AND item_id REGEXP "^\d+$" AND restock_quantity > 0)
 );
-

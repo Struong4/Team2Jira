@@ -1,0 +1,1 @@
+When running the code, please download the .qrc file that contains all the pictures necessary for the User Interface (UI). Before running the code, please run this command "pyrcc5 -o [file_name].py [file_name].qrc" to build properly. 
