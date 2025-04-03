@@ -90,3 +90,41 @@ CREATE TABLE IF NOT EXISTS restock (
     FOREIGN KEY (item_id) REFERENCES item(item_id),
     CHECK (staff_id REGEXP "^[A-Z]{2}\d{5}$" AND item_id REGEXP "^\d+$" AND restock_quantity > 0)
 );
+
+-- declares a trigger to buy an item
+CREATE TRIGGER before_buy_stock
+BEFORE INSERT ON buys
+FOR EACH ROW
+WHEN (SELECT quantity FROM item WHERE item_id = NEW.item_id) < NEW.buy_quantity
+BEGIN
+    SELECT RAISE(ABORT, 'Not enough stock available');
+END;
+
+-- Prevents purchase if student_id does not exist
+CREATE TRIGGER before_buy_student
+BEFORE INSERT ON buys
+FOR EACH ROW
+WHEN (SELECT COUNT(*) FROM student WHERE student_id = NEW.student_id) = 0
+BEGIN
+    SELECT RAISE(ABORT, 'Invalid student ID');
+END;
+
+-- Prevents purchase if item_id does not exist
+CREATE TRIGGER before_buy_item
+BEFORE INSERT ON buys
+FOR EACH ROW
+WHEN (SELECT COUNT(*) FROM item WHERE item_id = NEW.item_id) = 0
+BEGIN
+    SELECT RAISE(ABORT, 'Invalid item ID');
+END;
+
+-- declares a trigger after buying an item
+CREATE TRIGGER after_buy
+AFTER INSERT ON buys
+FOR EACH ROW
+BEGIN
+    -- Deduct the purchased quantity from the item inventory
+    UPDATE item
+    SET quantity = quantity - NEW.buy_quantity
+    WHERE item_id = NEW.item_id;
+END;

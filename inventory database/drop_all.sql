@@ -2,6 +2,12 @@
 
 -- SET SQL_SAFE_UPDATES = 0;
 
+-- drops all triggers
+DROP TRIGGER IF EXISTS before_buy_stock;
+DROP TRIGGER IF EXISTS before_buy_student;
+DROP TRIGGER IF EXISTS before_buy_item;
+DROP TRIGGER IF EXISTS after_buy;
+
 -- drops all tables
 DROP TABLE IF EXISTS buys;
 DROP TABLE IF EXISTS updates;

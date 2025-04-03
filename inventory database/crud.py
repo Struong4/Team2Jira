@@ -1,9 +1,12 @@
 import sqlite3
 import re
+from datetime import datetime
 
 INVENTORY = "inventory.db"
 CREATE_SCRIPT = "create_all.sql"
 DROP_SCRIPT = "drop_all.sql"
+
+ID_REG_EXP = "^[A-Z]{2}\d{5}$"
 
 
 # Custom REGEXP function for SQLite
@@ -28,7 +31,9 @@ def runSQLScript(sql_file):
 
     cursor = conn.cursor()
 
+    # Use executescript to handle multi-line SQL statements properly
     cursor.executescript(sql_script)
+
     conn.commit()
     conn.close()
     print(f"Executed {sql_file} on {INVENTORY}")
@@ -84,7 +89,6 @@ def addNewItem(item_id, item_name, weight_lbs, quantity=0, price=0.00, descript=
             """, (item_id, category))
 
         conn.commit()
-        #print(f"✅ Item '{item_name}' added successfully!")
         prompt = f"✅ Item '{item_name}' added successfully!"
 
     except sqlite3.IntegrityError as e:
@@ -187,23 +191,86 @@ def displayAllTables():
     cursor.close()
     conn.close()
 
+def buyItem(student_id, item_id, buy_datetime, buy_quantity):
+    prompt = ""
+
+    if datetime.strptime(buy_datetime, "%Y-%m-%d %H:%M:%S") > datetime.now():
+        return f"⚠️ Unable to buy item {item_id}. Invalid datetime of {buy_datetime}" 
+
+    # establishes a connection with the sql database
+    conn = sqlite3.connect(INVENTORY)
+
+    # gets the sql cursor
+    cursor = conn.cursor()
+
+    # Register REGEXP function
+    conn.create_function("REGEXP", 2, regexp)
+
+    try:
+        # executes the buy command
+        cursor.execute("""
+            INSERT INTO buys (student_id, item_id, buy_datetime, buy_quantity)
+            VALUES (?, ?, ?, ?)
+        """, (student_id, item_id, buy_datetime, buy_quantity,))
+    
+        conn.commit()
+
+        prompt = f"✅ Item '{item_id}' bought by {student_id}. Bought {buy_quantity} items!"
+    except sqlite3.IntegrityError as e:
+        if "CHECK constraint failed" in str(e):
+            # no need
+            if buy_quantity < 1:
+                prompt = f"⚠️ Unable to buy item {item_id}. Invalid buy_quantity of {buy_quantity}" 
+        else:
+            prompt = f"⚠️ Unable to buy item {item_id}. {e}" 
+    finally:
+        # closes the cursor and connection
+        cursor.close()
+        conn.close()
+
+    return prompt
+    
+def addNewStudent(student_id, student_first_name, student_last_name):
+
+    # establishes a connection with the sql database
+    conn = sqlite3.connect(INVENTORY)
+
+    # gets the sql cursor
+    cursor = conn.cursor()
+
+    # Register REGEXP function
+    conn.create_function("REGEXP", 2, regexp)
+
+    # executes the buy command
+    cursor.execute("""
+        INSERT INTO student (student_id, student_first_name, student_last_name)
+        VALUES (?, ?, ?)
+    """, (student_id, student_first_name, student_last_name,))
+
+    conn.commit()
+
+    # closes the cursor and connection
+    cursor.close()
+    conn.close()
+    pass
 
 # where we'll test the code to make sure it works
 if __name__ == "__main__":
 
     # creates tables using the create_all.sql script
+    runSQLScript(DROP_SCRIPT)
     runSQLScript(CREATE_SCRIPT)
 
     print("BEFORE TESTING ADD NEW ITEMS")
     displayAllTables()
 
     # normal test cases for adding items
-    print(addNewItem("1111111111", "milk", 5.0, 5, 0, "a carton of milk", 0, ["walmart", "target", "h mart"], ["dairy", "white"]))
-    print(addNewItem("2222222222", "orange", 1.0, 1, 0, "an orange", 0, ["walmart", "aldis"], ["fruit"]))
-    print(addNewItem("3333333333", "apple", 1.0, 1, 0, "an apple", 0, ["walmart"], ["fruit", "red"]))
+    print(addNewItem("1111111111", "milk", 5.0, 10, 10, "a carton of milk", 0, ["walmart", "target", "h mart"], ["dairy", "white"]))
+    print(addNewItem("2222222222", "orange", 1.0, 10, 10, "an orange", 0, ["walmart", "aldis"], ["fruit"]))
+    print(addNewItem("3333333333", "apple", 1.0, 10, 10, "an apple", 0, ["walmart"], ["fruit", "red"]))
 
     # edge cases for adding items
-    print(addNewItem("4444444444", "banana", 1.0, 1, 0, "an banana"))
+    print(addNewItem("4444444444", "banana", 1.0, 10, 10, "an banana"))
     print(addNewItem(5555555555, "chicken", 1.0, 1, 0, "an chicken"))
     print(addNewItem(6666666666, "pork", 1.0, 1, 0, "an pork"))
 
@@ -227,23 +294,61 @@ if __name__ == "__main__":
     print("AFTER TESTING ADD NEW ITEMS")
     displayAllTables()
 
-    # normal testing cases for removing an item
-    print(removeItem("1111111111"))
-    print(removeItem("2222222222"))
-    print(removeItem("3333333333"))
+    print("TESTING BUY ITEMS")
+    addNewStudent("GB70937", "Gia", "Santos")
 
-    # edge testing cases for removing an item
-    print(removeItem(4444444444))
-    print(removeItem(5555555555))
+    # normal case for buying items
+    print(buyItem("GB70937", "1111111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 1))
+    print(buyItem("GB70937", "2222222222", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 5))
+    print(buyItem("GB70937", "3333333333", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 10))
 
-    # error cases for removing an item
-    print(removeItem("1111111111"))
-    print(removeItem("9898989898"))
-    print(removeItem("111111111"))
-    print(removeItem("11111111111"))
-    print(removeItem("11111111a1"))
+    # edge case: no more stock
+    print(buyItem("GB70937", "3333333333", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 1))
+
+    # edge case: buying 0 items
+    print(buyItem("GB70937", "5555555555", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 0))
+
+    # error case: invalid student id
+    print(buyItem("12ABCDE", "4444444444", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 1))
+
+    # error case: nonexistent student id
+    print(buyItem("AB12345", "4444444444", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 1))
+
+    # error case: invalid item id
+    print(buyItem("GB70937", "444444444", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 1))
+
+    # error case: invalid item id
+    print(buyItem("GB70937", "8888888888", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 1))
+
+    # error case: invalid item id
+    print(buyItem("GB70937", "4444444444", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), -5))
+
+    # edge case: buying item at a past datetime
+    print(buyItem("GB70937", "4444444444", "2001-04-03  12:00:00", 1))
+
+    # error case: buying items at a future datetime than now
+    print(buyItem("GB70937", "5555555555", "2030-04-03  12:00:00", 1))
     
-    print("AFTER TESTING REMOVE ITEMS")
+
+
+    # normal testing cases for removing an item
+    # print(removeItem("1111111111"))
+    # print(removeItem("2222222222"))
+    # print(removeItem("3333333333"))
+
+    # # edge testing cases for removing an item
+    # print(removeItem(4444444444))
+    # print(removeItem(5555555555))
+
+    # # error cases for removing an item
+    # print(removeItem("1111111111"))
+    # print(removeItem("9898989898"))
+    # print(removeItem("111111111"))
+    # print(removeItem("11111111111"))
+    # print(removeItem("11111111a1"))
+    
+    # print("AFTER TESTING REMOVE ITEMS")
+
     displayAllTables()
 
 
