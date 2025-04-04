@@ -8,6 +8,10 @@ DROP TRIGGER IF EXISTS before_buy_student;
 DROP TRIGGER IF EXISTS before_buy_item;
 DROP TRIGGER IF EXISTS after_buy;
 
+DROP TRIGGER IF EXISTS before_restock_staff;
+DROP TRIGGER IF EXISTS before_restock_item;
+DROP TRIGGER IF EXISTS after_restock;
+
 -- drops all tables
 DROP TABLE IF EXISTS buys;
 DROP TABLE IF EXISTS updates;

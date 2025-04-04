@@ -128,3 +128,32 @@ BEGIN
     SET quantity = quantity - NEW.buy_quantity
     WHERE item_id = NEW.item_id;
 END;
+
+-- Prevents restock if item_id does not exist
+CREATE TRIGGER before_restock_item
+BEFORE INSERT ON restock
+FOR EACH ROW
+WHEN (SELECT COUNT(*) FROM item WHERE item_id = NEW.item_id) = 0
+BEGIN
+    SELECT RAISE(ABORT, 'Invalid item ID');
+END;
+
+-- Prevents restock if staff_id does not exist
+CREATE TRIGGER before_restock_staff
+BEFORE INSERT ON restock
+FOR EACH ROW
+WHEN (SELECT COUNT(*) FROM staff WHERE staff_id = NEW.staff_id) = 0
+BEGIN
+    SELECT RAISE(ABORT, 'Invalid staff ID');
+END;
+
+-- declares a trigger after restocking an item
+CREATE TRIGGER after_restock
+AFTER INSERT ON restock
+FOR EACH ROW
+BEGIN
+    -- Deduct the purchased quantity from the item inventory
+    UPDATE item
+    SET quantity = quantity + NEW.restock_quantity
+    WHERE item_id = NEW.item_id;
+END;
