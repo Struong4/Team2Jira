@@ -215,7 +215,7 @@ def buyItem(student_id, item_id, buy_datetime, buy_quantity):
     
         conn.commit()
 
-        prompt = f"✅ Item '{item_id}' bought by {student_id}. Bought {buy_quantity} items!"
+        prompt = f"✅ Item '{item_id}' bought by student {student_id}. Bought {buy_quantity} items!"
     except sqlite3.IntegrityError as e:
         if "CHECK constraint failed" in str(e):
             # no need
@@ -223,6 +223,45 @@ def buyItem(student_id, item_id, buy_datetime, buy_quantity):
                 prompt = f"⚠️ Unable to buy item {item_id}. Invalid buy_quantity of {buy_quantity}" 
         else:
             prompt = f"⚠️ Unable to buy item {item_id}. {e}" 
+    finally:
+        # closes the cursor and connection
+        cursor.close()
+        conn.close()
+
+    return prompt
+
+def restockItem(staff_id, item_id, restock_datetime, restock_quantity):
+    prompt = ""
+
+    if datetime.strptime(restock_datetime, "%Y-%m-%d %H:%M:%S") > datetime.now():
+        return f"⚠️ Unable to restock item {item_id}. Invalid datetime of {restock_datetime}" 
+
+
+    # establishes a connection with the sql database
+    conn = sqlite3.connect(INVENTORY)
+
+    # gets the sql cursor
+    cursor = conn.cursor()
+
+    # Register REGEXP function
+    conn.create_function("REGEXP", 2, regexp)
+
+    try:
+        # executes the buy command
+        cursor.execute("""
+            INSERT INTO restock (staff_id, item_id, restock_datetime, restock_quantity)
+            VALUES (?, ?, ?, ?)
+        """, (staff_id, item_id, restock_datetime, restock_quantity,))
+    
+        conn.commit()
+
+        prompt = f"✅ Item '{item_id}' restocked by staff {staff_id}. Restocked {restock_quantity} items!"
+    except sqlite3.IntegrityError as e:
+        if "CHECK constraint failed" in str(e):
+            if restock_quantity < 1:
+                prompt = f"⚠️ Unable to restock item {item_id}. Invalid restock_quantity of {restock_quantity}" 
+        else:
+            prompt = f"⚠️ Unable to restock item {item_id}. {e}" 
     finally:
         # closes the cursor and connection
         cursor.close()
@@ -252,7 +291,30 @@ def addNewStudent(student_id, student_first_name, student_last_name):
     # closes the cursor and connection
     cursor.close()
     conn.close()
-    pass
+
+def addNewStaff(staff_id, staff_first_name, staff_last_name):
+
+    # establishes a connection with the sql database
+    conn = sqlite3.connect(INVENTORY)
+
+    # gets the sql cursor
+    cursor = conn.cursor()
+
+    # Register REGEXP function
+    conn.create_function("REGEXP", 2, regexp)
+
+    # executes the buy command
+    cursor.execute("""
+        INSERT INTO staff (staff_id, staff_first_name, staff_last_name)
+        VALUES (?, ?, ?)
+    """, (staff_id, staff_first_name, staff_last_name,))
+
+    conn.commit()
+
+    # closes the cursor and connection
+    cursor.close()
+    conn.close()
+    
 
 # where we'll test the code to make sure it works
 if __name__ == "__main__":
@@ -294,40 +356,76 @@ if __name__ == "__main__":
     print("AFTER TESTING ADD NEW ITEMS")
     displayAllTables()
 
-    print("TESTING BUY ITEMS")
-    addNewStudent("GB70937", "Gia", "Santos")
+    print("TESTING RESTOCK ITMES")
+    addNewStaff("AB12345", "Your", "Mom")
 
-    # normal case for buying items
-    print(buyItem("GB70937", "1111111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 1))
-    print(buyItem("GB70937", "2222222222", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 5))
-    print(buyItem("GB70937", "3333333333", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 10))
+    # normal test cases for restocking items
+    print(restockItem("AB12345", "1111111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 20))
+    print(restockItem("AB12345", "2222222222", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 20))
+    print(restockItem("AB12345", "3333333333", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 20))
 
-    # edge case: no more stock
-    print(buyItem("GB70937", "3333333333", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 1))
+    # edge case: restocking 0 items
+    print(restockItem("AB12345", "4444444444", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 0))
 
-    # edge case: buying 0 items
-    print(buyItem("GB70937", "5555555555", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 0))
+    # error case: invalid staff id
+    print(restockItem("12ABCD", "4444444444", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 20))
 
-    # error case: invalid student id
-    print(buyItem("12ABCDE", "4444444444", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 1))
-
-    # error case: nonexistent student id
-    print(buyItem("AB12345", "4444444444", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 1))
+    # error case: nonexistent staff id
+    print(restockItem("CD12345", "4444444444", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 20))
 
     # error case: invalid item id
-    print(buyItem("GB70937", "444444444", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 1))
+    print(restockItem("AB12345", "aaaaaaaaaa", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 20))
+    print(restockItem("AB12345", "22222222", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 20))
 
-    # error case: invalid item id
-    print(buyItem("GB70937", "8888888888", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 1))
+    # error case: nonexistent item id
+    print(restockItem("AB12345", "9999999999", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 20))
 
-    # error case: invalid item id
-    print(buyItem("GB70937", "4444444444", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), -5))
+    # error case: invalid restock quantity
+    print(restockItem("AB12345", "4444444444", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), -10))
 
-    # edge case: buying item at a past datetime
-    print(buyItem("GB70937", "4444444444", "2001-04-03  12:00:00", 1))
+    # edge case: restocking datetime before now
+    print(restockItem("AB12345", "4444444444", "2001-04-03  12:00:00", 10))
 
-    # error case: buying items at a future datetime than now
-    print(buyItem("GB70937", "5555555555", "2030-04-03  12:00:00", 1))
+    # edge case: restocking datetime before now
+    print(restockItem("AB12345", "5555555555", "2030-04-03  12:00:00", 10))
+
+    # edge case: restocking same item from same staff
+    print(restockItem("AB12345", "1111111111", "2001-04-03  12:00:00", 10))
+
+    # print("TESTING BUY ITEMS")
+    # addNewStudent("GB70937", "Gia", "Santos")
+
+    # # normal case for buying items
+    # print(buyItem("GB70937", "1111111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 1))
+    # print(buyItem("GB70937", "2222222222", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 5))
+    # print(buyItem("GB70937", "3333333333", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 10))
+
+    # # edge case: no more stock
+    # print(buyItem("GB70937", "3333333333", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 1))
+
+    # # edge case: buying 0 items
+    # print(buyItem("GB70937", "5555555555", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 0))
+
+    # # error case: invalid student id
+    # print(buyItem("12ABCDE", "4444444444", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 1))
+
+    # # error case: nonexistent student id
+    # print(buyItem("AB12345", "4444444444", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 1))
+
+    # # error case: invalid item id
+    # print(buyItem("GB70937", "444444444", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 1))
+
+    # # error case: invalid item id
+    # print(buyItem("GB70937", "8888888888", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 1))
+
+    # # error case: invalid item id
+    # print(buyItem("GB70937", "4444444444", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), -5))
+
+    # # edge case: buying item at a past datetime
+    # print(buyItem("GB70937", "4444444444", "2001-04-03  12:00:00", 1))
+
+    # # error case: buying items at a future datetime than now
+    # print(buyItem("GB70937", "5555555555", "2030-04-03  12:00:00", 1))
     
 
 
