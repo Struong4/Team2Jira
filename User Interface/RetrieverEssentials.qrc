@@ -1,8 +1,0 @@
-<RCC>
-  <qresource prefix="my_resources">
-    <file>Logos/UMBCretrievers_LOGO.jpg</file>
-    <file>Logos/CheckoutCart1.jpg</file>
-    <file>Logos/CheckoutCart2.png</file>
-    <file>Logos/Retriever Essential.png</file>
-  </qresource>
-</RCC>
