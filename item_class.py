@@ -5,6 +5,9 @@
 #attribute quantity: the int quantity of the item
 #attribute weight: the double weight of item per one unit
 
+from crud import addNewItem
+from crud import removeItem
+
 class Item:
     def __init__(self, item_id, name, price, quantity, weight, description, origin, category, quantity_limit):
         self.item_id = str(item_id)  #unique ID
@@ -29,10 +32,25 @@ class Item:
               f"Origins: {self.origins}\n"
               f"Category: {self.category}\n"
               f"----------------------------------\n")
+        
+        # create item in sql database
+        addNewItem(
+            item_id=self.item_id,
+            item_name=self.name,
+            weight_lbs=self.weight,
+            quantity=self.quantity,
+            price=self.price,
+            descript=self.description,
+            quantity_limit=self.quantity_limit,
+            origins=self.origins,
+            categories=self.category
+        )
 
 
     def __del__(self):
+        removeItem(self.item_id) #dwlete item from sql database
         print(f'Item removed: {self.name} (ID: {self.item_id})\n')
+        
 
     #accessors
     def getItemID(self):
