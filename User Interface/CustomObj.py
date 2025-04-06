@@ -89,7 +89,87 @@ class CustomObjInCart(QtWidgets.QWidget):
         
     def set_weight(self,weight):
         self.label_14.setText(f"{self.label_14.text()} - {weight}")
-#from customobjincart.py import customObjInCart
+
+
+class StudentInventoryView(QtWidgets.QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        
+        self.setupUI()
+        
+    def setupUI(self):
+        self.studentObjFrame = QtWidgets.QFrame(self)
+        self.studentObjFrame.setFrameShape(QtWidgets.QFrame.Panel)
+        self.studentObjFrame.setLineWidth(1)
+        self.studentObjFrame.setMidLineWidth(1)
+        self.studentObjFrame.setObjectName("studentObjFrame")
+        
+        self.verticalLayout_1 = QtWidgets.QVBoxLayout(self.studentObjFrame)
+        self.verticalLayout_1.setObjectName("verticalLayout_1")
+        
+        self.studentLabel = QtWidgets.QLabel(self.studentObjFrame)
+        self.studentLabel.setStyleSheet("font: 10pt \"MS Shell Dlg 2\";\n"
+"text-decoration: underline;\n""color: black;")
+        self.studentLabel.setAlignment(QtCore.Qt.AlignCenter)
+        self.studentLabel.setObjectName("studentLabel")
+        self.studentLabel.setVisible(True)
+        
+        self.verticalLayout_1.addWidget(self.studentLabel)
+        
+        self.studentImage = QtWidgets.QGraphicsView(self.studentObjFrame)
+        self.studentImage.setObjectName("studentImage")
+        self.scene = QtWidgets.QGraphicsScene(self)
+        self.studentImage.setScene(self.scene)
+        
+        self.pixmap = QtGui.QPixmap(":/my_resources/Logos/Canned Goods.jpg")  # Replace with your image path
+        if not self.pixmap.isNull():
+            self.imageItem = QtWidgets.QGraphicsPixmapItem(self.pixmap)  # Create an item for the image
+            self.scene.addItem(self.imageItem)  # Add the image item to the scene
+            
+            resizedPixmap = self.pixmap.scaled(200, 150, QtCore.Qt.KeepAspectRatio)  # Resize to 200x150 pixels
+            self.imageItem.setPixmap(resizedPixmap)
+        else:
+            print("Failed to load image.") 
+            
+        # Disable scrollbars on the QGraphicsView
+        self.studentImage.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.studentImage.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+
+        self.resizeImage()
+        self.verticalLayout_1.addWidget(self.studentImage)
+        
+        mainLayout = QtWidgets.QVBoxLayout(self)
+        mainLayout.addWidget(self.studentObjFrame)
+        
+    def retranslateUi(self, Form):
+        _translate = QtCore.QCoreApplication.translate
+        Form.setWindowTitle(_translate("Form", "Student View of Inventory"))
+        self.studentLabel.setText(_translate("Form", "Obj1 Title"))
+        
+    def resizeImage(self):
+        view_width = self.studentImage.width()
+        view_height = self.studentImage.height()
+            
+        resizedPixmap = self.pixmap.scaled(view_width, view_height, QtCore.Qt.KeepAspectRatio)
+        self.imageItem.setPixmap(resizedPixmap)
+            
+    def resizeEvent(self, event):
+        self.resizeImage()
+        super().resizeEvent(event)
+        
+    def setObjName(self, name):
+        self.studentLabel.setText(name)
+        
+    def setObjImage(self, file_path):
+        self.pixmap = QtGui.QPixmap(file_path)  # Replace with your image path
+        if not self.pixmap.isNull():
+            self.imageItem = QtWidgets.QGraphicsPixmapItem(self.pixmap)  # Create an item for the image
+            self.scene.addItem(self.imageItem)  # Add the image item to the scene
+            
+            resizedPixmap = self.pixmap.scaled(200, 150, QtCore.Qt.KeepAspectRatio)  # Resize to 200x150 pixels
+            self.imageItem.setPixmap(resizedPixmap)
+        else:
+            print("Failed to load image.") 
 
 
 if __name__ == "__main__":
