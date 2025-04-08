@@ -62,11 +62,18 @@ class OpenStudentInventory(QtWidgets.QMainWindow):
         # open the checkout window when cart button is clicked
         # will close current window
         self.ui.GoToCartButton.clicked.connect(self.openCheckoutScreen)
+        self.ui.logOutButton.clicked.connect(self.logOut)
     
     def openCheckoutScreen(self):
         self.checkoutWindow = CheckoutWindow(self)
         self.checkoutWindow.setGeometry(self.geometry())
         self.checkoutWindow.show()
+        self.hide()
+        
+    def logOut(self):
+        self.logInScreen = LoginScreen()
+        self.logInScreen.setGeometry(self.geometry())
+        self.logInScreen.show()
         self.hide()
         
 class OpenStaffInventory(QtWidgets.QMainWindow):
@@ -77,11 +84,18 @@ class OpenStaffInventory(QtWidgets.QMainWindow):
         # open the checkout window when cart button is clicked
         # will close current window
         self.ui.addObjButton.clicked.connect(self.openNewItemScreen)
-    
+        self.ui.logOutButton.clicked.connect(self.logOut)
+            
     def openNewItemScreen(self):
         self.addItemWindow = OpenAddObjWindow(self)
         self.addItemWindow.setGeometry(self.geometry())
         self.addItemWindow.show()
+        self.hide()
+        
+    def logOut(self):
+        self.logInScreen = LoginScreen()
+        self.logInScreen.setGeometry(self.geometry())
+        self.logInScreen.show()
         self.hide()
         
 class CheckoutWindow(QtWidgets.QMainWindow):
