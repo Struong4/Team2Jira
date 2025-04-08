@@ -10,8 +10,10 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+import RetrieverEssentials_rc
+from CustomObj import StudentInventoryView
 
-class Ui_MainWindow(object):
+class Ui_StudentInventoryWindow(QtWidgets.QMainWindow):    
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(431, 262)
@@ -109,6 +111,7 @@ class Ui_MainWindow(object):
         icon.addPixmap(QtGui.QPixmap(":/my_resources/Logos/CheckoutCart1.jpg"), QtGui.QIcon.Normal, QtGui.QIcon.On)
         self.GoToCartButton.setIcon(icon)
         self.GoToCartButton.setObjectName("GoToCartButton")
+        
         self.horizontalLayout.addWidget(self.GoToCartButton)
         self.NonSideBar.addLayout(self.horizontalLayout)
         self.scrollArea = QtWidgets.QScrollArea(self.centralwidget)
@@ -119,9 +122,6 @@ class Ui_MainWindow(object):
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.gridLayout_3 = QtWidgets.QGridLayout(self.scrollAreaWidgetContents)
         self.gridLayout_3.setObjectName("gridLayout_3")
-        """self.gridLayout_2 = QtWidgets.QGridLayout()
-        self.gridLayout_2.setObjectName("gridLayout_2")
-        self.gridLayout_3.addLayout(self.gridLayout_2, 0, 0, 1, 1)"""
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
         self.NonSideBar.addWidget(self.scrollArea)
         self.horizontalLayout_4.addLayout(self.NonSideBar)
@@ -169,14 +169,10 @@ class Ui_MainWindow(object):
             self.addInventoryItem.resize(item_width, item_height)
             self.gridLayout_3.addWidget(self.addInventoryItem, row, col, 1, 1)
 
-import RetrieverEssentials_rc
-from CustomObj import StudentInventoryView
 
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
+    MainWindow = Ui_StudentInventoryWindow()
     MainWindow.show()
     sys.exit(app.exec_())
