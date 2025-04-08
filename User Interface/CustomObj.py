@@ -20,9 +20,6 @@ class CustomObjInCart(QtWidgets.QWidget):
         self.setupUI()
         
     def setupUI(self):
-        self.setObjectName("Form")
-        self.resize(400, 87)
-        
         self.objFrame1_1 = QtWidgets.QFrame(self)
         self.objFrame1_1.setGeometry(QtCore.QRect(9, 9, 222, 69))
         self.objFrame1_1.setFrameShape(QtWidgets.QFrame.Box)
@@ -89,7 +86,6 @@ class CustomObjInCart(QtWidgets.QWidget):
         
     def set_weight(self,weight):
         self.label_14.setText(f"{self.label_14.text()} - {weight}")
-
 
 class StudentInventoryView(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -170,16 +166,118 @@ class StudentInventoryView(QtWidgets.QWidget):
             self.imageItem.setPixmap(resizedPixmap)
         else:
             print("Failed to load image.") 
+        
+        
+    
 
+class StaffInventoryView(QtWidgets.QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        
+        self.setupUI()
+        
+    def setupUI(self):
+        self.staffObjFrame = QtWidgets.QFrame(self)
+        self.staffObjFrame.setFrameShape(QtWidgets.QFrame.Panel)
+        self.staffObjFrame.setLineWidth(1)
+        self.staffObjFrame.setMidLineWidth(1)
+        self.staffObjFrame.setObjectName("staffObjFrame")
+        self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.staffObjFrame)
+        self.verticalLayout_2.setObjectName("verticalLayout_2")
+        self.staffObjLabel = QtWidgets.QLabel(self.staffObjFrame)
+        self.staffObjLabel.setStyleSheet("font: 10pt \"MS Shell Dlg 2\";\n"
+"text-decoration: underline;\n""color: black;")
+        self.staffObjLabel.setAlignment(QtCore.Qt.AlignCenter)
+        self.staffObjLabel.setObjectName("staffObjLabel")
+        self.verticalLayout_2.addWidget(self.staffObjLabel, 0, QtCore.Qt.AlignHCenter)
+        self.staffObjImage = QtWidgets.QGraphicsView(self.staffObjFrame)
+        self.staffObjImage.setObjectName("staffObjImage")
+        self.scene = QtWidgets.QGraphicsScene(self)
+        self.staffObjImage.setScene(self.scene)
+        self.verticalLayout_2.addWidget(self.staffObjImage)
+        self.horizontalLayout = QtWidgets.QHBoxLayout()
+        self.horizontalLayout.setObjectName("horizontalLayout")
+        self.editItemButton = QtWidgets.QPushButton(self.staffObjFrame)
+        self.editItemButton.setStyleSheet("background-color: rgb(0, 170, 0);\n"
+"color: white;")
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(":/my_resources/Logos/Edit.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.editItemButton.setIcon(icon)
+        self.editItemButton.setObjectName("editItemButton")
+        self.horizontalLayout.addWidget(self.editItemButton)
+        self.removeItemButton = QtWidgets.QPushButton(self.staffObjFrame)
+        self.removeItemButton.setStyleSheet("background-color: rgb(170, 0, 0);\n"
+"color: white;")
+        icon1 = QtGui.QIcon()
+        icon1.addPixmap(QtGui.QPixmap(":/my_resources/Logos/Remove.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.removeItemButton.setIcon(icon1)
+        self.removeItemButton.setObjectName("removeItemButton")
+        self.horizontalLayout.addWidget(self.removeItemButton)
+        self.verticalLayout_2.addLayout(self.horizontalLayout)
 
+        self.retranslateUi(self)
+        
+        self.pixmap = QtGui.QPixmap(":/my_resources/Logos/Canned Goods.jpg")  # Replace with your image path
+        if not self.pixmap.isNull():
+            self.imageItem = QtWidgets.QGraphicsPixmapItem(self.pixmap)  # Create an item for the image
+            self.scene.addItem(self.imageItem)  # Add the image item to the scene
+            
+            resizedPixmap = self.pixmap.scaled(200, 150, QtCore.Qt.KeepAspectRatio)  # Resize to 200x150 pixels
+            self.imageItem.setPixmap(resizedPixmap)
+        else:
+            print("Failed to load image.") 
+            
+        # Disable scrollbars on the QGraphicsView
+        self.staffObjImage.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.staffObjImage.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+
+        self.resizeImage()
+        #self.verticalLayout_2.addWidget(self.staffObjImage)
+        
+        mainLayout = QtWidgets.QVBoxLayout(self)
+        mainLayout.addWidget(self.staffObjFrame)
+        
+    def retranslateUi(self, Form):
+        _translate = QtCore.QCoreApplication.translate
+        Form.setWindowTitle(_translate("Form", "Form"))
+        self.staffObjLabel.setText(_translate("Form", "Obj1 Title"))
+        self.editItemButton.setText(_translate("Form", "Edit"))
+        self.removeItemButton.setText(_translate("Form", "Remove"))
+        
+    def resizeImage(self):
+        view_width = self.staffObjImage.width()
+        view_height = self.staffObjImage.height()
+            
+        resizedPixmap = self.pixmap.scaled(view_width, view_height, QtCore.Qt.KeepAspectRatio)
+        self.imageItem.setPixmap(resizedPixmap)
+            
+    def resizeEvent(self, event):
+        self.resizeImage()
+        super().resizeEvent(event)
+        
+    def setObjName(self, name):
+        self.staffObjLabel.setText(name)
+        
+    def setObjImage(self, file_path):
+        self.pixmap = QtGui.QPixmap(file_path)  # Replace with your image path
+        if not self.pixmap.isNull():
+            self.imageItem = QtWidgets.QGraphicsPixmapItem(self.pixmap)  # Create an item for the image
+            self.scene.addItem(self.imageItem)  # Add the image item to the scene
+            
+            resizedPixmap = self.pixmap.scaled(200, 150, QtCore.Qt.KeepAspectRatio)  # Resize to 200x150 pixels
+            self.imageItem.setPixmap(resizedPixmap)
+        else:
+            print("Failed to load image.") 
+    
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
-    widget = CustomObjInCart()
+    widget = StaffInventoryView()
+    #widget.setObjName("Test 2")
     
     #widget.set_image(":/my_resources/Logos/Retriever Essential.png")
-    widget.set_object_name("Item Name")
-    widget.set_weight("Weight")
+    #widget.set_object_name("Item Name")
+    #widget.set_weight("Weight")
     
     widget.show()
     sys.exit(app.exec_())
