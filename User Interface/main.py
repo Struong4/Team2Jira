@@ -4,6 +4,7 @@ from LoginPage import Ui_Login
 from StudentInventoryView import Ui_StudentInventoryWindow
 from StaffInventoryView import Ui_StaffInventoryWindow
 from AddInventoryObj import Ui_StaffAddObj
+from item_class import Item
 
 class LoginScreen(QtWidgets.QMainWindow):
     def __init__(self):
@@ -118,11 +119,114 @@ class OpenAddObjWindow(QtWidgets.QMainWindow):
         self.ui.setupUi(self)
         self.staffInventory = main_window
         self.ui.cancelButton.clicked.connect(self.goToAddScreen)
+        self.ui.confirmButton.clicked.connect(self.addObj)
         
     def goToAddScreen(self):
         self.staffInventory.setGeometry(self.geometry())
         self.staffInventory.show()
         self.close()
+        
+    def addObj(self):       
+        # goes back tothe inventory view
+        self.saveItemInfo()
+        self.staffInventory.setGeometry(self.geometry())
+        self.staffInventory.show()
+        self.close()
+        
+    def saveItemInfo(self):
+        print("item save triggered")
+        
+        itemID = self.ui.itemIDText.text().strip()
+        name = self.ui.productNameText.text()
+        price = self.ui.priceText.text()
+        quantity = self.ui.availableQuantitySpinBox.value()
+        weight = self.ui.weightText.text()
+        description = self.ui.descriptionText.toPlainText()
+        quantityLimit = self.ui.limitSpinBox.value()
+        
+        
+        # this uncommented section of code is used to save he image path
+        # needs to be connected to sql
+        #imageID will be based on 
+        """pixmap = self.ui.imageUpload.pixmap()
+        buffer = QtCore.QBuffer()
+        buffer.open(QtCore.QBuffer.WriteOnly)
+        pixmap.save(buffer, "PNG")
+        imageData = buffer.data()
+        
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+
+        # Create table if it doesn't exist
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS images (
+            id INTEGER PRIMARY KEY,
+            image BLOB
+            )
+            ''')
+
+        # Insert or replace image
+        cursor.execute('''
+        INSERT OR REPLACE INTO images (id, image)
+        VALUES (?, ?)
+        ''', (imageID, imageData))
+
+        conn.commit()
+        conn.close()"""
+        
+            
+        try:
+            price = float(price)
+        except ValueError:
+            print("Price input incorrect format")
+            return
+            
+        try:
+            quantity = float(price)
+        except ValueError:
+            print("Quantity input incorrect format")
+            return
+            
+        try:
+            quantityLimit = float(price)
+        except ValueError:
+            print("Quantity Limit input incorrect format")
+            return
+            
+
+        origins = []
+        categories = []
+
+        #add origins check box
+        if self.ui.originCheckBox1.isChecked():
+            origins.append(self.ui.originCheckBox1.text())
+        if self.ui.originCheckBox2.isChecked():
+            origins.append(self.ui.originCheckBox2.text())
+        if self.ui.originCheckBox3.isChecked():
+            origins.append(self.ui.originCheckBox3.text())
+        if self.ui.originCheckBox4.isChecked():
+            origins.append(self.ui.originCheckBox4.text()) 
+
+        #add categories check box
+        if self.ui.catCheckBox1.isChecked():
+            categories.append(self.ui.catCheckBox1.text())
+        if self.ui.catCheckBox2.isChecked():
+            categories.append(self.ui.catCheckBox2.text())
+        if self.ui.catCheckBox3.isChecked():
+            categories.append(self.ui.catCheckBox3.text())
+        if self.ui.catCheckBox4.isChecked():
+            categories.append(self.ui.catCheckBox4.text())
+            
+        print("=== Product Details ===")
+        print(f"Item ID: {itemID}")
+        print(f"Name: {name}")
+        print(f"Price: {price}")
+        print(f"Available Quantity: {quantity}")
+        print(f"Weight: {weight}")
+        print(f"Description: {description}")
+        print(f"Quantity Limit: {quantityLimit}")
+        print(f"Origins: {', '.join(origins) if origins else 'None'}")
+        print(f"Categories: {', '.join(categories) if categories else 'None'}")
         
         
 if __name__ == "__main__":
