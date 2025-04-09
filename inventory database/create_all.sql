@@ -157,3 +157,34 @@ BEGIN
     SET quantity = quantity + NEW.restock_quantity
     WHERE item_id = NEW.item_id;
 END;
+
+-- declares a trigger that checks if an item_id exists before updating
+CREATE TRIGGER before_update_item
+BEFORE UPDATE ON item
+FOR EACH ROW
+BEGIN
+    -- Check if the item_id exists in the table
+    SELECT 
+        CASE
+            WHEN (SELECT COUNT(*) FROM item WHERE item_id = OLD.item_id) = 0 THEN
+                RAISE(ABORT, 'Item ID does not exist')
+        END;
+END;
+
+-- declares a trigger that checks if an item_id exists before adding to update log
+CREATE TRIGGER before_update_log
+BEFORE INSERT ON updates
+FOR EACH ROW
+WHEN (SELECT COUNT(*) FROM item WHERE item_id = NEW.item_id) = 0
+BEGIN
+    SELECT RAISE(ABORT, 'Item ID does not exist');
+END;
+
+-- Prevents update if staff_id does not exist
+CREATE TRIGGER before_update_staff
+BEFORE INSERT ON updates
+FOR EACH ROW
+WHEN (SELECT COUNT(*) FROM staff WHERE staff_id = NEW.staff_id) = 0
+BEGIN
+    SELECT RAISE(ABORT, 'Invalid staff ID');
+END;

@@ -12,6 +12,10 @@ DROP TRIGGER IF EXISTS before_restock_staff;
 DROP TRIGGER IF EXISTS before_restock_item;
 DROP TRIGGER IF EXISTS after_restock;
 
+DROP TRIGGER IF EXISTS before_update_item;
+DROP TRIGGER IF EXISTS before_update_log;
+DROP TRIGGER IF EXISTS before_update_staff;
+
 -- drops all tables
 DROP TABLE IF EXISTS buys;
 DROP TABLE IF EXISTS updates;
