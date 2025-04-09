@@ -2,6 +2,7 @@ import sqlite3
 import re
 from datetime import datetime
 import time
+from random import randint
 
 INVENTORY = "inventory.db"
 CREATE_SCRIPT = "create_all.sql"
@@ -414,6 +415,41 @@ def showInventory():
 
     # inventory is in dictionary format
     return inventory
+
+def showHistory():
+    # declares and initializes variables
+    transactions = []
+
+    # establishes a connection with the sql database
+    conn = sqlite3.connect(INVENTORY)
+
+    # gets the sql cursor
+    cursor = conn.cursor()
+
+    #tables = ["buys", "restock", "updates"]
+    tables = {"buys": "BUY", "restock": "RESTOCK", "updates": "UPDATE"}
+
+    for table in tables:
+    # gets all buy transactions
+        cursor.execute(f"SELECT * FROM {table}")
+        rows = cursor.fetchall()
+
+        for row in rows:
+            transaction = {
+                'Transaction Type': tables[table],
+                'Person ID': row[0],
+                'Item ID': row[1],
+                'Datetime': row[2]
+            }
+
+            if table == "buys" or table == "restock":
+                transaction["Quantity"] = row[3]
+            transactions.append(transaction)
+
+    cursor.close()
+    conn.close()
+
+    return transactions
     
 def addNewStudent(student_id, student_first_name, student_last_name):
 
@@ -503,11 +539,47 @@ if __name__ == "__main__":
     print("AFTER TESTING ADD NEW ITEMS")
     displayAllTables()
 
-    print("INVENTORY")
-    inventory = showInventory()
+    print("TESTING SHOW HISTORY")
+    addNewStaff("AB12345", "Your", "Mom")
+    addNewStudent("GB70937", "Gia", "Santos")
 
-    for item in inventory:
-        print(item, inventory[item])
+    print(updateItem("AB12345", "1111111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "almond milk", 6.0, 5, 5, "a carton of almond milk", 3, ["walmart", "target", "h mart"], ["dairy", "white"]))
+    time.sleep(randint(1,5))
+    print(restockItem("AB12345", "1111111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 20))
+    time.sleep(randint(1,5))
+    print(buyItem("GB70937", "1111111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 1))
+    time.sleep(randint(1,5))
+    print(updateItem("AB12345", "2222222222", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "tangerine", 1.5, 20, 10, "a tangerine", 20, ["walmart", "aldis"], ["fruit"]))
+    time.sleep(randint(1,5))
+    print(updateItem("AB12345", "3333333333", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "cherry", 0.5, 20, 0.5, "a cherry", 10, ["walmart"], ["fruit", "red"]))
+    time.sleep(randint(1,5))
+    print(buyItem("GB70937", "2222222222", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 5))
+    time.sleep(randint(1,5))
+    print(updateItem("AB12345", '4444444444', datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 'banana', 1.0, 50, 10.0, 'a banana', 10, ['h mart', 'lotte mart'], ["yellow", "tropical"]))
+    time.sleep(randint(1,5))
+    print(updateItem("AB12345", "1111111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "almond milk", 6.0, 5, 5, "a carton of almond milk", 3, ["aldis", "giant"], ["dairy", "white"]))
+    time.sleep(randint(1,5))
+    print(restockItem("AB12345", "2222222222", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 20))
+    time.sleep(randint(1,5))
+    print(updateItem("AB12345", "1111111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "almond milk", 6.0, 5, 5, "a carton of almond milk", 3, ["aldis", "giant"], ["cow"]))
+    time.sleep(randint(1,5))
+    print(restockItem("AB12345", "3333333333", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 20))
+    time.sleep(randint(1,5))
+    print(updateItem("AB12345", "1111111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "almond milk", 6.0, 5, 5, "a carton of almond milk", 3))
+    time.sleep(randint(1,5))
+    print(buyItem("GB70937", "3333333333", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 10))
+
+    print("HISTORY")
+    transactions = showHistory()
+    for transaction in transactions:
+        print(transaction)
+
+    # print("INVENTORY")
+    # inventory = showInventory()
+
+    # for item in inventory:
+    #     print(item, inventory[item])
+    
 
     # print("TESTING UPDATE ITMES")
     # addNewStaff("AB12345", "Your", "Mom")
@@ -667,6 +739,8 @@ if __name__ == "__main__":
     # print("AFTER TESTING REMOVE ITEMS")
 
     #displayAllTables()
+
+    
 
 
 
