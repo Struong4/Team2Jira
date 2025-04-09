@@ -11,23 +11,27 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from item_class import Item
 
+import RetrieverEssentials_rc
 
-class Ui_Dialog(object):
-    def setupUi(self, Dialog):
-        Dialog.setObjectName("Dialog")
-        Dialog.resize(523, 375)
-        self.horizontalLayout = QtWidgets.QHBoxLayout(Dialog)
+
+class Ui_StaffAddObj(object):
+    def setupUi(self, MainWindow):
+        MainWindow.setObjectName("MainWindow")
+        MainWindow.resize(457, 258)
+        self.centralwidget = QtWidgets.QWidget(MainWindow)
+        self.centralwidget.setObjectName("centralwidget")
+        self.horizontalLayout = QtWidgets.QHBoxLayout(self.centralwidget)
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.formLayout = QtWidgets.QFormLayout()
         self.formLayout.setLabelAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.formLayout.setObjectName("formLayout")
-        self.scrollArea = QtWidgets.QScrollArea(Dialog)
+        self.scrollArea = QtWidgets.QScrollArea(self.centralwidget)
         self.scrollArea.setFrameShape(QtWidgets.QFrame.Panel)
         self.scrollArea.setFrameShadow(QtWidgets.QFrame.Plain)
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, -71, 339, 695))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 339, 695))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
@@ -36,7 +40,7 @@ class Ui_Dialog(object):
         self.productNameLabel = QtWidgets.QLabel(self.scrollAreaWidgetContents)
         self.productNameLabel.setObjectName("productNameLabel")
         self.verticalLayout_2.addWidget(self.productNameLabel)
-        self.productNameText = QtWidgets.QTextEdit(self.scrollAreaWidgetContents)
+        self.productNameText = QtWidgets.QLineEdit(self.scrollAreaWidgetContents)
         self.productNameText.setObjectName("productNameText")
         self.verticalLayout_2.addWidget(self.productNameText)
         spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
@@ -44,7 +48,7 @@ class Ui_Dialog(object):
         self.itemIDLabel = QtWidgets.QLabel(self.scrollAreaWidgetContents)
         self.itemIDLabel.setObjectName("itemIDLabel")
         self.verticalLayout_2.addWidget(self.itemIDLabel)
-        self.itemIDText = QtWidgets.QTextEdit(self.scrollAreaWidgetContents)
+        self.itemIDText = QtWidgets.QLineEdit(self.scrollAreaWidgetContents)
         self.itemIDText.setObjectName("itemIDText")
         self.verticalLayout_2.addWidget(self.itemIDText)
         self.gridLayout = QtWidgets.QGridLayout()
@@ -96,13 +100,13 @@ class Ui_Dialog(object):
         self.priceLabel = QtWidgets.QLabel(self.scrollAreaWidgetContents)
         self.priceLabel.setObjectName("priceLabel")
         self.verticalLayout_2.addWidget(self.priceLabel)
-        self.priceText = QtWidgets.QTextEdit(self.scrollAreaWidgetContents)
+        self.priceText = QtWidgets.QLineEdit(self.scrollAreaWidgetContents)
         self.priceText.setObjectName("priceText")
         self.verticalLayout_2.addWidget(self.priceText)
         self.weightLabel = QtWidgets.QLabel(self.scrollAreaWidgetContents)
         self.weightLabel.setObjectName("weightLabel")
         self.verticalLayout_2.addWidget(self.weightLabel)
-        self.weightText = QtWidgets.QTextEdit(self.scrollAreaWidgetContents)
+        self.weightText = QtWidgets.QLineEdit(self.scrollAreaWidgetContents)
         self.weightText.setObjectName("weightText")
         self.verticalLayout_2.addWidget(self.weightText)
         self.descriptionLabel = QtWidgets.QLabel(self.scrollAreaWidgetContents)
@@ -130,13 +134,13 @@ class Ui_Dialog(object):
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
         spacerItem7 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_2.addItem(spacerItem7)
-        self.confirmButton = QtWidgets.QPushButton(Dialog)
+        self.confirmButton = QtWidgets.QPushButton(self.centralwidget)
         self.confirmButton.setStyleSheet("background-color: rgb(0, 170, 0);\n"
 "color: rgb(255, 255, 255);\n"
 "font: 75 10pt \"MS Shell Dlg 2\";")
         self.confirmButton.setObjectName("confirmButton")
         self.horizontalLayout_2.addWidget(self.confirmButton)
-        self.cancelButton = QtWidgets.QPushButton(Dialog)
+        self.cancelButton = QtWidgets.QPushButton(self.centralwidget)
         self.cancelButton.setStyleSheet("background-color: rgb(255, 0, 0);\n"
 "color: rgb(255, 255, 255);\n"
 "font: 75 10pt \"MS Shell Dlg 2\";")
@@ -145,7 +149,7 @@ class Ui_Dialog(object):
         self.formLayout.setLayout(2, QtWidgets.QFormLayout.FieldRole, self.horizontalLayout_2)
         self.verticalLayout_6 = QtWidgets.QVBoxLayout()
         self.verticalLayout_6.setObjectName("verticalLayout_6")
-        self.label = QtWidgets.QLabel(Dialog)
+        self.label = QtWidgets.QLabel(self.centralwidget)
         self.label.setMinimumSize(QtCore.QSize(0, 0))
         self.label.setMaximumSize(QtCore.QSize(50, 50))
         self.label.setText("")
@@ -157,13 +161,19 @@ class Ui_Dialog(object):
         self.verticalLayout = QtWidgets.QVBoxLayout()
         self.verticalLayout.setContentsMargins(10, 10, 10, -1)
         self.verticalLayout.setObjectName("verticalLayout")
-        self.imageUpload = QtWidgets.QLabel(Dialog)
-        self.imageUpload.setMinimumSize(QtCore.QSize(150, 150))
+        self.imageUpload = QtWidgets.QLabel(self.centralwidget)
+        self.imageUpload.setMinimumSize(QtCore.QSize(100, 100))
         self.imageUpload.setMaximumSize(QtCore.QSize(16777215, 150))
         self.imageUpload.setStyleSheet("border-color: rgb(0, 0, 0);")
         self.imageUpload.setFrameShape(QtWidgets.QFrame.Panel)
+        self.imageUpload.setText("")
         self.imageUpload.setTextFormat(QtCore.Qt.PlainText)
+
+        self.imageUpload.setPixmap(QtGui.QPixmap(":/my_resources/Logos/Upload Image.png"))
+        self.imageUpload.setScaledContents(False)
         self.imageUpload.setAlignment(QtCore.Qt.AlignCenter)
+        self.imageUpload.setWordWrap(False)
+
         self.imageUpload.setObjectName("imageUpload")
         self.verticalLayout.addWidget(self.imageUpload)
         spacerItem8 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
@@ -174,49 +184,89 @@ class Ui_Dialog(object):
         spacerItem10 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.formLayout.setItem(2, QtWidgets.QFormLayout.LabelRole, spacerItem10)
         self.horizontalLayout.addLayout(self.formLayout)
+        MainWindow.setCentralWidget(self.centralwidget)
 
-        self.retranslateUi(Dialog)
-        QtCore.QMetaObject.connectSlotsByName(Dialog)
-       # self.confirmButton.clicked.connect(self.save_item) #saves item inputs when confirm is clicked
-        
+        self.retranslateUi(MainWindow)
+        QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
-    def retranslateUi(self, Dialog):
+
+    def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
-        self.productNameLabel.setText(_translate("Dialog", "Product Name"))
-        self.itemIDLabel.setText(_translate("Dialog", "Item ID"))
-        self.catCheckBox3.setText(_translate("Dialog", "Cat 3"))
-        self.originCheckBox2.setText(_translate("Dialog", "MD Food Bank"))
-        self.catCheckBox2.setText(_translate("Dialog", "Cat2"))
-        self.originLabel.setText(_translate("Dialog", "Origin:"))
-        self.catCheckBox4.setText(_translate("Dialog", "Cat4"))
-        self.categoryLabel.setText(_translate("Dialog", "Category:"))
-        self.catCheckBox1.setText(_translate("Dialog", "Cat 1"))
-        self.originCheckBox1.setText(_translate("Dialog", "Patel Brothers"))
-        self.originCheckBox3.setText(_translate("Dialog", "Origin1"))
-        self.originCheckBox4.setText(_translate("Dialog", "Origin 2"))
-        self.priceLabel.setText(_translate("Dialog", "Price"))
-        self.weightLabel.setText(_translate("Dialog", "Weight"))
-        self.descriptionLabel.setText(_translate("Dialog", "Description"))
-        self.availableQuantityLabel.setText(_translate("Dialog", "Available Quantity"))
-        self.limitLabel.setText(_translate("Dialog", "Quantity Limit"))
-        self.confirmButton.setText(_translate("Dialog", "Confirm"))
-        self.cancelButton.setText(_translate("Dialog", "Cancel"))
-        self.imageUpload.setText(_translate("Dialog", "Upload Image"))
+
+        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        self.productNameLabel.setText(_translate("MainWindow", "Product Name"))
+        self.itemIDLabel.setText(_translate("MainWindow", "Item ID"))
+        self.catCheckBox3.setText(_translate("MainWindow", "Cat 3"))
+        self.originCheckBox2.setText(_translate("MainWindow", "MD Food Bank"))
+        self.catCheckBox2.setText(_translate("MainWindow", "Cat2"))
+        self.originLabel.setText(_translate("MainWindow", "Origin:"))
+        self.catCheckBox4.setText(_translate("MainWindow", "Cat4"))
+        self.categoryLabel.setText(_translate("MainWindow", "Category:"))
+        self.catCheckBox1.setText(_translate("MainWindow", "Cat 1"))
+        self.originCheckBox1.setText(_translate("MainWindow", "Patel Brothers"))
+        self.originCheckBox3.setText(_translate("MainWindow", "Origin1"))
+        self.originCheckBox4.setText(_translate("MainWindow", "Origin 2"))
+        self.priceLabel.setText(_translate("MainWindow", "Price"))
+        self.weightLabel.setText(_translate("MainWindow", "Weight"))
+        self.descriptionLabel.setText(_translate("MainWindow", "Description"))
+        self.availableQuantityLabel.setText(_translate("MainWindow", "Available Quantity"))
+        self.limitLabel.setText(_translate("MainWindow", "Quantity Limit"))
+        self.confirmButton.setText(_translate("MainWindow", "Confirm"))
+        self.cancelButton.setText(_translate("MainWindow", "Cancel"))
         self.confirmButton.clicked.connect(self.save_item) #saves item inputs when confirm is clicked
 
-#import RetrieverEssentials_rc
+    def dragEnterEvent(self, event):
+        """
+        This event is triggered when a drag enters the widget.
+        Check if the dragged data contains URLs (for image files).
+        """
+        if event.mimeData().hasUrls():
+            event.acceptProposedAction()
+            
+    def dropEvent(self, event: QtGui.QDropEvent):
+        """
+        This event is triggered when a drop occurs.
+        The dropped image is displayed using QLabel.
+        """
+        # Get the list of URLs from the MIME data
+        urls = event.mimeData().urls()
+        if urls:
+            # Get the first image path and load it as a QPixmap
+            file_path = urls[0].toLocalFile()
+            pixmap = QtGui.QPixmap(file_path)
+            if not pixmap.isNull():
+                # Display the image in the QLabel
+                self.imageUpload.setPixmap(pixmap.scaled(self.imageUpload.size(), aspectRatioMode=1))
+                self.imageUpload.setText("")  # Clear the text when an image is dropped
+                print(file_path)
+            else:
+                self.imageUpload.setText("Failed to load image!")
+                
+    def selectImage(self, event):
+        """
+        This method is triggered when the user clicks on the image label.
+        It opens a file dialog to select an image.
+        """
+        file_path, _ = QtWidgets.QFileDialog.getOpenFileName(None, "Select Image", "", "Images (*.png *.xpm *.jpg *.jpeg)")
+        if file_path:
+            pixmap = QtGui.QPixmap(file_path)
+            if not pixmap.isNull():
+                # Display the image in the QLabel
+                self.imageUpload.setPixmap(pixmap.scaled(self.imageUpload.size(), aspectRatioMode=1))
+                self.imageUpload.setText("")  # Clear the text when an image is loaded
+            else:
+                self.imageUpload.setText("Failed to load image!")
 
     def save_item(self):
         #called on confirm button clicked
         print(f"Item save triggered\n")
         
         #convert ui input to variables, create new Item instance with variables
-        item_id = self.itemIDText.toPlainText().strip()
-        name = self.productNameText.toPlainText()
-        price = self.priceText.toPlainText()
+        item_id = self.itemIDText.text()
+        name = self.productNameText.text()
+        price = self.priceText.text()
         quantity = self.availableQuantitySpinBox.value()
-        weight = self.weightText.toPlainText()
+        weight = self.weightText.text()
         description = self.descriptionText.toPlainText()
         quantity_limit = self.limitSpinBox.value()
  
@@ -257,11 +307,12 @@ class Ui_Dialog(object):
         new_item = Item(item_id, name, price, quantity, weight, description, origins, categories, quantity_limit)
 
 
+
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
-    Dialog = QtWidgets.QDialog()
-    ui = Ui_Dialog()
-    ui.setupUi(Dialog)
-    Dialog.show()
+    MainWindow = QtWidgets.QMainWindow()
+    ui = Ui_StaffAddObj()
+    ui.setupUi(MainWindow)
+    MainWindow.show()
     sys.exit(app.exec_())

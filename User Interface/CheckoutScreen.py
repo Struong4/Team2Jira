@@ -10,8 +10,10 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+from CustomObj import CustomObjInCart
+import RetrieverEssentials_rc
 
-class Ui_MainWindow(object):
+class Ui_CheckoutWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(509, 308)
@@ -36,6 +38,9 @@ class Ui_MainWindow(object):
         self.horizontalLayout.addWidget(self.label)
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem)
+        self.goBackButton = QtWidgets.QPushButton(self.centralwidget)
+        self.goBackButton.setObjectName("goBackButton")
+        self.horizontalLayout.addWidget(self.goBackButton)
         self.verticalLayout_2.addLayout(self.horizontalLayout)
         self.horizontalLayout_7 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_7.setObjectName("horizontalLayout_7")
@@ -48,10 +53,10 @@ class Ui_MainWindow(object):
         self.verticalLayout = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents)
         self.verticalLayout.setObjectName("verticalLayout")
         
-        # For Testing purposes only
+        # For Testing purposes
         self.addCustomItemToCheckout(":/my_resources/Logos/Retriever Essential.png", "Item 1", "5000g")
         self.addCustomItemToCheckout(":/my_resources/Logos/Retriever Essential.png", "Item 2", "100g")
-        self.addCustomItemToCheckout(":/my_resources/Logos/Retriever Essential.png", "Item 3", "400g")
+        #self.addCustomItemToCheckout(":/my_resources/Logos/Retriever Essential.png", "Item 3", "400g")
         
         """
         Make a loop through the current cart database
@@ -92,17 +97,17 @@ class Ui_MainWindow(object):
         spacerItem4 = QtWidgets.QSpacerItem(140, 20, QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Minimum)
         self.formLayout_2.setItem(1, QtWidgets.QFormLayout.FieldRole, spacerItem4)
         self.verticalLayout_6.addLayout(self.formLayout_2)
-        self.pushButton_4 = QtWidgets.QPushButton(self.frame)
+        self.checkoutButton = QtWidgets.QPushButton(self.frame)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.pushButton_4.sizePolicy().hasHeightForWidth())
-        self.pushButton_4.setSizePolicy(sizePolicy)
-        self.pushButton_4.setMinimumSize(QtCore.QSize(150, 23))
-        self.pushButton_4.setStyleSheet("background-color: rgb(255, 255, 255);\n"
+        sizePolicy.setHeightForWidth(self.checkoutButton.sizePolicy().hasHeightForWidth())
+        self.checkoutButton.setSizePolicy(sizePolicy)
+        self.checkoutButton.setMinimumSize(QtCore.QSize(150, 23))
+        self.checkoutButton.setStyleSheet("background-color: rgb(255, 255, 255);\n"
 "border-color: rgb(0, 0, 0);")
-        self.pushButton_4.setObjectName("pushButton_4")
-        self.verticalLayout_6.addWidget(self.pushButton_4)
+        self.checkoutButton.setObjectName("checkoutButton")
+        self.verticalLayout_6.addWidget(self.checkoutButton)
         self.verticalLayout_5.addWidget(self.frame)
         spacerItem5 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout_5.addItem(spacerItem5)
@@ -119,9 +124,10 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))        
+        self.goBackButton.setText(_translate("MainWindow", "Continue Shopping"))
         self.label_7.setText(_translate("MainWindow", "Total Count:"))
         self.label_8.setText(_translate("MainWindow", "#")) # "#" will later be replaced with the the number of items in the cart
-        self.pushButton_4.setText(_translate("MainWindow", "Checkout"))
+        self.checkoutButton.setText(_translate("MainWindow", "Checkout"))
         
     def addCustomItemToCheckout(self, image_location, name, weight):
         self.cart_item = CustomObjInCart() # create custom item
@@ -131,15 +137,13 @@ class Ui_MainWindow(object):
         self.verticalLayout.addWidget(self.cart_item) # add item to the layout
         self.cart_item.setFixedSize(400,87) # for visability
         
-from CustomObj import CustomObjInCart
-import RetrieverEssentials_rc
 
 
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
+    ui = Ui_CheckoutWindow()
     ui.setupUi(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())
