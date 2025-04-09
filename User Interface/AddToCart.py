@@ -1,7 +1,9 @@
 import sys
-import sqlite3
+from datetime import datetime
 from PyQt5 import QtWidgets, QtCore
+import crud
 from StudentInventoryView_1_0 import Ui_MainWindow
+
 
 class ShoppingCart:
     def __init__(self, student_id):
@@ -19,7 +21,7 @@ class ShoppingCart:
             self.items[item_id] += quantity
         else:
             self.items[item_id] = quantity
-        print(f"Added {quantity} of item '{item_id}' to cart for student '{self.student_id}'.")
+        print(f"Added {quantity} of '{item_id}' to cart for student '{self.student_id}'.")
 
     def remove_item(self, item_id, quantity=1):
         """
@@ -29,7 +31,7 @@ class ShoppingCart:
             self.items[item_id] -= quantity
             if self.items[item_id] <= 0:
                 del self.items[item_id]
-            print(f"Removed {quantity} of item '{item_id}' from cart for student '{self.student_id}'.")
+            print(f"Removed {quantity} of '{item_id}' from cart for student '{self.student_id}'.")
         else:
             print(f"Item '{item_id}' not found in cart for student '{self.student_id}'.")
 
@@ -41,18 +43,30 @@ class ShoppingCart:
 
     def checkout(self):
         """
-        Process checkout.
-        Here you might loop through self.items and use functions from crud.py
-        to update the inventory and record the purchase.
-        After processing, clear the cart.
+        Process checkout:
+          - Loop through the items stored in the cart.
+          - For each item, call crud.buyItem (from crud.py) to update inventory
+            and record the purchase (using the current datetime).
+          - Clear the cart after processing.
         """
         print("Proceeding to checkout with the following items:")
         for item_id, quantity in self.items.items():
-            print(f"  Item: {item_id}, Quantity: {quantity}")
+
+            now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+            result = crud.buyItem(self.student_id, item_id, now_str, quantity)
+            if "✅" in result:
+                print(f"Processed purchase for '{item_id}' (qty: {quantity}).")
+            else:
+                print(f"Failed to process purchase for '{item_id}': {result}")
+
         self.items.clear()
         print("Checkout complete. Cart is now empty.")
 
 
+# -------------------------------
+# UI Integration Controller
+# -------------------------------
 class StudentInventoryController(QtWidgets.QMainWindow):
     def __init__(self, student_id):
         super().__init__()
@@ -72,20 +86,21 @@ class StudentInventoryController(QtWidgets.QMainWindow):
 
     def eventFilter(self, obj, event):
         """
-        When a student clicks on an inventory item frame, add the item to the cart.
+        When a student clicks on an inventory item frame, add it to the cart.
+        Here we assume that the frame's objectName (e.g., "objFrame3") maps to an item id ("item3").
         """
         if event.type() == QtCore.QEvent.MouseButtonRelease:
             frame_name = obj.objectName()
             item_id = "item" + frame_name.replace("objFrame", "")
-            print(f"{frame_name} clicked. Adding item '{item_id}' to cart.")
+            print(f"{frame_name} clicked. Adding '{item_id}' to cart.")
             self.cart.add_item(item_id, quantity=1)
             self.update_cart_ui()
-            return True
+            return True  # Mark event as handled.
         return super().eventFilter(obj, event)
 
     def update_cart_ui(self):
         """
-        Update the UI (for example, in the status bar) to show current cart contents.
+        Update the UI status bar (or other widget) to reflect the current cart contents.
         """
         cart_contents = self.cart.get_cart_items()
         cart_text = "Cart: " + ", ".join([f"{k} ({v})" for k, v in cart_contents.items()])
@@ -98,11 +113,12 @@ class StudentInventoryController(QtWidgets.QMainWindow):
         self.cart.checkout()
         self.update_cart_ui()
 
+
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    # test
-    student_id = "student001"
-    controller = StudentInventoryController(student_id)
+
+    test_student_id = "student001"
+    controller = StudentInventoryController(test_student_id)
     controller.show()
 
     sys.exit(app.exec_())
