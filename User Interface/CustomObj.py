@@ -14,10 +14,9 @@ import RetrieverEssentials_rc
 
 
 class CustomObjInCart(QtWidgets.QWidget):
-    deletePressed = QtCore.pyqtSignal(object)
-    
     def __init__(self, parent=None):
         super().__init__(parent)
+        
         self.setupUI()
         
     def setupUI(self):
@@ -56,11 +55,11 @@ class CustomObjInCart(QtWidgets.QWidget):
         self.spinBox_6.setObjectName("spinBox_6")
         self.horizontalLayout_14.addWidget(self.spinBox_6)
         
-        self.deleteButton = QtWidgets.QPushButton(self.objFrame1_1)
-        self.deleteButton.setMinimumSize(QtCore.QSize(46, 0))
-        self.deleteButton.setMaximumSize(QtCore.QSize(75, 16777215))
-        self.deleteButton.setObjectName("deleteButton")
-        self.horizontalLayout_14.addWidget(self.deleteButton)
+        self.pushButton_7 = QtWidgets.QPushButton(self.objFrame1_1)
+        self.pushButton_7.setMinimumSize(QtCore.QSize(46, 0))
+        self.pushButton_7.setMaximumSize(QtCore.QSize(75, 16777215))
+        self.pushButton_7.setObjectName("pushButton_7")
+        self.horizontalLayout_14.addWidget(self.pushButton_7)
         
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_14.addItem(spacerItem)
@@ -69,8 +68,6 @@ class CustomObjInCart(QtWidgets.QWidget):
         
         self.horizontalLayout_13.addLayout(self.verticalLayout_9)
         
-        self.deleteButton.clicked.connect(self.emiteDeleteSignal)
-        
         self.retranslateUi()
 
     def retranslateUi(self):
@@ -78,7 +75,7 @@ class CustomObjInCart(QtWidgets.QWidget):
         self.setWindowTitle(_translate("Form", "Custom Object in Cart"))
         self.label_13.setText(_translate("Form", "Object Image"))
         self.label_14.setText(_translate("Form", "Object Name - Weight"))
-        self.deleteButton.setText(_translate("Form", "Delete"))
+        self.pushButton_7.setText(_translate("Form", "Delete"))
         
     def set_image(self, image_path):
         pixmap = QtGui.QPixmap(image_path)
@@ -89,9 +86,6 @@ class CustomObjInCart(QtWidgets.QWidget):
         
     def set_weight(self,weight):
         self.label_14.setText(f"{self.label_14.text()} - {weight}")
-        
-    def emiteDeleteSignal(self):
-        self.deletePressed.emit(self)
 
 class StudentInventoryView(QtWidgets.QWidget):
     def __init__(self, parent=None):

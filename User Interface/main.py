@@ -4,7 +4,7 @@ from LoginPage import Ui_Login
 from StudentInventoryView import Ui_StudentInventoryWindow
 from StaffInventoryView import Ui_StaffInventoryWindow
 from AddInventoryObj import Ui_StaffAddObj
-#from item_class import Item
+from item_class import Item
 
 class LoginScreen(QtWidgets.QMainWindow):
     def __init__(self):
