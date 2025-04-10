@@ -1,9 +1,10 @@
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtWidgets
 from CheckoutScreen import Ui_CheckoutWindow
 from LoginPage import Ui_Login
 from StudentInventoryView import Ui_StudentInventoryWindow
 from StaffInventoryView import Ui_StaffInventoryWindow
 from AddInventoryObj import Ui_StaffAddObj
+from AddToCart import AddToCartController  # Import the controller we just defined
 
 class LoginScreen(QtWidgets.QMainWindow):
     def __init__(self):
@@ -19,14 +20,12 @@ class LoginScreen(QtWidgets.QMainWindow):
     def studentAcceptLogin(self):
         username = self.ui.studentULineEdit.text()
         password = self.ui.studentPLineEdit.text()
-        
-        # Dummy Login
+        # Dummy login check
         if(username == "Group2") and (password == "1234"):
             self.studentInventory = OpenStudentInventory()
             self.studentInventory.setGeometry(self.geometry())
             self.studentInventory.show()
             self.close()
-            
         else:
             print("Incorrect Password")
         
@@ -38,14 +37,11 @@ class LoginScreen(QtWidgets.QMainWindow):
     def staffAcceptLogin(self):
         username = self.ui.staffULineEdit.text()
         password = self.ui.staffPLineEdit.text()
-        print(f"Username: {username}, Password: {password}")
-        
         if(username == "Staff2") and (password == "123123"):
             self.staffInventory = OpenStaffInventory()
             self.staffInventory.setGeometry(self.geometry())
             self.staffInventory.show()
             self.close()
-            
         else:
             print("Incorrect Password")
         
@@ -59,13 +55,17 @@ class OpenStudentInventory(QtWidgets.QMainWindow):
         super().__init__()
         self.ui = Ui_StudentInventoryWindow()
         self.ui.setupUi(self)
-        # open the checkout window when cart button is clicked
-        # will close current window
         self.ui.GoToCartButton.clicked.connect(self.openCheckoutScreen)
         self.ui.logOutButton.clicked.connect(self.logOut)
+        # Create an instance of the add-to-cart controller for this inventory window
+        # (Assume "student001" as the current student ID, adjust as needed)
+        self.addCartController = AddToCartController(self.ui, "student001", None)
     
     def openCheckoutScreen(self):
         self.checkoutWindow = CheckoutWindow(self)
+        # Pass the checkout window reference to the add-to-cart controller so it can update its UI
+        self.addCartController.checkoutWindow = self.checkoutWindow
+        self.addCartController.updateCheckoutWindow()
         self.checkoutWindow.setGeometry(self.geometry())
         self.checkoutWindow.show()
         self.hide()
@@ -75,14 +75,25 @@ class OpenStudentInventory(QtWidgets.QMainWindow):
         self.logInScreen.setGeometry(self.geometry())
         self.logInScreen.show()
         self.hide()
+
+class CheckoutWindow(QtWidgets.QMainWindow):
+    def __init__(self, main_window):
+        super().__init__()
+        self.ui = Ui_CheckoutWindow()
+        self.ui.setupUi(self)
+        self.studentInventory = main_window
+        self.ui.goBackButton.clicked.connect(self.goBack)
         
+    def goBack(self):
+        self.studentInventory.setGeometry(self.geometry())
+        self.studentInventory.show()
+        self.close()
+
 class OpenStaffInventory(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         self.ui = Ui_StaffInventoryWindow()
         self.ui.setupUi(self)
-        # open the checkout window when cart button is clicked
-        # will close current window
         self.ui.addObjButton.clicked.connect(self.openNewItemScreen)
         self.ui.logOutButton.clicked.connect(self.logOut)
             
@@ -98,19 +109,10 @@ class OpenStaffInventory(QtWidgets.QMainWindow):
         self.logInScreen.show()
         self.hide()
         
-class CheckoutWindow(QtWidgets.QMainWindow):
-    def __init__(self, main_window):
-        super().__init__()
-        self.ui = Ui_CheckoutWindow()
-        self.ui.setupUi(self)
-        self.studentInventory = main_window
-        self.ui.goBackButton.clicked.connect(self.goBack)
-        
-    def goBack(self):
-        self.studentInventory.setGeometry(self.geometry())
-        self.studentInventory.show()
-        self.close()
-        
+class CheckoutWindowStaff(QtWidgets.QMainWindow):
+    # If needed, create a checkout window for staff
+    pass
+
 class OpenAddObjWindow(QtWidgets.QMainWindow):
     def __init__(self, main_window):
         super().__init__()
@@ -123,7 +125,6 @@ class OpenAddObjWindow(QtWidgets.QMainWindow):
         self.staffInventory.setGeometry(self.geometry())
         self.staffInventory.show()
         self.close()
-        
         
 if __name__ == "__main__":
     import sys
