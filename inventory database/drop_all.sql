@@ -1,6 +1,16 @@
-USE Inventory;
+-- USE Inventory;
 
-SET SQL_SAFE_UPDATES = 0;
+-- SET SQL_SAFE_UPDATES = 0;
+
+-- drops all triggers
+DROP TRIGGER IF EXISTS before_buy_stock;
+DROP TRIGGER IF EXISTS before_buy_student;
+DROP TRIGGER IF EXISTS before_buy_item;
+DROP TRIGGER IF EXISTS after_buy;
+
+DROP TRIGGER IF EXISTS before_restock_staff;
+DROP TRIGGER IF EXISTS before_restock_item;
+DROP TRIGGER IF EXISTS after_restock;
 
 -- drops all tables
 DROP TABLE IF EXISTS buys;
