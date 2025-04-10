@@ -54,8 +54,8 @@ class Ui_CheckoutWindow(object):
         self.verticalLayout.setObjectName("verticalLayout")
         
         # For Testing purposes
-        self.addCustomItemToCheckout(":/my_resources/Logos/Retriever Essential.png", "Item 1", "5000g")
-        self.addCustomItemToCheckout(":/my_resources/Logos/Retriever Essential.png", "Item 2", "100g")
+        #self.addCustomItemToCheckout(":/my_resources/Logos/Retriever Essential.png", "Item 1", "5000g")
+        #self.addCustomItemToCheckout(":/my_resources/Logos/Retriever Essential.png", "Item 2", "100g")
         #self.addCustomItemToCheckout(":/my_resources/Logos/Retriever Essential.png", "Item 3", "400g")
         
         """
@@ -63,6 +63,17 @@ class Ui_CheckoutWindow(object):
         Use the function addCustomItemToCheckout to display all the items in the cart
         Use the format of image_location(URL), item's name, item's weight
         """
+        
+        for i in range(5):
+            item = CustomObjInCart()
+            item.set_object_name(f"Item {i+1}")
+            item.set_weight(f"{(i+1)*10}")
+            item.set_image(":/my_resources/Logos/Retriever Essential.png")
+            item.setFixedSize(400,87) # for visability
+            
+            self.verticalLayout.addWidget(item)
+            item.deletePressed.connect(lambda widget=item: self.removeItem(widget))
+            
 
         spacerItem2 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout.addItem(spacerItem2)
@@ -117,7 +128,7 @@ class Ui_CheckoutWindow(object):
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
-
+        
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
@@ -134,10 +145,14 @@ class Ui_CheckoutWindow(object):
         self.cart_item.set_image(image_location)  # Set an image for the object
         self.cart_item.set_object_name(name)  # Set the object name
         self.cart_item.set_weight(weight)  # Set the weight
-        self.verticalLayout.addWidget(self.cart_item) # add item to the layout
         self.cart_item.setFixedSize(400,87) # for visability
         
-
+    def removeItem(self,widget):
+        layout = widget.parentWidget().layout()
+        if layout:
+            layout.removeWidget(widget)
+        widget.setParent(None)
+        widget.deleteLater()
 
 if __name__ == "__main__":
     import sys

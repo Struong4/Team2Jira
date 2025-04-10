@@ -9,7 +9,6 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from item_class import Item
 
 import RetrieverEssentials_rc
 
@@ -168,14 +167,19 @@ class Ui_StaffAddObj(object):
         self.imageUpload.setFrameShape(QtWidgets.QFrame.Panel)
         self.imageUpload.setText("")
         self.imageUpload.setTextFormat(QtCore.Qt.PlainText)
-
         self.imageUpload.setPixmap(QtGui.QPixmap(":/my_resources/Logos/Upload Image.png"))
         self.imageUpload.setScaledContents(False)
         self.imageUpload.setAlignment(QtCore.Qt.AlignCenter)
         self.imageUpload.setWordWrap(False)
-
         self.imageUpload.setObjectName("imageUpload")
         self.verticalLayout.addWidget(self.imageUpload)
+        
+        # Add drag and drop feature for the imageUpload section
+        self.imageUpload.setAcceptDrops(True) #enable drop function for the label
+        self.imageUpload.dragEnterEvent = self.dragEnterEvent
+        self.imageUpload.dropEvent = self.dropEvent
+        self.imageUpload.mousePressEvent = self.selectImage
+        
         spacerItem8 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout.addItem(spacerItem8)
         spacerItem9 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
@@ -189,10 +193,8 @@ class Ui_StaffAddObj(object):
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
-
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.productNameLabel.setText(_translate("MainWindow", "Product Name"))
         self.itemIDLabel.setText(_translate("MainWindow", "Item ID"))
@@ -213,7 +215,6 @@ class Ui_StaffAddObj(object):
         self.limitLabel.setText(_translate("MainWindow", "Quantity Limit"))
         self.confirmButton.setText(_translate("MainWindow", "Confirm"))
         self.cancelButton.setText(_translate("MainWindow", "Cancel"))
-        self.confirmButton.clicked.connect(self.save_item) #saves item inputs when confirm is clicked
 
     def dragEnterEvent(self, event):
         """
@@ -256,57 +257,8 @@ class Ui_StaffAddObj(object):
                 self.imageUpload.setText("")  # Clear the text when an image is loaded
             else:
                 self.imageUpload.setText("Failed to load image!")
-
-    def save_item(self):
-        #called on confirm button clicked
-        print(f"Item save triggered\n")
         
-        #convert ui input to variables, create new Item instance with variables
-        item_id = self.itemIDText.text()
-        name = self.productNameText.text()
-        price = self.priceText.text()
-        quantity = self.availableQuantitySpinBox.value()
-        weight = self.weightText.text()
-        description = self.descriptionText.toPlainText()
-        quantity_limit = self.limitSpinBox.value()
- 
-        #validate the numerical inputs
-        try:
-            price = float(price)
-            quantity = int(quantity)
-            weight = float(weight)
-            quantity_limit = int(quantity_limit)
-        except ValueError:
-            print(f"Error: incorrect input format.\n")
-            return       
         
-        origins = []
-        categories = []
-
-        #add origins check box
-        if self.originCheckBox1.isChecked():
-            origins.append(self.originCheckBox1.text())
-        if self.originCheckBox2.isChecked():
-            origins.append(self.originCheckBox2.text())
-        if self.originCheckBox3.isChecked():
-            origins.append(self.originCheckBox3.text())
-        if self.originCheckBox4.isChecked():
-            origins.append(self.originCheckBox4.text()) 
-            
-        #add categories check box
-        if self.catCheckBox1.isChecked():
-            categories.append(self.catCheckBox1.text())
-        if self.catCheckBox2.isChecked():
-            categories.append(self.catCheckBox2.text())
-        if self.catCheckBox3.isChecked():
-            categories.append(self.catCheckBox3.text())
-        if self.catCheckBox4.isChecked():
-            categories.append(self.catCheckBox4.text()) 
-
-        #create item via item_class constructor
-        new_item = Item(item_id, name, price, quantity, weight, description, origins, categories, quantity_limit)
-
-
 
 if __name__ == "__main__":
     import sys
