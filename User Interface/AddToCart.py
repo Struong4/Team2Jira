@@ -1,124 +1,139 @@
-import sys
+﻿from PyQt5 import QtWidgets, QtCore
 from datetime import datetime
-from PyQt5 import QtWidgets, QtCore
 import crud
-from StudentInventoryView_1_0 import Ui_MainWindow
+from CustomObj import CustomObjInCart
 
-
+# ---------------------------------------
+# In-Memory Shopping Cart with Debugging
+# ---------------------------------------
 class ShoppingCart:
     def __init__(self, student_id):
-        """
-        Initialize the shopping cart for a specific student.
-        """
         self.student_id = student_id
         self.items = {}
+        print(f"[DEBUG] ShoppingCart created for student '{student_id}'.")
 
     def add_item(self, item_id, quantity=1):
-        """
-        Add an item to the cart.
-        """
+        print(f"[DEBUG] Attempting to add {quantity} of '{item_id}' to cart.")
         if item_id in self.items:
             self.items[item_id] += quantity
         else:
             self.items[item_id] = quantity
-        print(f"Added {quantity} of '{item_id}' to cart for student '{self.student_id}'.")
+        print(f"[DEBUG] Cart contents after adding: {self.items}")
 
     def remove_item(self, item_id, quantity=1):
-        """
-        Remove a specified quantity of an item from the cart.
-        """
+        print(f"[DEBUG] Attempting to remove {quantity} of '{item_id}' from cart.")
         if item_id in self.items:
             self.items[item_id] -= quantity
             if self.items[item_id] <= 0:
                 del self.items[item_id]
-            print(f"Removed {quantity} of '{item_id}' from cart for student '{self.student_id}'.")
+            print(f"[DEBUG] Cart contents after removal: {self.items}")
         else:
-            print(f"Item '{item_id}' not found in cart for student '{self.student_id}'.")
+            print(f"[DEBUG] Item '{item_id}' not found in cart.")
 
     def get_cart_items(self):
-        """
-        Return the current cart items.
-        """
         return self.items
 
     def checkout(self):
-        """
-        Process checkout:
-          - Loop through the items stored in the cart.
-          - For each item, call crud.buyItem (from crud.py) to update inventory
-            and record the purchase (using the current datetime).
-          - Clear the cart after processing.
-        """
-        print("Proceeding to checkout with the following items:")
+        print("[DEBUG] Starting checkout process...")
         for item_id, quantity in self.items.items():
-
             now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
+            print(f"[DEBUG] Processing item '{item_id}' (Quantity: {quantity}) at {now_str}")
             result = crud.buyItem(self.student_id, item_id, now_str, quantity)
             if "✅" in result:
-                print(f"Processed purchase for '{item_id}' (qty: {quantity}).")
+                print(f"[DEBUG] Processed purchase for '{item_id}' (qty: {quantity}).")
             else:
-                print(f"Failed to process purchase for '{item_id}': {result}")
-
+                print(f"[DEBUG] Failed to process purchase for '{item_id}': {result}")
         self.items.clear()
-        print("Checkout complete. Cart is now empty.")
+        print("[DEBUG] Checkout complete. Cart is now empty.")
 
 
-# -------------------------------
-# UI Integration Controller
-# -------------------------------
-class StudentInventoryController(QtWidgets.QMainWindow):
-    def __init__(self, student_id):
+# --------------------------------------------------------------
+# Controller: Integrate Add-to-Cart functionality into Inventory UI
+# --------------------------------------------------------------
+class AddToCartController(QtCore.QObject):
+    def __init__(self, inventoryUI, student_id, checkoutWindow=None):
+        """
+        :param inventoryUI: The UI instance from your StudentInventoryView.
+        :param student_id: The current student's ID.
+        :param checkoutWindow: Optional CheckoutWindow instance to update its display.
+        """
         super().__init__()
+        self.inventoryUI = inventoryUI
         self.student_id = student_id
-
-        self.ui = Ui_MainWindow()
-        self.ui.setupUi(self)
-
+        self.checkoutWindow = checkoutWindow
         self.cart = ShoppingCart(student_id)
+        print(f"[DEBUG] AddToCartController initialized for student '{student_id}'.")
 
-        self.ui.GoToCartButton.clicked.connect(self.on_checkout_clicked)
+        # Find the parent container where you add the item widgets.
+        if hasattr(self.inventoryUI, "scrollAreaWidgetContents"):
+            parent = self.inventoryUI.scrollAreaWidgetContents
+            print("[DEBUG] Using inventoryUI.scrollAreaWidgetContents as parent for item search.")
+        else:
+            parent = self.inventoryUI
+            print("[DEBUG] scrollAreaWidgetContents not found, using inventoryUI itself.")
 
-        for i in range(1, 17):
-            frame = getattr(self.ui, f"objFrame{i}", None)
-            if frame:
-                frame.installEventFilter(self)
+        if parent is None:
+            print("[DEBUG] Error: Parent container is None. Cannot search for child widgets.")
+        else:
+        # Instead of searching specifically for QFrame, pass None for the class type 
+        # so we find *all* widgets named objFrame*. This includes custom classes 
+        # that do not inherit from QFrame.
+            item_widgets = parent.findChildren(QtWidgets.QWidget, QtCore.QRegExp("^objFrame.*"))
+            print(f"[DEBUG] Found {len(item_widgets)} inventory item widgets matching 'objFrame.*'.")
+
+            for widget in item_widgets:
+                print(f"[DEBUG] Installing event filter on widget '{widget.objectName()}'.")
+                widget.setAttribute(QtCore.Qt.WA_Hover, True)
+                widget.installEventFilter(self)
 
     def eventFilter(self, obj, event):
-        """
-        When a student clicks on an inventory item frame, add it to the cart.
-        Here we assume that the frame's objectName (e.g., "objFrame3") maps to an item id ("item3").
-        """
-        if event.type() == QtCore.QEvent.MouseButtonRelease:
+        print(f"[DEBUG] eventFilter: Object '{obj.objectName()}' received event type {event.type()}.")
+        if event.type() == QtCore.QEvent.Enter:
+            print(f"[DEBUG] Mouse entered '{obj.objectName()}'.")
+            obj.setStyleSheet("background-color: rgba(0, 120, 215, 50);")
+            return False
+
+        elif event.type() == QtCore.QEvent.Leave:
+            print(f"[DEBUG] Mouse left '{obj.objectName()}'.")
+            obj.setStyleSheet("")
+            return False
+
+        elif event.type() == QtCore.QEvent.MouseButtonRelease:
+            print(f"[DEBUG] MouseButtonRelease on '{obj.objectName()}'.")
             frame_name = obj.objectName()
             item_id = "item" + frame_name.replace("objFrame", "")
-            print(f"{frame_name} clicked. Adding '{item_id}' to cart.")
-            self.cart.add_item(item_id, quantity=1)
-            self.update_cart_ui()
-            return True  # Mark event as handled.
+            print(f"[DEBUG] Adding item '{item_id}' to cart.")
+            self.cart.add_item(item_id, 1)
+            self.updateCheckoutWindow()
+            return True
         return super().eventFilter(obj, event)
 
-    def update_cart_ui(self):
+    def updateCheckoutWindow(self):
         """
-        Update the UI status bar (or other widget) to reflect the current cart contents.
+        Updates the CheckoutScreen UI with current cart items.
         """
-        cart_contents = self.cart.get_cart_items()
-        cart_text = "Cart: " + ", ".join([f"{k} ({v})" for k, v in cart_contents.items()])
-        self.statusBar().showMessage(cart_text)
+        if not self.checkoutWindow:
+            print("[DEBUG] No checkout window available; skipping UI update.")
+            return
+        
+        layout = self.checkoutWindow.ui.verticalLayout
+        while layout.count():
+            child = layout.takeAt(0)
+            if child.widget():
+                child.widget().deleteLater()
 
-    def on_checkout_clicked(self):
-        """
-        When the "Go To Cart" button is clicked, process the checkout.
-        """
-        self.cart.checkout()
-        self.update_cart_ui()
+        for item_id, quantity in self.cart.get_cart_items().items():
+            image_path = ":/my_resources/Logos/Retriever Essential.png"
+            display_name = item_id
+            display_info = f"Qty: {quantity}"
+            print(f"[DEBUG] Updating checkout UI: Adding '{item_id}' with {display_info}.")
+            cart_item = CustomObjInCart()
+            cart_item.set_image(image_path)
+            cart_item.set_object_name(display_name)
+            cart_item.set_weight(display_info)
+            layout.addWidget(cart_item)
 
-
-if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-
-    test_student_id = "student001"
-    controller = StudentInventoryController(test_student_id)
-    controller.show()
-
-    sys.exit(app.exec_())
+        if hasattr(self.checkoutWindow.ui, "label_8"):
+            total = sum(self.cart.get_cart_items().values())
+            self.checkoutWindow.ui.label_8.setText(str(total))
+            print(f"[DEBUG] Total items updated to {total} in checkout UI.")

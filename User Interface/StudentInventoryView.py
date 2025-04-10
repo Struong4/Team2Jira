@@ -199,6 +199,7 @@ class Ui_StudentInventoryWindow(QtWidgets.QMainWindow):
             row = i // columns
             
             self.addInventoryItem = StudentInventoryView()
+            self.addInventoryItem.setObjectName(f"objFrame{i+1}")
             self.addInventoryItem.setObjName(str(i+1)) # replace this with the object's name
             self.addInventoryItem.setObjImage(":/my_resources/Logos/Canned Goods.jpg") # replace this with the image file_path
             self.addInventoryItem.resizeImage()
