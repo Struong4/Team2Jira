@@ -125,7 +125,7 @@ class Ui_Login(object):
         self.staffPLabel.setText(_translate("MainWindow", "Password:"))
         self.studentStaffTabs.setTabText(self.studentStaffTabs.indexOf(self.StaffLoginTab), _translate("MainWindow", "Staff Login"))
         
-import RetrieverEssentials_rc
+import UserInterface.RetrieverEssentials_rc
 
 
 if __name__ == "__main__":

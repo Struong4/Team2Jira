@@ -1,7 +1,7 @@
 ﻿from PyQt5 import QtWidgets, QtCore
 from datetime import datetime
-import crud
-from CustomObj import CustomObjInCart
+from InventoryDatabase import crud
+from UserInterface.CustomObj import CustomObjInCart
 
 # ---------------------------------------
 # In-Memory Shopping Cart with Debugging
