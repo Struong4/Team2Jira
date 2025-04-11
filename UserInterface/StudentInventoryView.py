@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'staffInventoryView.ui'
+# Form implementation generated from reading ui file 'StudentInventoryView_1.5.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.9
 #
@@ -10,13 +10,13 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-import RetrieverEssentials_rc
-from CustomObj import StaffInventoryView
+import UserInterface.RetrieverEssentials_rc
+from UserInterface.CustomObj import StudentInventoryView
 
-class Ui_StaffInventoryWindow(QtWidgets.QMainWindow):
+class Ui_StudentInventoryWindow(QtWidgets.QMainWindow):    
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(800, 600)
+        MainWindow.resize(431, 262)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.horizontalLayout_4 = QtWidgets.QHBoxLayout(self.centralwidget)
@@ -134,36 +134,37 @@ class Ui_StaffInventoryWindow(QtWidgets.QMainWindow):
         self.horizontalLayout.addItem(spacerItem3)
         spacerItem4 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem4)
-        self.addObjButton = QtWidgets.QPushButton(self.centralwidget)
+        self.GoToCartButton = QtWidgets.QPushButton(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.addObjButton.sizePolicy().hasHeightForWidth())
-        self.addObjButton.setSizePolicy(sizePolicy)
-        self.addObjButton.setMinimumSize(QtCore.QSize(75, 23))
-        self.addObjButton.setMaximumSize(QtCore.QSize(100, 23))
+        sizePolicy.setHeightForWidth(self.GoToCartButton.sizePolicy().hasHeightForWidth())
+        self.GoToCartButton.setSizePolicy(sizePolicy)
+        self.GoToCartButton.setMinimumSize(QtCore.QSize(75, 23))
+        self.GoToCartButton.setMaximumSize(QtCore.QSize(100, 23))
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(":/my_resources/Logos/Add.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.addObjButton.setIcon(icon)
-        self.addObjButton.setObjectName("addObjButton")
-        self.horizontalLayout.addWidget(self.addObjButton)
+        icon.addPixmap(QtGui.QPixmap(":/my_resources/Logos/CheckoutCart1.jpg"), QtGui.QIcon.Normal, QtGui.QIcon.On)
+        self.GoToCartButton.setIcon(icon)
+        self.GoToCartButton.setObjectName("GoToCartButton")
+        
+        self.horizontalLayout.addWidget(self.GoToCartButton)
         self.NonSideBar.addLayout(self.horizontalLayout)
         self.scrollArea = QtWidgets.QScrollArea(self.centralwidget)
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 675, 547))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 306, 189))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.gridLayout_3 = QtWidgets.QGridLayout(self.scrollAreaWidgetContents)
         self.gridLayout_3.setObjectName("gridLayout_3")
-        self.gridLayout_2 = QtWidgets.QGridLayout()
-        self.gridLayout_2.setObjectName("gridLayout_2")
-        self.gridLayout_3.addLayout(self.gridLayout_2, 0, 0, 1, 1)
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
         self.NonSideBar.addWidget(self.scrollArea)
         self.horizontalLayout_4.addLayout(self.NonSideBar)
         MainWindow.setCentralWidget(self.centralwidget)
-
+        self.statusbar = QtWidgets.QStatusBar(MainWindow)
+        self.statusbar.setObjectName("statusbar")
+        MainWindow.setStatusBar(self.statusbar)
+        
         self.uploadInventoryView()
 
         self.retranslateUi(MainWindow)
@@ -181,7 +182,7 @@ class Ui_StaffInventoryWindow(QtWidgets.QMainWindow):
         self.SearchBar.setText(_translate("MainWindow", "Search Bar"))
         self.SortByLabel.setText(_translate("MainWindow", "Sort By:"))
         self.SortByComboBox.setItemText(0, _translate("MainWindow", "Name"))
-        self.addObjButton.setText(_translate("MainWindow", "Add New Item"))
+        self.GoToCartButton.setText(_translate("MainWindow", "Go To Cart"))
 
     def uploadInventoryView(self):
         columns = 4
@@ -197,16 +198,20 @@ class Ui_StaffInventoryWindow(QtWidgets.QMainWindow):
             col = i % columns
             row = i // columns
             
-            self.addInventoryItem = StaffInventoryView()
+            self.addInventoryItem = StudentInventoryView()
+            self.addInventoryItem.setObjectName(f"objFrame{i+1}")
             self.addInventoryItem.setObjName(str(i+1)) # replace this with the object's name
             self.addInventoryItem.setObjImage(":/my_resources/Logos/Canned Goods.jpg") # replace this with the image file_path
             self.addInventoryItem.resizeImage()
             self.addInventoryItem.resize(item_width, item_height)
             self.gridLayout_3.addWidget(self.addInventoryItem, row, col, 1, 1)
-            
+
+
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
-    MainWindow = Ui_StaffInventoryWindow()
+    MainWindow = QtWidgets.QMainWindow()
+    ui = Ui_StudentInventoryWindow()
+    ui.setupUi(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())
