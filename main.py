@@ -5,7 +5,6 @@ from UserInterface.StudentInventoryView import Ui_StudentInventoryWindow
 from UserInterface.StaffInventoryView import Ui_StaffInventoryWindow
 from UserInterface.AddInventoryObj import Ui_StaffAddObj
 from UserInterface.AddToCart import AddToCartController  # Import the controller we just defined
-
 class LoginScreen(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()

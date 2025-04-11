@@ -10,8 +10,8 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from CustomObj import CustomObjInCart
-import RetrieverEssentials_rc
+from UserInterface.CustomObj import CustomObjInCart
+import UserInterface.RetrieverEssentials_rc
 
 class Ui_CheckoutWindow(object):
     def setupUi(self, MainWindow):

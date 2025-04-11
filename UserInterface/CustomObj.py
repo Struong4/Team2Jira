@@ -10,7 +10,7 @@
 import sys, os
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-import RetrieverEssentials_rc
+import UserInterface.RetrieverEssentials_rc
 
 
 class CustomObjInCart(QtWidgets.QWidget):

@@ -10,8 +10,8 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-import RetrieverEssentials_rc
-from CustomObj import StudentInventoryView
+import UserInterface.RetrieverEssentials_rc
+from UserInterface.CustomObj import StudentInventoryView
 
 class Ui_StudentInventoryWindow(QtWidgets.QMainWindow):    
     def setupUi(self, MainWindow):
