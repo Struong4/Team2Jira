@@ -20,7 +20,7 @@ class ShoppingCart:
             self.items[item_id] = quantity
         print(f"[DEBUG] Cart contents after adding: {self.items}")
 
-    def remove_item(self, item_id, quantity=1):
+    def remove_item(self, item_id, quantity):
         print(f"[DEBUG] Attempting to remove {quantity} of '{item_id}' from cart.")
         if item_id in self.items:
             self.items[item_id] -= quantity
@@ -130,9 +130,31 @@ class AddToCartController(QtCore.QObject):
             cart_item = CustomObjInCart()
             cart_item.set_image(image_path)
             cart_item.set_object_name(display_name)
-            cart_item.set_weight(display_info)
+            cart_item.set_quantity_in_cart(quantity)
             layout.addWidget(cart_item)
+            
+            """ For Removing items from the checkoutsceen"""
+            cart_item.deletePressed.connect(lambda widget=cart_item: self.removeItemFromCheckout(widget))
 
+        if hasattr(self.checkoutWindow.ui, "label_8"):
+            total = sum(self.cart.get_cart_items().values())
+            self.checkoutWindow.ui.label_8.setText(str(total))
+            print(f"[DEBUG] Total items updated to {total} in checkout UI.")
+            
+    """ For Removeing Items in the checkout screen"""
+    def removeItemFromCheckout(self,widget):
+        layout = widget.parentWidget().layout()
+        quantity = widget.spinBox_6.value()
+        name = widget.label_14.text().split(" - ")[0]
+        print(quantity)
+        self.cart.remove_item(name, quantity)
+        
+        if layout:
+            layout.removeWidget(widget)
+        widget.setParent(None)
+        self.checkoutWindow.ui.label_8.setText
+        widget.deleteLater()
+        
         if hasattr(self.checkoutWindow.ui, "label_8"):
             total = sum(self.cart.get_cart_items().values())
             self.checkoutWindow.ui.label_8.setText(str(total))
