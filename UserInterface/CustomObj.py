@@ -53,6 +53,8 @@ class CustomObjInCart(QtWidgets.QWidget):
         self.spinBox_6 = QtWidgets.QSpinBox(self.objFrame1_1)
         self.spinBox_6.setMaximumSize(QtCore.QSize(33, 16777215))
         self.spinBox_6.setObjectName("spinBox_6")
+        self.spinBox_6.setMinimum(1)
+        
         self.horizontalLayout_14.addWidget(self.spinBox_6)
         
         self.pushButton_7 = QtWidgets.QPushButton(self.objFrame1_1)
@@ -86,6 +88,12 @@ class CustomObjInCart(QtWidgets.QWidget):
         
     def set_weight(self,weight):
         self.label_14.setText(f"{self.label_14.text()} - {weight}")
+    
+    """
+    This sets the maximum number of items that can be grabbed
+    """
+    def set_max_quantity(self, max):
+        self.spinBox_6.setMaximum(max)
 
 class StudentInventoryView(QtWidgets.QWidget):
     def __init__(self, parent=None):
