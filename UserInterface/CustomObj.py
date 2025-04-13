@@ -16,6 +16,8 @@ import UserInterface.RetrieverEssentials_rc
 class CustomObjInCart(QtWidgets.QWidget):
     """For Removing Items from the checkout screen"""
     deletePressed = QtCore.pyqtSignal(object)
+    quantityChange = QtCore.pyqtSignal(object)
+    
     
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -74,6 +76,7 @@ class CustomObjInCart(QtWidgets.QWidget):
         
         """For Removing Items from the checkout screen"""
         self.deleteButton.clicked.connect(self.emiteDeleteSignal)
+        self.spinBox_6.valueChanged.connect(self.spinBoxValueChange)
         
         self.retranslateUi()
 
@@ -106,6 +109,10 @@ class CustomObjInCart(QtWidgets.QWidget):
     """For Removing Items from the checkout screen"""
     def emiteDeleteSignal(self):
         self.deletePressed.emit(self)
+        
+    """For changing the value of the spinBox"""
+    def spinBoxValueChange(self):
+        self.quantityChange.emit(self)
 
 class StudentInventoryView(QtWidgets.QWidget):
     def __init__(self, parent=None):
