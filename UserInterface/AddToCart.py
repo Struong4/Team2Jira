@@ -1,4 +1,4 @@
-﻿from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets, QtCore
 from datetime import datetime
 from InventoryDatabase import crud
 from UserInterface.CustomObj import CustomObjInCart
@@ -10,7 +10,7 @@ class ShoppingCart:
     def __init__(self, student_id):
         self.student_id = student_id
         self.items = {}
-        print(f"[DEBUG] ShoppingCart created for student '{student_id}'.")
+        #print(f"[DEBUG] ShoppingCart created for student '{student_id}'.")
 
     def add_item(self, item_id, quantity=1):
         #print(f"[DEBUG] Attempting to add {quantity} of '{item_id}' to cart.")
@@ -18,33 +18,33 @@ class ShoppingCart:
             self.items[item_id] += quantity
         else:
             self.items[item_id] = quantity
-        print(f"[DEBUG] Cart contents after adding: {self.items}")
+        #print(f"[DEBUG] Cart contents after adding: {self.items}")
 
-    def remove_item(self, item_id, quantity=1):
-        print(f"[DEBUG] Attempting to remove {quantity} of '{item_id}' from cart.")
+    def remove_item(self, item_id, quantity):
+        #print(f"[DEBUG] Attempting to remove {quantity} of '{item_id}' from cart.")
         if item_id in self.items:
             self.items[item_id] -= quantity
             if self.items[item_id] <= 0:
                 del self.items[item_id]
-            print(f"[DEBUG] Cart contents after removal: {self.items}")
-        else:
-            print(f"[DEBUG] Item '{item_id}' not found in cart.")
+            #print(f"[DEBUG] Cart contents after removal: {self.items}")
+        #else:
+            #print(f"[DEBUG] Item '{item_id}' not found in cart.")
 
     def get_cart_items(self):
         return self.items
 
     def checkout(self):
-        print("[DEBUG] Starting checkout process...")
+        #print("[DEBUG] Starting checkout process...")
         for item_id, quantity in self.items.items():
             now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            print(f"[DEBUG] Processing item '{item_id}' (Quantity: {quantity}) at {now_str}")
+            #print(f"[DEBUG] Processing item '{item_id}' (Quantity: {quantity}) at {now_str}")
             result = crud.buyItem(self.student_id, item_id, now_str, quantity)
             if "✅" in result:
                 print(f"[DEBUG] Processed purchase for '{item_id}' (qty: {quantity}).")
             else:
                 print(f"[DEBUG] Failed to process purchase for '{item_id}': {result}")
         self.items.clear()
-        print("[DEBUG] Checkout complete. Cart is now empty.")
+        #print("[DEBUG] Checkout complete. Cart is now empty.")
 
 
 # --------------------------------------------------------------
@@ -62,7 +62,9 @@ class AddToCartController(QtCore.QObject):
         self.student_id = student_id
         self.checkoutWindow = checkoutWindow
         self.cart = ShoppingCart(student_id)
+
         self.cart_contents = {}
+
         #print(f"[DEBUG] AddToCartController initialized for student '{student_id}'.")
 
         # Find the parent container where you add the item widgets.
@@ -128,17 +130,58 @@ class AddToCartController(QtCore.QObject):
             display_name = item_id
             display_info = f"Qty: {quantity}"
            # print(f"[DEBUG] Updating checkout UI: Adding '{item_id}' with {display_info}.")
+
             cart_item = CustomObjInCart()
             cart_item.set_image(image_path)
             cart_item.set_object_name(display_name)
-            cart_item.set_weight(display_info)
+            cart_item.set_quantity_in_cart(quantity)
             layout.addWidget(cart_item)
+            
+            """ For Removing items from the checkoutsceen """
+            cart_item.deletePressed.connect(lambda widget=cart_item: self.removeItemFromCheckout(widget))
+            
+            """ For change in quantity spinbox """
+            cart_item.quantityChange.connect(lambda widget=cart_item: self.changeCartSize(widget))
 
         if hasattr(self.checkoutWindow.ui, "label_8"):
             total = sum(self.cart.get_cart_items().values())
             self.checkoutWindow.ui.label_8.setText(str(total))
             #print(f"[DEBUG] Total items updated to {total} in checkout UI.")
             
+    """ For Removeing Items in the checkout screen"""
+    def removeItemFromCheckout(self,widget):
+        layout = widget.parentWidget().layout()
+        quantity = widget.spinBox_6.value()
+        name = widget.label_14.text().split(" - ")[0]
+        #print(quantity)
+        self.cart.remove_item(name, quantity)
+        
+        if layout:
+            layout.removeWidget(widget)
+        widget.setParent(None)
+        self.checkoutWindow.ui.label_8.setText
+        widget.deleteLater()
+        
+        if hasattr(self.checkoutWindow.ui, "label_8"):
+            total = sum(self.cart.get_cart_items().values())
+            self.checkoutWindow.ui.label_8.setText(str(total))
+            #print(f"[DEBUG] Total items updated to {total} in checkout UI.")
+            
+    """ For value change in spin box"""
+    def changeCartSize(self, widget):
+        # Extract the item name from the widget's label
+        name = widget.label_14.text().split(" - ")[0]
+    
+        #Get the new quantity from the spinbox
+        new_quantity = widget.spinBox_6.value()
+
+        # Update the cart dictionary
+        self.cart.items[name] = new_quantity
+        
+        if hasattr(self.checkoutWindow.ui, "label_8"):
+            total = sum(self.cart.get_cart_items().values())
+            self.checkoutWindow.ui.label_8.setText(str(total))
+
     def cart_completeCheckout(self):
         print("[DEBUG] Starting checkout process...")
         self.cart_contents = self.cart.get_cart_items()

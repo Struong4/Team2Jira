@@ -135,8 +135,7 @@ class Ui_CheckoutWindow(object):
         self.cart_item.set_object_name(name)  # Set the object name
         self.cart_item.set_weight(weight)  # Set the weight
         self.verticalLayout.addWidget(self.cart_item) # add item to the layout
-        self.cart_item.setFixedSize(400,87) # for visability
-        
+        self.cart_item.setFixedSize(400,87) # for visability      
 
 
 if __name__ == "__main__":
