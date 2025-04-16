@@ -1,4 +1,5 @@
 from PyQt5 import QtWidgets
+from InventoryDatabase.item_class import Item
 from UserInterface.CheckoutScreen import Ui_CheckoutWindow
 from UserInterface.LoginPage import Ui_Login
 from UserInterface.StudentInventoryView import Ui_StudentInventoryWindow
@@ -61,7 +62,7 @@ class OpenStudentInventory(QtWidgets.QMainWindow):
         self.addCartController = AddToCartController(self.ui, "student001", None)
     
     def openCheckoutScreen(self):
-        self.checkoutWindow = CheckoutWindow(self)
+        self.checkoutWindow = CheckoutWindow(self, self.addCartController)
         # Pass the checkout window reference to the add-to-cart controller so it can update its UI
         self.addCartController.checkoutWindow = self.checkoutWindow
         self.addCartController.updateCheckoutWindow()
@@ -76,13 +77,15 @@ class OpenStudentInventory(QtWidgets.QMainWindow):
         self.hide()
 
 class CheckoutWindow(QtWidgets.QMainWindow):
-    def __init__(self, main_window):
+    def __init__(self, main_window, addCartController):
         super().__init__()
         self.ui = Ui_CheckoutWindow()
         self.ui.setupUi(self)
         self.studentInventory = main_window
         self.ui.goBackButton.clicked.connect(self.goBack)
+        self.addCartController = addCartController
         self.ui.checkoutButton.clicked.connect(self.completeCheckout)
+        
         
     def goBack(self):
         self.studentInventory.setGeometry(self.geometry())
@@ -95,7 +98,7 @@ class CheckoutWindow(QtWidgets.QMainWindow):
         Add complete checkout code here
         Remove items from database after checking out
         """
-        
+        self.addCartController.cart_completeCheckout()
         self.studentInventory.setGeometry(self.geometry())
         self.studentInventory.show()
         self.close()
@@ -140,12 +143,17 @@ class OpenAddObjWindow(QtWidgets.QMainWindow):
         
     def addObj(self):       
         # goes back tothe inventory view
-        self.saveItemInfo()
+        self.saveItemInfo(1) #use mode 1 for add new item
         self.staffInventory.setGeometry(self.geometry())
         self.staffInventory.show()
         self.close()
         
-    def saveItemInfo(self):
+        
+    #use mode 1 for add new item
+    #use mode 2 for modify existing item
+    #any other mode value is an error
+    #staff_id is an optional argument called only when using the modifyItem usemode (2)
+    def saveItemInfo(self, useMode, staff_id = None):
         print("item save triggered")
         
         itemID = self.ui.itemIDText.text().strip()
@@ -229,6 +237,7 @@ class OpenAddObjWindow(QtWidgets.QMainWindow):
         if self.ui.catCheckBox4.isChecked():
             categories.append(self.ui.catCheckBox4.text())
             
+        """    
         print("=== Product Details ===")
         print(f"Item ID: {itemID}")
         print(f"Name: {name}")
@@ -238,11 +247,21 @@ class OpenAddObjWindow(QtWidgets.QMainWindow):
         print(f"Description: {description}")
         print(f"Quantity Limit: {quantityLimit}")
         print(f"Origins: {', '.join(origins) if origins else 'None'}")
-        print(f"Categories: {', '.join(categories) if categories else 'None'}")
+        print(f"Categories: {', '.join(categories) if categories else 'None'}") 
+        """
         
-        """
-        Add item to database here with the variables given
-        """
+        #create item object using constructor
+        #this constructor is connected to the SQL database and will create a new item through crud.py
+        newItem = Item(itemID, name, price, quantity, weight, description, origins, categories, quantityLimit)
+        if(useMode == 1):
+            newItem.updateSQL()
+        elif(useMode == 2): 
+            newItem.modify_item(staff_id) #to be called to modify an existing item
+        else:
+            print("ERROR: Invalid use mode.")
+    
+        
+    
         
 if __name__ == "__main__":
     import sys

@@ -1,4 +1,4 @@
-﻿from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets, QtCore
 from datetime import datetime
 from InventoryDatabase import crud
 from UserInterface.CustomObj import CustomObjInCart
@@ -62,6 +62,9 @@ class AddToCartController(QtCore.QObject):
         self.student_id = student_id
         self.checkoutWindow = checkoutWindow
         self.cart = ShoppingCart(student_id)
+
+        self.cart_contents = {}
+
         #print(f"[DEBUG] AddToCartController initialized for student '{student_id}'.")
 
         # Find the parent container where you add the item widgets.
@@ -126,7 +129,8 @@ class AddToCartController(QtCore.QObject):
             image_path = ":/my_resources/Logos/Retriever Essential.png"
             display_name = item_id
             display_info = f"Qty: {quantity}"
-            #print(f"[DEBUG] Updating checkout UI: Adding '{item_id}' with {display_info}.")
+           # print(f"[DEBUG] Updating checkout UI: Adding '{item_id}' with {display_info}.")
+
             cart_item = CustomObjInCart()
             cart_item.set_image(image_path)
             cart_item.set_object_name(display_name)
@@ -177,3 +181,17 @@ class AddToCartController(QtCore.QObject):
         if hasattr(self.checkoutWindow.ui, "label_8"):
             total = sum(self.cart.get_cart_items().values())
             self.checkoutWindow.ui.label_8.setText(str(total))
+
+    def cart_completeCheckout(self):
+        print("[DEBUG] Starting checkout process...")
+        self.cart_contents = self.cart.get_cart_items()
+        for item_id, quantity in self.cart_contents.items():
+            now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            print(f"[DEBUG] Processing item '{item_id}' (Quantity: {quantity}) at {now_str}")
+            result = crud.buyItem(self.student_id, item_id, now_str, quantity)
+            if "✅" in result:
+                print(f"[DEBUG] Processed purchase for '{item_id}' (qty: {quantity}).")
+            else:
+                print(f"[DEBUG] Failed to process purchase for '{item_id}': {result}")
+        self.cart_contents.clear()
+        print("[DEBUG] Checkout complete. Cart is now empty.")
