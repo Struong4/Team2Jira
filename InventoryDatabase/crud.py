@@ -182,7 +182,7 @@ def displayAllTables():
 
     print("DISPLAYING ALL TABLES")
 
-    tables = ["student", "item", "origin", "category", "staff", "buys", "updates", "restock"]
+    tables = ["item", "origin", "category", "staff", "orders", "updates", "restock"]
 
     for table in tables:
         print(f"TABLE: {table.upper()}")
@@ -201,11 +201,11 @@ def displayAllTables():
     cursor.close()
     conn.close()
 
-def buyItem(student_id, item_id, buy_datetime, buy_quantity):
+def buyItem(item_id, order_datetime, order_quantity):
     prompt = ""
 
-    if datetime.strptime(buy_datetime, "%Y-%m-%d %H:%M:%S") > datetime.now():
-        return f"⚠️ Unable to buy item {item_id}. Invalid datetime of {buy_datetime}" 
+    if datetime.strptime(order_datetime, "%Y-%m-%d %H:%M:%S") > datetime.now():
+        return f"⚠️ Unable to buy item {item_id}. Invalid datetime of {order_datetime}" 
 
     # establishes a connection with the sql database
     conn = sqlite3.connect(INVENTORY)
@@ -219,18 +219,18 @@ def buyItem(student_id, item_id, buy_datetime, buy_quantity):
     try:
         # executes the buy command
         cursor.execute("""
-            INSERT INTO buys (student_id, item_id, buy_datetime, buy_quantity)
-            VALUES (?, ?, ?, ?)
-        """, (student_id, item_id, buy_datetime, buy_quantity,))
+            INSERT INTO orders (item_id, order_datetime, order_quantity)
+            VALUES (?, ?, ?)
+        """, (item_id, order_datetime, order_quantity,))
 
         conn.commit()
 
-        prompt = f"✅ Item '{item_id}' bought by student {student_id}. Bought {buy_quantity} items!"
+        prompt = f"✅ {order_quantity} Item(s) '{item_id}' have been bought"
     except sqlite3.IntegrityError as e:
         if "CHECK constraint failed" in str(e):
             # no need
-            if buy_quantity < 1:
-                prompt = f"⚠️ Unable to buy item {item_id}. Invalid buy_quantity of {buy_quantity}" 
+            if order_quantity < 1:
+                prompt = f"⚠️ Unable to buy item {item_id}. Invalid buy_quantity of {order_quantity}" 
         else:
             prompt = f"⚠️ Unable to buy item {item_id}. {e}" 
     finally:
@@ -427,7 +427,7 @@ def showHistory():
     cursor = conn.cursor()
 
     #tables = ["buys", "restock", "updates"]
-    tables = {"buys": "BUY", "restock": "RESTOCK", "updates": "UPDATE"}
+    tables = {"orders": "ORDER", "restock": "RESTOCK", "updates": "UPDATE"}
 
     for table in tables:
     # gets all buy transactions
@@ -435,44 +435,39 @@ def showHistory():
         rows = cursor.fetchall()
 
         for row in rows:
-            transaction = {
-                'Transaction Type': tables[table],
-                'Person ID': row[0],
-                'Item ID': row[1],
-                'Datetime': row[2]
-            }
 
-            if table == "buys" or table == "restock":
-                transaction["Quantity"] = row[3]
+            if table == "orders":
+
+                transaction = {
+                    'Transaction Type': tables[table],
+                    'Item ID': row[0],
+                    'Datetime': row[1],
+                    'Quantity': row[2]
+                }
+            elif table == "updates":
+                
+                transaction = {
+                    'Transaction Type': tables[table],
+                    'Staff ID': row[0],
+                    'Item ID': row[1],
+                    'Datetime': row[2]
+                }
+            elif table == "restock":
+
+                transaction = {
+                    'Transaction Type': tables[table],
+                    'Staff ID': row[0],
+                    'Item ID': row[1],
+                    'Datetime': row[2],
+                    'Quantity': row[3]
+                }
+
             transactions.append(transaction)
 
     cursor.close()
     conn.close()
 
     return transactions
-
-def addNewStudent(student_id, student_first_name, student_last_name):
-
-    # establishes a connection with the sql database
-    conn = sqlite3.connect(INVENTORY)
-
-    # gets the sql cursor
-    cursor = conn.cursor()
-
-    # Register REGEXP function
-    conn.create_function("REGEXP", 2, regexp)
-
-    # executes the buy command
-    cursor.execute("""
-        INSERT INTO student (student_id, student_first_name, student_last_name)
-        VALUES (?, ?, ?)
-    """, (student_id, student_first_name, student_last_name,))
-
-    conn.commit()
-
-    # closes the cursor and connection
-    cursor.close()
-    conn.close()
 
 def addNewStaff(staff_id, staff_first_name, staff_last_name):
 
@@ -485,7 +480,7 @@ def addNewStaff(staff_id, staff_first_name, staff_last_name):
     # Register REGEXP function
     conn.create_function("REGEXP", 2, regexp)
 
-    # executes the buy command
+    # executes the add staff command
     cursor.execute("""
         INSERT INTO staff (staff_id, staff_first_name, staff_last_name)
         VALUES (?, ?, ?)
@@ -539,45 +534,44 @@ if __name__ == "__main__":
     print("AFTER TESTING ADD NEW ITEMS")
     displayAllTables()
 
-    print("INVENTORY")
-    inventory = showInventory()
+    # print("INVENTORY")
+    # inventory = showInventory()
 
-    for item in inventory:
-        print(item, inventory[item])
-    print("TESTING SHOW HISTORY")
-    addNewStaff("AB12345", "Your", "Mom")
-    addNewStudent("GB70937", "Gia", "Santos")
+    # for item in inventory:
+    #     print(item, inventory[item])
+    # print("TESTING SHOW HISTORY")
+    # addNewStaff("AB12345", "Your", "Mom")
 
-    print(updateItem("AB12345", "1111111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "almond milk", 6.0, 5, 5, "a carton of almond milk", 3, ["walmart", "target", "h mart"], ["dairy", "white"]))
-    time.sleep(randint(1,5))
-    print(restockItem("AB12345", "1111111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 20))
-    time.sleep(randint(1,5))
-    print(buyItem("GB70937", "1111111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 1))
-    time.sleep(randint(1,5))
-    print(updateItem("AB12345", "2222222222", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "tangerine", 1.5, 20, 10, "a tangerine", 20, ["walmart", "aldis"], ["fruit"]))
-    time.sleep(randint(1,5))
-    print(updateItem("AB12345", "3333333333", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "cherry", 0.5, 20, 0.5, "a cherry", 10, ["walmart"], ["fruit", "red"]))
-    time.sleep(randint(1,5))
-    print(buyItem("GB70937", "2222222222", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 5))
-    time.sleep(randint(1,5))
-    print(updateItem("AB12345", '4444444444', datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 'banana', 1.0, 50, 10.0, 'a banana', 10, ['h mart', 'lotte mart'], ["yellow", "tropical"]))
-    time.sleep(randint(1,5))
-    print(updateItem("AB12345", "1111111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "almond milk", 6.0, 5, 5, "a carton of almond milk", 3, ["aldis", "giant"], ["dairy", "white"]))
-    time.sleep(randint(1,5))
-    print(restockItem("AB12345", "2222222222", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 20))
-    time.sleep(randint(1,5))
-    print(updateItem("AB12345", "1111111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "almond milk", 6.0, 5, 5, "a carton of almond milk", 3, ["aldis", "giant"], ["cow"]))
-    time.sleep(randint(1,5))
-    print(restockItem("AB12345", "3333333333", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 20))
-    time.sleep(randint(1,5))
-    print(updateItem("AB12345", "1111111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "almond milk", 6.0, 5, 5, "a carton of almond milk", 3))
-    time.sleep(randint(1,5))
-    print(buyItem("GB70937", "3333333333", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 10))
+    # print(updateItem("AB12345", "1111111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "almond milk", 6.0, 5, 5, "a carton of almond milk", 3, ["walmart", "target", "h mart"], ["dairy", "white"]))
+    # time.sleep(randint(1,5))
+    # print(restockItem("AB12345", "1111111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 20))
+    # time.sleep(randint(1,5))
+    # print(buyItem("1111111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 1))
+    # time.sleep(randint(1,5))
+    # print(updateItem("AB12345", "2222222222", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "tangerine", 1.5, 20, 10, "a tangerine", 20, ["walmart", "aldis"], ["fruit"]))
+    # time.sleep(randint(1,5))
+    # print(updateItem("AB12345", "3333333333", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "cherry", 0.5, 20, 0.5, "a cherry", 10, ["walmart"], ["fruit", "red"]))
+    # time.sleep(randint(1,5))
+    # print(buyItem("2222222222", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 5))
+    # time.sleep(randint(1,5))
+    # print(updateItem("AB12345", '4444444444', datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 'banana', 1.0, 50, 10.0, 'a banana', 10, ['h mart', 'lotte mart'], ["yellow", "tropical"]))
+    # time.sleep(randint(1,5))
+    # print(updateItem("AB12345", "1111111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "almond milk", 6.0, 5, 5, "a carton of almond milk", 3, ["aldis", "giant"], ["dairy", "white"]))
+    # time.sleep(randint(1,5))
+    # print(restockItem("AB12345", "2222222222", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 20))
+    # time.sleep(randint(1,5))
+    # print(updateItem("AB12345", "1111111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "almond milk", 6.0, 5, 5, "a carton of almond milk", 3, ["aldis", "giant"], ["cow"]))
+    # time.sleep(randint(1,5))
+    # print(restockItem("AB12345", "3333333333", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 20))
+    # time.sleep(randint(1,5))
+    # print(updateItem("AB12345", "1111111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "almond milk", 6.0, 5, 5, "a carton of almond milk", 3))
+    # time.sleep(randint(1,5))
+    # print(buyItem("3333333333", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 10))
 
-    print("HISTORY")
-    transactions = showHistory()
-    for transaction in transactions:
-        print(transaction)
+    # print("HISTORY")
+    # transactions = showHistory()
+    # for transaction in transactions:
+    #     print(transaction)
 
     # print("INVENTORY")
     # inventory = showInventory()
@@ -686,40 +680,39 @@ if __name__ == "__main__":
 
 
 
-    # print("TESTING BUY ITEMS")
-    # addNewStudent("GB70937", "Gia", "Santos")
+    print("TESTING BUY ITEMS")
 
-    # # normal case for buying items
-    # print(buyItem("GB70937", "1111111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 1))
-    # print(buyItem("GB70937", "2222222222", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 5))
-    # print(buyItem("GB70937", "3333333333", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 10))
+    # normal case for buying items
+    print(buyItem("1111111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 1))
+    print(buyItem("2222222222", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 5))
+    print(buyItem("3333333333", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 10))
 
-    # # edge case: no more stock
-    # print(buyItem("GB70937", "3333333333", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 1))
+    # edge case: no more stock
+    print(buyItem("3333333333", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 1))
 
-    # # edge case: buying 0 items
-    # print(buyItem("GB70937", "5555555555", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 0))
+    # edge case: buying 0 items
+    print(buyItem("5555555555", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 0))
 
-    # # error case: invalid student id
-    # print(buyItem("12ABCDE", "4444444444", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 1))
+    # error case: invalid student id
+    print(buyItem("4444444444", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 1))
 
-    # # error case: nonexistent student id
-    # print(buyItem("AB12345", "4444444444", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 1))
+    # error case: nonexistent student id
+    print(buyItem("4444444444", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 1))
 
-    # # error case: invalid item id
-    # print(buyItem("GB70937", "444444444", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 1))
+    # error case: invalid item id
+    print(buyItem("444444444", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 1))
 
-    # # error case: invalid item id
-    # print(buyItem("GB70937", "8888888888", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 1))
+    # error case: invalid item id
+    print(buyItem("8888888888", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 1))
 
-    # # error case: invalid item id
-    # print(buyItem("GB70937", "4444444444", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), -5))
+    # error case: invalid item id
+    print(buyItem("4444444444", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), -5))
 
-    # # edge case: buying item at a past datetime
-    # print(buyItem("GB70937", "4444444444", "2001-04-03  12:00:00", 1))
+    # edge case: buying item at a past datetime
+    print(buyItem("4444444444", "2001-04-03  12:00:00", 1))
 
-    # # error case: buying items at a future datetime than now
-    # print(buyItem("GB70937", "5555555555", "2030-04-03  12:00:00", 1))
+    # error case: buying items at a future datetime than now
+    print(buyItem("5555555555", "2030-04-03  12:00:00", 1))
 
 
 
