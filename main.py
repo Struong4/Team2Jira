@@ -268,7 +268,7 @@ class OpenAddObjWindow(QtWidgets.QMainWindow):
 if __name__ == "__main__":
     import sys
     crud.resetInventory(os.path.join("InventoryDatabase", "drop_all.sql"))
-    crud.resetInventory(os.path.join("InventoryDatabase", "create_all.sql"))
+    crud.createInventoryInventory(os.path.join("InventoryDatabase", "create_all.sql"))
     app = QtWidgets.QApplication(sys.argv)
     window = LoginScreen()
     window.show()
