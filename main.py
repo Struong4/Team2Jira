@@ -6,6 +6,8 @@ from UserInterface.StudentInventoryView import Ui_StudentInventoryWindow
 from UserInterface.StaffInventoryView import Ui_StaffInventoryWindow
 from UserInterface.AddInventoryObj import Ui_StaffAddObj
 from UserInterface.AddToCart import AddToCartController  # Import the controller we just defined
+from InventoryDatabase import crud
+import os
 class LoginScreen(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
@@ -265,6 +267,8 @@ class OpenAddObjWindow(QtWidgets.QMainWindow):
         
 if __name__ == "__main__":
     import sys
+    crud.resetInventory(os.path.join("InventoryDatabase", "drop_all.sql"))
+    crud.resetInventory(os.path.join("InventoryDatabase", "create_all.sql"))
     app = QtWidgets.QApplication(sys.argv)
     window = LoginScreen()
     window.show()

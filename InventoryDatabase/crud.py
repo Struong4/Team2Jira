@@ -10,11 +10,11 @@ DROP_SCRIPT = "drop_all.sql"
 
 ID_REG_EXP = "^[A-Z]{2}\d{5}$"
 
-def createInventory():
-    runSQLScript(CREATE_SCRIPT)
+def createInventory(create_script):
+    runSQLScript(create_script)
 
-def resetInventory():
-    runSQLScript(DROP_SCRIPT)
+def resetInventory(drop_script):
+    runSQLScript(drop_script)
 
 
 # Custom REGEXP function for SQLite
@@ -497,8 +497,8 @@ def addNewStaff(staff_id, staff_first_name, staff_last_name):
 if __name__ == "__main__":
 
     # creates tables using the create_all.sql script
-    resetInventory()
-    createInventory()
+    resetInventory(DROP_SCRIPT)
+    createInventory(CREATE_SCRIPT)
 
     print("BEFORE TESTING ADD NEW ITEMS")
     displayAllTables()
