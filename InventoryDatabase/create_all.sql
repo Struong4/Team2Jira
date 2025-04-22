@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS item (
     descript VARCHAR(500),
     quantity INT NOT NULL,
     quantity_limit INT,
+    image_str TEXT,
     PRIMARY KEY (item_id),
     CHECK (item_id REGEXP "^\d+$" AND weight_lbs >= 0 AND price >= 0 AND quantity >= 0 AND quantity_limit >= 0)
 );
