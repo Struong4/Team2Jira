@@ -165,7 +165,7 @@
     .sidebar button:hover {
       background-color: rgb(220, 150, 15);
     }
-  </style>  
+  </style>
 </head>
 <body>
 
@@ -188,9 +188,10 @@
       <input type="text" placeholder="Search...">
       <label for="sortby">Sort by:</label>
       <select id="sortby">
-        <option>Name</option>
-        <option>Price</option>
-        <option>ID</option>
+        <option>Name A-Z</option>
+        <option>Name Z-A</option>
+        <option>ID Ascending</option>
+        <option>ID Descending</option>
       </select>
       <button id="addItemButton"><img src="Logos/Add.png" alt="Cart" style="height:20px;"> Add New Item</button>
     </div>
@@ -202,17 +203,19 @@
 </div>
 
 <script>
-    const items = [
-      { name: 'Item 1', image: 'Logos/canned_goods.jpg' },
-      { name: 'Item 2', image: 'item2.jpg' },
-      { name: 'Item 3', image: 'item3.jpg' },
-      { name: 'Item 4', image: 'item4.jpg' },
-      { name: 'Item 5', image: 'item5.jpg' }
-    ];
-  
+  // For testing purposes
+  const items = [
+  { id: 3, name: 'ABCD', image: 'Logos/canned_goods.jpg' },
+  { id: 1, name: 'AABB', image: 'item2.jpg' },
+  { id: 5, name: 'BBCD', image: 'item3.jpg' },
+  { id: 4, name: 'ZYXA', image: 'item4.jpg' },
+  { id: 2, name: 'DDJF', image: 'item5.jpg' }
+];
+
+
     const grid = document.getElementById('itemsGrid');
-  
-    items.forEach(item => {
+
+    function createItemBox(item) {
       const box = document.createElement('div');
       box.className = 'item-box';
       box.innerHTML = `
@@ -223,22 +226,48 @@
           <button class="removeItemButton">Remove Item</button>
         </div>
       `;
-      grid.appendChild(box);
-  
       box.querySelector('.editItemButton').addEventListener('click', () => {
-        window.location.assign("./EditExistingItem.html");  // Redirects to EditExistingItem.html
-    });
-  
+        window.location.assign("./EditExistingItem.html");
+      });
       box.querySelector('.removeItemButton').addEventListener('click', () => {
         box.remove();
       });
+      return box;
+    }
+
+    function renderItems(itemList) {
+      grid.innerHTML = '';  // Clear current items
+      itemList.forEach(item => {
+        const box = createItemBox(item);
+        grid.appendChild(box);
+      });
+    }
+
+    // Initial render: sort A-Z
+    const sortedAZ = [...items].sort((a, b) => a.name.localeCompare(b.name));
+    renderItems(sortedAZ);
+    document.getElementById('sortby').value = "Name A-Z";
+
+    document.getElementById('sortby').addEventListener('change', (e) => {
+      let sorted = [...items];
+      if (e.target.value === 'Name A-Z') {
+        sorted.sort((a, b) => a.name.localeCompare(b.name));
+      } else if (e.target.value === 'Name Z-A') {
+        sorted.sort((a, b) => b.name.localeCompare(a.name));
+      } else if (e.target.value === 'ID Ascending') {
+        sorted.sort((a, b) => a.id - b.id);
+      } else if (e.target.value === 'ID Descending') {
+        sorted.sort((a, b) => b.id - a.id);
+      }
+      renderItems(sorted);
     });
+    
 </script>
 
 <script>
-    const filters = ['Canned Food', 'Produce', 'Grains', 'Test 1', 'Test 2']; 
+    const filters = ['Canned Food', 'Produce', 'Grains', 'Test 1', 'Test 2'];
     const filterDiv = document.getElementById('filterCategories');
-  
+
     filters.forEach(category => {
       const label = document.createElement('label');
       const checkbox = document.createElement('input');
@@ -249,7 +278,7 @@
       label.appendChild(document.createTextNode(category));
       filterDiv.appendChild(label);
     });
-  
+
     document.getElementById('addCategoryButton').addEventListener('click', () => {
       const newCategory = prompt("Enter new category name:");
       if (newCategory) {
@@ -265,25 +294,23 @@
     });
 
     document.getElementById('removeCategoryButton').addEventListener('click', () => {
-        const checkboxes = filterDiv.querySelectorAll('input[type="checkbox"]');
-        checkboxes.forEach(checkbox => {
-          if (checkbox.checked) {
-            checkbox.parentElement.remove();
-          }
-        });
+      const checkboxes = filterDiv.querySelectorAll('input[type="checkbox"]');
+      checkboxes.forEach(checkbox => {
+        if (checkbox.checked) {
+          checkbox.parentElement.remove();
+        }
       });
-      
-  
-    document.getElementById('addItemButton').addEventListener('click', () => {
-        window.location.assign("./AddNewItem.html");
     });
-    
+
+    document.getElementById('addItemButton').addEventListener('click', () => {
+      window.location.assign("./AddNewItem.html");
+    });
 
     document.getElementById('logoutButton').addEventListener('click', () => {
-        const confirmLogout = confirm("Are you sure you want to log out?");
-        if (confirmLogout) {
-            window.location.assign("./StudentView.html");
-        }
+      const confirmLogout = confirm("Are you sure you want to log out?");
+      if (confirmLogout) {
+        window.location.assign("./StudentView.html");
+      }
     });
 </script>
 

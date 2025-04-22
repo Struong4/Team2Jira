@@ -167,9 +167,10 @@
       <input type="text" placeholder="Search...">
       <label for="sortby">Sort by:</label>
       <select id="sortby">
-        <option>Name</option>
-        <option>ID</option>
-        <option>In Stock</option>
+        <option>Name A-Z</option>
+        <option>Name Z-A</option>
+        <option>ID Ascending</option>
+        <option>ID Descending</option>
       </select>
       <button><img src="Logos/CheckoutCart1.jpg" alt="Cart" style="height:20px;"> Go To Cart</button>
     </div>
@@ -183,47 +184,59 @@
 </div>
 
 <script>
-  // loop through database to add items and their images
   const items = [
-    { name: 'Item 1', image: 'Logos/canned_goods.jpg' },
-    { name: 'Item 2', image: 'item2.jpg' },
-    { name: 'Item 3', image: 'item3.jpg' },
-    { name: 'Item 4', image: 'item4.jpg' },
-    { name: 'Item 5', image: 'item5.jpg' }
+    { id: 3, name: 'ABCD', image: 'Logos/canned_goods.jpg' },
+    { id: 1, name: 'AABB', image: 'item2.jpg' },
+    { id: 5, name: 'BBCD', image: 'item3.jpg' },
+    { id: 4, name: 'ZYXA', image: 'item4.jpg' },
+    { id: 2, name: 'DDJF', image: 'item5.jpg' }
   ];
 
   const grid = document.getElementById('itemsGrid');
 
-  items.forEach(item => {
-    const box = document.createElement('div');
-    box.className = 'item-box';
-    box.innerHTML = `
-      <h4>${item.name}</h4>
-      <img src="${item.image}" alt="${item.name}">
-      <button>Item Details</button>
-    `;
-    grid.appendChild(box);
+  function renderItems(itemList) {
+    grid.innerHTML = '';  // Clear existing items
+    itemList.forEach(item => {
+      const box = document.createElement('div');
+      box.className = 'item-box';
+      box.innerHTML = `
+        <h4>${item.name}</h4>
+        <img src="${item.image}" alt="${item.name}">
+        <button>Item Details</button>
+      `;
+      grid.appendChild(box);
+    });
+  }
+
+  // Initial default sort: Name A-Z
+  const sortedAZ = [...items].sort((a, b) => a.name.localeCompare(b.name));
+  renderItems(sortedAZ);
+  document.getElementById('sortby').value = "Name A-Z";
+
+  document.getElementById('sortby').addEventListener('change', (e) => {
+    let sorted = [...items];
+
+    switch (e.target.value) {
+      case 'Name A-Z':
+        sorted.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case 'Name Z-A':
+        sorted.sort((a, b) => b.name.localeCompare(a.name));
+        break;
+      case 'ID Ascending':
+        sorted.sort((a, b) => a.id - b.id);
+        break;
+      case 'ID Descending':
+        sorted.sort((a, b) => b.id - a.id);
+        break;
+      default:
+        break;
+    }
+
+    renderItems(sorted);
   });
 </script>
 
-<script>
-  // loop through database to add category names
-  const filters = ['Canned Food', 'Produce', 'Grains', 'Test 1', 'Test 2']; 
-  const filterDiv = document.getElementById('filterCategories'); // Corrected element ID
-
-  filters.forEach(category => {
-    const label = document.createElement('label');
-    const checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    checkbox.name = category;
-    checkbox.value = category;
-    
-    label.appendChild(checkbox);
-    label.appendChild(document.createTextNode(category));
-
-    filterDiv.appendChild(label);
-  });
-</script>
 
 </body>
 </html>
