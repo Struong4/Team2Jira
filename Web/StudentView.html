@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Student Inventory Window</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+    .container {
+      display: flex;
+      height: 100vh;
+    }
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      width: 120px;
+      border-right: 1px solid #ccc;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+    .sidebar img {
+      width: 75px;
+      height: 75px;
+      object-fit: contain;
+      margin: 0 auto 10px;
+    }
+    #filterCategories {
+      display: flex;
+      flex-direction: column; /* Ensures vertical stacking */
+    }
+    .sidebar label {
+      display: block; /* Makes each label take up full width */
+      margin-bottom: 10px; /* Adds spacing between each label/checkbox pair */
+    }
+    .sidebar input[type="checkbox"] {
+      margin-right: 8px; /* Adds space between the checkbox and label text */
+    }
+    .sidebar input {
+      margin: 5px 0;
+    }
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .header {
+      background-color: black; /* Changed to black */
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      padding: 5px 10px;
+    }
+    .log-in {
+      background-color: rgb(253, 181, 21); /* Changed to gold */
+      padding: 4px;
+      display: flex;
+      align-items: center;
+    }
+    .log-in button {
+      background-color: white;
+      border: none;
+      padding: 5px;
+      cursor: pointer;
+    }
+    .toolbar {
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      background-color: rgb(253, 181, 21); /* Changed to gold */
+      color: white; /* Text color white for contrast */
+    }
+    .toolbar input[type="text"] {
+      margin-right: 15px;
+      padding: 5px;
+      flex: 1;
+      background-color: #ffffff; /* Dark background for input */
+      color: rgb(0, 0, 0); /* White text for input */
+      border: 1px solid #ffffff; /* Subtle border */
+    }
+    .toolbar select {
+      margin-right: auto;
+      padding: 5px;
+      background-color: #ffffff; /* Dark background for select */
+      color: rgb(0, 0, 0); /* White text for select */
+      border: 1px solid #ffffff; /* Subtle border */
+    }
+    .toolbar button {
+      margin-left: 10px;
+      padding: 5px 10px;
+      min-width: 75px;
+      background-color: #ffffff; /* Dark background for button */
+      color: rgb(0, 0, 0); /* White text for button */
+      border: none;
+      cursor: pointer;
+    }
+    .toolbar button:hover {
+      background-color: #ffffff; /* Slightly lighter button on hover */
+    }
+    .content {
+      flex: 1;
+      overflow: auto;
+      padding: 10px;
+      background: #f2f2f2;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 15px;
+    }
+    .item-box {
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease;
+    }
+    .item-box:hover {
+      transform: translateY(-3px);
+    }
+    .item-box img {
+      max-width: 100%;
+      height: auto;
+      margin-bottom: 10px;
+      border-radius: 4px;
+    }
+    .item-box button {
+      margin-top: auto;
+      padding: 5px 10px;
+      border: none;
+      background: rgb(253, 181, 21);
+      color: white;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    .item-box button:hover {
+      background: rgb(220, 150, 15);
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="sidebar">
+    <img src="Logos/retriever_essential.png" alt="Retriever Essential Logo">
+    <label>Filter Categories:</label>
+    <div id="filterCategories"></div> <!-- This is where the categories will be inserted -->
+  </div>
+
+  <div class="main">
+    <div class="header">
+      <div class="log-in">
+        <!-- Login Button Links to Login Page -->
+        <a href="StaffLogin.html">
+          <button>Staff Login</button>
+        </a>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <input type="text" placeholder="Search...">
+      <label for="sortby">Sort by:</label>
+      <select id="sortby">
+        <option>Name</option>
+        <option>ID</option>
+        <option>In Stock</option>
+      </select>
+      <button><img src="Logos/CheckoutCart1.jpg" alt="Cart" style="height:20px;"> Go To Cart</button>
+    </div>
+
+    <div class="content">
+      <div class="grid" id="itemsGrid">
+        <!-- JavaScript will add item boxes here -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // loop through database to add items and their images
+  const items = [
+    { name: 'Item 1', image: 'Logos/canned_goods.jpg' },
+    { name: 'Item 2', image: 'item2.jpg' },
+    { name: 'Item 3', image: 'item3.jpg' },
+    { name: 'Item 4', image: 'item4.jpg' },
+    { name: 'Item 5', image: 'item5.jpg' }
+  ];
+
+  const grid = document.getElementById('itemsGrid');
+
+  items.forEach(item => {
+    const box = document.createElement('div');
+    box.className = 'item-box';
+    box.innerHTML = `
+      <h4>${item.name}</h4>
+      <img src="${item.image}" alt="${item.name}">
+      <button>Item Details</button>
+    `;
+    grid.appendChild(box);
+  });
+</script>
+
+<script>
+  // loop through database to add category names
+  const filters = ['Canned Food', 'Produce', 'Grains', 'Test 1', 'Test 2']; 
+  const filterDiv = document.getElementById('filterCategories'); // Corrected element ID
+
+  filters.forEach(category => {
+    const label = document.createElement('label');
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.name = category;
+    checkbox.value = category;
+    
+    label.appendChild(checkbox);
+    label.appendChild(document.createTextNode(category));
+
+    filterDiv.appendChild(label);
+  });
+</script>
+
+</body>
+</html>

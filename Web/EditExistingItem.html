@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Inventory Object</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f8f8f8;
+        }
+        .container {
+            display: flex;
+            flex-direction: column; /* Stack the content vertically */
+            align-items: center;
+        }
+        header {
+            width: 100%;
+            background-color: rgb(253, 181, 21);
+            color: rgb(0, 0, 0);
+            padding: 20px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .main-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 60px;  /* Increase space between columns */
+            margin-top: 20px;
+        }
+        .logo-dropzone {
+            width: 300px;  /* Increase the width */
+            height: 200px;  /* Optionally increase the height to match the new width */
+            border: 2px dashed #aaa;
+            border-radius: 8px;
+            background-color: transparent;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+        .logo-dropzone.dragover {
+            background-color: #e0ffe0;
+            border-color: #00aa00;
+        }
+        .logo-dropzone img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+        .logo-dropzone input {
+            display: none;
+        }
+        .form-container {
+            max-width: 900px; /* Increase the width */
+            width: 100%;  /* Ensure the form container adapts to available space */
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], textarea, input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .checkbox-group {
+            margin-bottom: 15px;
+        }
+        .checkbox-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .checkbox-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* Creates a responsive grid */
+            gap: 15px; /* Space between checkboxes */
+            margin-top: 5px;
+        }        
+        .checkbox-options label {
+            font-weight: normal;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .actions {
+            text-align: right;
+        }
+        .actions button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        .confirm {
+            background-color: #00aa00;
+            color: white;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+        .confirm.enabled {
+            cursor: pointer;
+            opacity: 1;
+        }
+        .cancel {
+            background-color: #ff0000;
+            color: white;
+        }
+        /* Styling for the new button */
+        .generate-id-btn {
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #f0f0f0;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        /* Align Item ID input and button horizontally */
+        .input-group {
+            display: flex;
+            align-items: center;
+        }
+        .required-symbol {
+            color: red;
+            font-size: 18px; /* Adjust size if needed */
+            margin-left: 5px; /* Space between label text and the asterisk */
+        }        
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            Edit Inventory Object
+        </header>
+
+        <div class="main-container">
+            <!-- Logo Drag and Drop Zone -->
+            <div class="logo-dropzone" id="logoDropzone">
+                <img id="logoPreview" src="Logos/Upload Image.png" alt="Logo">
+                <input type="file" accept="image/*" id="logoInput">
+            </div>
+
+            <!-- Form Content -->
+            <div class="form-container">
+                <div class="form-group">
+                    <label for="productName">Product Name<span class="required-symbol">*</span></label>
+                    <input type="text" id="productName">
+                </div>
+
+                <!-- Item ID -->
+                <div class="form-group">
+                    <label for="itemID">Item ID<span class="required-symbol">*</span></label>
+                    <div class="input-group">
+                        <input type="text" id="itemID">
+                        <button type="button" class="generate-id-btn" onclick="generateItemID()">Generate ID</button>
+                    </div>
+                </div>
+
+                <!-- Origin Checkbox Group -->
+                <div class="form-group checkbox-group">
+                    <label class="checkbox-label">Origin<span class="required-symbol">*</span></label>
+                    <div class="checkbox-options">
+                        <label><input type="checkbox" class="origin-checkbox"> Patel Brothers</label>
+                        <label><input type="checkbox" class="origin-checkbox"> MD Food Bank</label>
+                        <label><input type="checkbox" class="origin-checkbox"> Donated</label>
+                        <label>
+                            <input type="checkbox" id="otherOriginCheckbox">
+                            <input type="text" id="otherOriginInput" placeholder="Enter custom origin" style="margin-left:5px;">
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Category Checkbox Group -->
+                <div class="form-group checkbox-group">
+                    <label class="checkbox-label">Category:</label>
+                    <div class="checkbox-options">
+                        <label><input type="checkbox"> Canned</label>
+                        <label><input type="checkbox"> Produce</label>
+                        <label><input type="checkbox"> Grains</label>
+                        <label><input type="checkbox"> Cat4</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="price">Price</label>
+                    <input type="text" id="price">
+                </div>
+
+                <div class="form-group">
+                    <label for="weight">Weight</label>
+                    <input type="text" id="weight">
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Description<span class="required-symbol">*</span></label>
+                    <textarea id="description" rows="4"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="availableQuantity">Available Quantity<span class="required-symbol">*</span></label>
+                    <input type="number" id="availableQuantity" min="0" max="10000">
+                </div>
+
+                <div class="form-group">
+                    <label for="quantityLimit">Quantity Limit<span class="required-symbol">*</span></label>
+                    <input type="number" id="quantityLimit" min="1" max="10000">
+                </div>
+
+                <div class="actions">
+                    <button class="confirm" onclick="window.location.href='StaffView.html'" id="confirmButton" disabled>Confirm</button>
+                    <button class="cancel" onclick="window.location.href='StaffView.html'">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const dropzone = document.getElementById('logoDropzone');
+        const logoPreview = document.getElementById('logoPreview');
+        const logoInput = document.getElementById('logoInput');
+        const confirmButton = document.getElementById('confirmButton');
+        const originCheckboxes = document.querySelectorAll('.origin-checkbox');
+        
+        // Drag over effect
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropzone.classList.add('dragover');
+        });
+
+        dropzone.addEventListener('dragleave', () => {
+            dropzone.classList.remove('dragover');
+        });
+
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = () => logoPreview.src = reader.result;
+                reader.readAsDataURL(file);
+            } else {
+                alert('Please drop a valid image file.');
+            }
+        });
+
+        // Click to upload
+        dropzone.addEventListener('click', () => {
+            logoInput.click();
+        });
+
+        // Handle file input change
+        logoInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = () => logoPreview.src = reader.result;
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Generate 10-digit item ID
+        function generateItemID() {
+            const itemID = Math.floor(1000000000 + Math.random() * 9000000000);  // Generates a 10-digit number
+            document.getElementById('itemID').value = itemID;  // Sets the ID into the input field
+        }
+
+        // Enable Confirm button if all required fields are filled
+        function validateForm() {
+            const productName = document.getElementById('productName').value;
+            const itemID = document.getElementById('itemID').value;
+            const description = document.getElementById('description').value;
+            const availableQuantity = document.getElementById('availableQuantity').value;
+            const quantityLimit = document.getElementById('quantityLimit').value;
+            const isOriginSelected = Array.from(originCheckboxes).some(checkbox => checkbox.checked);
+            const isOtherOriginChecked = document.getElementById('otherOriginCheckbox').checked;
+            const otherOriginInput = document.getElementById('otherOriginInput').value.trim(); // Check if the input is filled
+        
+            // Check if at least one origin checkbox is selected or if "Other" is selected and the custom input is filled
+            const isValidOrigin = isOriginSelected || (isOtherOriginChecked && otherOriginInput !== '');
+        
+            if (productName && itemID && description && availableQuantity && quantityLimit && isValidOrigin) {
+                confirmButton.disabled = false;
+                confirmButton.classList.add('enabled');
+            } else {
+                confirmButton.disabled = true;
+                confirmButton.classList.remove('enabled');
+            }
+        }
+        
+        // Event listeners for real-time validation
+        document.getElementById('productName').addEventListener('input', validateForm);
+        document.getElementById('itemID').addEventListener('input', validateForm);
+        document.getElementById('description').addEventListener('input', validateForm);
+        document.getElementById('availableQuantity').addEventListener('input', validateForm);
+        document.getElementById('quantityLimit').addEventListener('input', validateForm);
+
+        // Listen for changes to checkboxes
+        originCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', validateForm);
+        });
+    </script>
+</body>
+</html>
