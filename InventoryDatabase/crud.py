@@ -8,7 +8,8 @@ INVENTORY = "inventory.db"
 CREATE_SCRIPT = "create_all.sql"
 DROP_SCRIPT = "drop_all.sql"
 
-ID_REG_EXP = "^[A-Z]{2}\d{5}$"
+ID_REG_EXP = r"^[A-Z]{2}\d{5}$"
+NAME_PATTERN = r"^[A-Z][a-z]+(?:[-' ][A-Z][a-z]+)*$"
 
 def createInventory(create_script):
     runSQLScript(create_script)
@@ -22,8 +23,8 @@ def regexp(expr, item):
     """Apply regular expression matching."""
     if item is None:
         return False
-    reg = re.compile(expr)
-    return reg.search(item) is not None
+    return re.fullmatch(expr, item) is not None
+
 
 def runSQLScript(sql_file):
 
@@ -469,7 +470,18 @@ def showHistory():
 
     return transactions
 
-def addNewStaff(staff_id, staff_first_name, staff_last_name):
+def addNewStaff(staff_id, staff_first_name, staff_last_name, staff_username, staff_password):
+    prompt = ""
+
+    # checks for check constraints
+    if not re.fullmatch(ID_REG_EXP, staff_id):
+        return f"❌ Invalid staff ID '{staff_id}'. Must match format: 2 uppercase letters followed by 5 digits."
+    elif not re.fullmatch(ID_REG_EXP, staff_username):
+        return f"❌ Invalid staff username '{staff_username}'. Must match format: 2 uppercase letters followed by 5 digits."
+    elif not re.fullmatch(NAME_PATTERN, staff_first_name):
+        return f"❌ Invalid staff first name '{staff_first_name}'."
+    elif not re.fullmatch(NAME_PATTERN, staff_last_name):
+        return f"❌ Invalid staff last name '{staff_last_name}'."
 
     # establishes a connection with the sql database
     conn = sqlite3.connect(INVENTORY)
@@ -480,17 +492,32 @@ def addNewStaff(staff_id, staff_first_name, staff_last_name):
     # Register REGEXP function
     conn.create_function("REGEXP", 2, regexp)
 
-    # executes the add staff command
-    cursor.execute("""
-        INSERT INTO staff (staff_id, staff_first_name, staff_last_name)
-        VALUES (?, ?, ?)
-    """, (staff_id, staff_first_name, staff_last_name,))
+    try:
+        # executes the add staff command
+        #print(f"about to add staff {staff_id}")
+        cursor.execute("""
+            INSERT INTO staff (staff_id, staff_first_name, staff_last_name, staff_username, staff_password)
+            VALUES (?, ?, ?, ?, ?)
+        """, (staff_id, staff_first_name, staff_last_name, staff_username, staff_password))
 
-    conn.commit()
+        conn.commit()
 
-    # closes the cursor and connection
-    cursor.close()
-    conn.close()
+        #print("added a staff")
+
+        prompt = f"✅ Staff '{staff_id}' successfully added!"
+
+    except sqlite3.IntegrityError as e:
+        if "UNIQUE constraint failed" in str(e):
+            prompt = f"⚠️ Unable to add staff {staff_id}. Staff ID '{staff_id}' already exists in the database!"
+        else:
+            prompt = f"⚠️ Unable to add staff {staff_id}. {e}"
+    
+    finally:
+        # closes the cursor and connection
+        cursor.close()
+        conn.close()
+
+    return prompt
 
 
 # where we'll test the code to make sure it works
@@ -503,36 +530,59 @@ if __name__ == "__main__":
     print("BEFORE TESTING ADD NEW ITEMS")
     displayAllTables()
 
-    # normal test cases for adding items
-    print(addNewItem("1111111111", "milk", 5.0, 10, 10, "a carton of milk", 0, ["walmart", "target", "h mart"], ["dairy", "white"]))
-    print(addNewItem("2222222222", "orange", 1.0, 10, 10, "an orange", 0, ["walmart", "aldis"], ["fruit"]))
-    print(addNewItem("3333333333", "apple", 1.0, 10, 10, "an apple", 0, ["walmart"], ["fruit", "red"]))
+    print("TESTING ADD STAFF")
+    # testing normal case for add staff
+    print(addNewStaff("GB70937", "Gia", "Santos", "GB70937", "password"))
+    print(addNewStaff("AB12345", "Olive", "Santos", "AB12345", "123pass"))
+    print(addNewStaff("CD67890", "Manuel", "Santos", "CD67890", "pass1234"))
 
-    # edge cases for adding items
-    print(addNewItem("4444444444", "banana", 1.0, 10, 10, "an banana"))
-    print(addNewItem(5555555555, "chicken", 1.0, 1, 0, "an chicken"))
-    print(addNewItem(6666666666, "pork", 1.0, 1, 0, "an pork"))
+    # error case duplicate staff ID
+    print(addNewStaff("GB70937", "John", "Doe", "GB70937", "password"))
 
-    # error cases for adding items
-    # unique constraints
-    print(addNewItem("4444444444", "cereal", 1.0, 1, 0, "an cereal"))
+    # error case invalid staff ID
+    print(addNewStaff("12ABCDE", "John", "Doe", "GB70937", "password"))
 
-    # check contraints
-    print(addNewItem("7777777777", "yogurt", -1.0, 1, 0, "an yogurt"))
-    print(addNewItem("8888888888", "sugar", 1.0, -1, 0, "an sugar"))
-    print(addNewItem("9999a99999", "salt", 1.0, 1, 0, "an salt"))
-    print(addNewItem("9999999999", "sugar", 1.0, -1, 0, "an sugar"))
-    print(addNewItem("9999999999", "sugar", 1.0, 1, -5, "an sugar"))
+    # error case invalid staff username
+    print(addNewStaff("GB70937", "John", "Doe", "12ABCDE", "password"))
 
-    # data constraints
-    print(addNewItem("000000000", "rice", 1.0, 1, 0, "a rice"))
-    print(addNewItem("1111122222", "eggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg", 1, 1.0, "an sugar", 5))
-    print(addNewItem("4444455555", "meat", 1, 1.0, 10, 10))
-    print(addNewItem("5555566666", "beef", 1, 1.0, 10, "an beef", 5, "hello", []))
-    print(addNewItem("6666677777", "blueberry", 1, 1.0, 10, "an blueberry", 5, [], "hi"))
+    # error case invalid staff first name
+    print(addNewStaff("GB70937", "1234princess", "Doe", "GB70937", "password"))
 
-    print("AFTER TESTING ADD NEW ITEMS")
+    # error case invalid staff last name
+    print(addNewStaff("GB70937", "John", "1234princess", "GB70937", "password"))
+
     displayAllTables()
+
+    # normal test cases for adding items
+    # print(addNewItem("1111111111", "milk", 5.0, 10, 10, "a carton of milk", 0, ["walmart", "target", "h mart"], ["dairy", "white"]))
+    # print(addNewItem("2222222222", "orange", 1.0, 10, 10, "an orange", 0, ["walmart", "aldis"], ["fruit"]))
+    # print(addNewItem("3333333333", "apple", 1.0, 10, 10, "an apple", 0, ["walmart"], ["fruit", "red"]))
+
+    # # edge cases for adding items
+    # print(addNewItem("4444444444", "banana", 1.0, 10, 10, "an banana"))
+    # print(addNewItem(5555555555, "chicken", 1.0, 1, 0, "an chicken"))
+    # print(addNewItem(6666666666, "pork", 1.0, 1, 0, "an pork"))
+
+    # # error cases for adding items
+    # # unique constraints
+    # print(addNewItem("4444444444", "cereal", 1.0, 1, 0, "an cereal"))
+
+    # # check contraints
+    # print(addNewItem("7777777777", "yogurt", -1.0, 1, 0, "an yogurt"))
+    # print(addNewItem("8888888888", "sugar", 1.0, -1, 0, "an sugar"))
+    # print(addNewItem("9999a99999", "salt", 1.0, 1, 0, "an salt"))
+    # print(addNewItem("9999999999", "sugar", 1.0, -1, 0, "an sugar"))
+    # print(addNewItem("9999999999", "sugar", 1.0, 1, -5, "an sugar"))
+
+    # # data constraints
+    # print(addNewItem("000000000", "rice", 1.0, 1, 0, "a rice"))
+    # print(addNewItem("1111122222", "eggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg", 1, 1.0, "an sugar", 5))
+    # print(addNewItem("4444455555", "meat", 1, 1.0, 10, 10))
+    # print(addNewItem("5555566666", "beef", 1, 1.0, 10, "an beef", 5, "hello", []))
+    # print(addNewItem("6666677777", "blueberry", 1, 1.0, 10, "an blueberry", 5, [], "hi"))
+
+    # print("AFTER TESTING ADD NEW ITEMS")
+    # displayAllTables()
 
     # print("INVENTORY")
     # inventory = showInventory()
@@ -680,39 +730,39 @@ if __name__ == "__main__":
 
 
 
-    print("TESTING BUY ITEMS")
+    # print("TESTING BUY ITEMS")
 
-    # normal case for buying items
-    print(buyItem("1111111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 1))
-    print(buyItem("2222222222", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 5))
-    print(buyItem("3333333333", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 10))
+    # # normal case for buying items
+    # print(buyItem("1111111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 1))
+    # print(buyItem("2222222222", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 5))
+    # print(buyItem("3333333333", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 10))
 
-    # edge case: no more stock
-    print(buyItem("3333333333", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 1))
+    # # edge case: no more stock
+    # print(buyItem("3333333333", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 1))
 
-    # edge case: buying 0 items
-    print(buyItem("5555555555", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 0))
+    # # edge case: buying 0 items
+    # print(buyItem("5555555555", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 0))
 
-    # error case: invalid student id
-    print(buyItem("4444444444", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 1))
+    # # error case: invalid student id
+    # print(buyItem("4444444444", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 1))
 
-    # error case: nonexistent student id
-    print(buyItem("4444444444", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 1))
+    # # error case: nonexistent student id
+    # print(buyItem("4444444444", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 1))
 
-    # error case: invalid item id
-    print(buyItem("444444444", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 1))
+    # # error case: invalid item id
+    # print(buyItem("444444444", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 1))
 
-    # error case: invalid item id
-    print(buyItem("8888888888", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 1))
+    # # error case: invalid item id
+    # print(buyItem("8888888888", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 1))
 
-    # error case: invalid item id
-    print(buyItem("4444444444", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), -5))
+    # # error case: invalid item id
+    # print(buyItem("4444444444", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), -5))
 
-    # edge case: buying item at a past datetime
-    print(buyItem("4444444444", "2001-04-03  12:00:00", 1))
+    # # edge case: buying item at a past datetime
+    # print(buyItem("4444444444", "2001-04-03  12:00:00", 1))
 
-    # error case: buying items at a future datetime than now
-    print(buyItem("5555555555", "2030-04-03  12:00:00", 1))
+    # # error case: buying items at a future datetime than now
+    # print(buyItem("5555555555", "2030-04-03  12:00:00", 1))
 
 
 

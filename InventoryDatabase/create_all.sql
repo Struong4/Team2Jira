@@ -41,9 +41,11 @@ CREATE TABLE IF NOT EXISTS staff (
 	staff_id CHAR(7) NOT NULL,
     staff_first_name VARCHAR(50) NOT NULL,
     staff_last_name VARCHAR(50) NOT NULL,
+    staff_username CHAR(7) NOT NULL,
+    staff_password VARCHAR(50) NOT NULL,
     PRIMARY KEY (staff_id),
     CHECK (staff_id REGEXP "^[A-Z]{2}\d{5}$" AND staff_first_name REGEXP "^[A-Z][a-z]+(?:[-' ][A-Z][a-z]+)*$" AND 
-    staff_last_name REGEXP "^[A-Z][a-z]+(?:[-' ][A-Z][a-z]+)*$")
+    staff_last_name REGEXP "^[A-Z][a-z]+(?:[-' ][A-Z][a-z]+)*$" and staff_username REGEXP "^[A-Z]{2}\d{5}$")
 );
 
 -- creates a table for orders
