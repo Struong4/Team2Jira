@@ -386,7 +386,7 @@ def updateItem(staff_id, item_id, update_datetime, item_name, weight_lbs, quanti
         conn.close()
     return prompt
 
-def showInventory():
+def showInventory(origins=[], categories=[]):
     # declares and initializes variables
     inventory = {}
 
@@ -396,26 +396,49 @@ def showInventory():
     # gets the sql cursor
     cursor = conn.cursor()
 
-    # gets all the items in the inventory
-    cursor.execute(f"SELECT * FROM item")
+    # query for filtering out items of specific origins and categories
+    query = """
+        SELECT i.item_id, i.item_name, i.weight_lbs, i.price, i.descript,
+               i.quantity, i.quantity_limit
+        FROM item i
+        LEFT JOIN origin o ON i.item_id = o.item_id
+        LEFT JOIN category c ON i.item_id = c.item_id
+    """
+    conditions = []
+    params = []
+
+    # add filters if provided
+    if origins:
+        placeholders = ",".join("?" for _ in origins)
+        conditions.append(f"o.origin_name IN ({placeholders})")
+        params.extend(origins)
+
+    if categories:
+        placeholders = ",".join("?" for _ in categories)
+        conditions.append(f"c.category_name IN ({placeholders})")
+        params.extend(categories)
+
+    # append WHERE clause if needed
+    if conditions:
+        query += " WHERE " + " AND ".join(conditions)
+
+    cursor.execute(query, params)
     rows = cursor.fetchall()
 
-    # iterates through all the items and stores them in a dictionary
     for row in rows:
-        item_id = row[0]
-        item_name = row[1]
-        weight_lbs = row[2]
-        price = row[3]
-        descript = row[4]
-        quantity = row[5]
-        quantity_limit = row[6]
-
-        inventory[item_id] = {"Item name": item_name, "Weight": weight_lbs, "Price": price, "Description": descript, "Quantity": quantity, "Quantity Limit": quantity_limit}
+        item_id, item_name, weight_lbs, price, descript, quantity, quantity_limit = row
+        inventory[item_id] = {
+            "Item name": item_name,
+            "Weight": weight_lbs,
+            "Price": price,
+            "Description": descript,
+            "Quantity": quantity,
+            "Quantity Limit": quantity_limit
+        }
 
     cursor.close()
     conn.close()
 
-    # inventory is in dictionary format
     return inventory
 
 def showHistory():
