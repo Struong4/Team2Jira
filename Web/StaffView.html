@@ -288,10 +288,16 @@
   document.getElementById('addCategoryButton').addEventListener('click', () => {
     const newCategory = prompt("Enter new category name:");
     if (newCategory) {
-      filters.push(newCategory);
-      renderCategories();
+      const trimmed = newCategory.trim();
+      if (trimmed && !filters.includes(trimmed)) {
+        filters.push(trimmed);
+        renderCategories();
+      } else {
+        alert("Category already exists or input is invalid.");
+      }
     }
   });
+  
 
   document.getElementById('removeCategoryButton').addEventListener('click', () => {
     filters = filters.filter(cat => {
