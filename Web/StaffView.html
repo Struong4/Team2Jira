@@ -205,69 +205,75 @@
 <script>
   // For testing purposes
   const items = [
-  { id: 3, name: 'ABCD', image: 'Logos/canned_goods.jpg' },
-  { id: 1, name: 'AABB', image: 'item2.jpg' },
-  { id: 5, name: 'BBCD', image: 'item3.jpg' },
-  { id: 4, name: 'ZYXA', image: 'item4.jpg' },
-  { id: 2, name: 'DDJF', image: 'item5.jpg' }
-];
+    { id: 3, name: 'ABCD', image: 'Logos/canned_goods.jpg' },
+    { id: 1, name: 'AABB', image: 'item2.jpg' },
+    { id: 5, name: 'BBCD', image: 'item3.jpg' },
+    { id: 4, name: 'ZYXA', image: 'item4.jpg' },
+    { id: 2, name: 'DDJF', image: 'item5.jpg' }
+  ];
 
+  const grid = document.getElementById('itemsGrid');
 
-    const grid = document.getElementById('itemsGrid');
-
-    function createItemBox(item) {
-      const box = document.createElement('div');
-      box.className = 'item-box';
-      box.innerHTML = `
-        <h4>${item.name}</h4>
-        <img src="${item.image}" alt="${item.name}">
-        <div class="button-container">
-          <button class="editItemButton">Edit Item</button>
-          <button class="removeItemButton">Remove Item</button>
-        </div>
-      `;
-      box.querySelector('.editItemButton').addEventListener('click', () => {
-        window.location.assign("./EditExistingItem.html");
-      });
-      box.querySelector('.removeItemButton').addEventListener('click', () => {
-        box.remove();
-      });
-      return box;
-    }
-
-    function renderItems(itemList) {
-      grid.innerHTML = '';  // Clear current items
-      itemList.forEach(item => {
-        const box = createItemBox(item);
-        grid.appendChild(box);
-      });
-    }
-
-    // Initial render: sort A-Z
-    const sortedAZ = [...items].sort((a, b) => a.name.localeCompare(b.name));
-    renderItems(sortedAZ);
-    document.getElementById('sortby').value = "Name A-Z";
-
-    document.getElementById('sortby').addEventListener('change', (e) => {
-      let sorted = [...items];
-      if (e.target.value === 'Name A-Z') {
-        sorted.sort((a, b) => a.name.localeCompare(b.name));
-      } else if (e.target.value === 'Name Z-A') {
-        sorted.sort((a, b) => b.name.localeCompare(a.name));
-      } else if (e.target.value === 'ID Ascending') {
-        sorted.sort((a, b) => a.id - b.id);
-      } else if (e.target.value === 'ID Descending') {
-        sorted.sort((a, b) => b.id - a.id);
-      }
-      renderItems(sorted);
+  function createItemBox(item) {
+    const box = document.createElement('div');
+    box.className = 'item-box';
+    box.innerHTML = `
+      <h4>${item.name}</h4>
+      <img src="${item.image}" alt="${item.name}">
+      <div class="button-container">
+        <button class="editItemButton">Edit Item</button>
+        <button class="removeItemButton">Remove Item</button>
+      </div>
+    `;
+    box.querySelector('.editItemButton').addEventListener('click', () => {
+      window.location.assign("./EditExistingItem.html");
     });
-    
+    box.querySelector('.removeItemButton').addEventListener('click', () => {
+      box.remove();
+    });
+    return box;
+  }
+
+  function renderItems(itemList) {
+    grid.innerHTML = '';  // Clear current items
+    itemList.forEach(item => {
+      const box = createItemBox(item);
+      grid.appendChild(box);
+    });
+  }
+
+  // Initial render: sort A-Z
+  const sortedAZ = [...items].sort((a, b) => a.name.localeCompare(b.name));
+  renderItems(sortedAZ);
+  document.getElementById('sortby').value = "Name A-Z";
+
+  document.getElementById('sortby').addEventListener('change', (e) => {
+    let sorted = [...items];
+    if (e.target.value === 'Name A-Z') {
+      sorted.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (e.target.value === 'Name Z-A') {
+      sorted.sort((a, b) => b.name.localeCompare(a.name));
+    } else if (e.target.value === 'ID Ascending') {
+      sorted.sort((a, b) => a.id - b.id);
+    } else if (e.target.value === 'ID Descending') {
+      sorted.sort((a, b) => b.id - a.id);
+    }
+    renderItems(sorted);
+  });
 </script>
 
 <script>
-    const filters = ['Canned Food', 'Produce', 'Grains', 'Test 1', 'Test 2'];
-    const filterDiv = document.getElementById('filterCategories');
+  const filterDiv = document.getElementById('filterCategories');
+  let filters = ['Canned Food', 'Produce', 'Grains', 'Test 1', 'Test 2'];
 
+  function updateCategoryStorage() {
+    const currentCategories = Array.from(filterDiv.querySelectorAll('input[type="checkbox"]'))
+                                   .map(cb => cb.value);
+    localStorage.setItem('inventoryCategories', JSON.stringify(currentCategories));
+  }
+
+  function renderCategories() {
+    filterDiv.innerHTML = '';
     filters.forEach(category => {
       const label = document.createElement('label');
       const checkbox = document.createElement('input');
@@ -278,40 +284,37 @@
       label.appendChild(document.createTextNode(category));
       filterDiv.appendChild(label);
     });
+    updateCategoryStorage();
+  }
 
-    document.getElementById('addCategoryButton').addEventListener('click', () => {
-      const newCategory = prompt("Enter new category name:");
-      if (newCategory) {
-        const label = document.createElement('label');
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.name = newCategory;
-        checkbox.value = newCategory;
-        label.appendChild(checkbox);
-        label.appendChild(document.createTextNode(newCategory));
-        filterDiv.appendChild(label);
-      }
-    });
+  renderCategories();
 
-    document.getElementById('removeCategoryButton').addEventListener('click', () => {
-      const checkboxes = filterDiv.querySelectorAll('input[type="checkbox"]');
-      checkboxes.forEach(checkbox => {
-        if (checkbox.checked) {
-          checkbox.parentElement.remove();
-        }
-      });
-    });
+  document.getElementById('addCategoryButton').addEventListener('click', () => {
+    const newCategory = prompt("Enter new category name:");
+    if (newCategory) {
+      filters.push(newCategory);
+      renderCategories();
+    }
+  });
 
-    document.getElementById('addItemButton').addEventListener('click', () => {
-      window.location.assign("./AddNewItem.html");
+  document.getElementById('removeCategoryButton').addEventListener('click', () => {
+    filters = filters.filter(cat => {
+      const cb = filterDiv.querySelector(`input[value="${cat}"]`);
+      return cb && !cb.checked;
     });
+    renderCategories();
+  });
 
-    document.getElementById('logoutButton').addEventListener('click', () => {
-      const confirmLogout = confirm("Are you sure you want to log out?");
-      if (confirmLogout) {
-        window.location.assign("./StudentView.html");
-      }
-    });
+  document.getElementById('addItemButton').addEventListener('click', () => {
+    window.location.assign("./AddNewItem.html");
+  });
+
+  document.getElementById('logoutButton').addEventListener('click', () => {
+    const confirmLogout = confirm("Are you sure you want to log out?");
+    if (confirmLogout) {
+      window.location.assign("./StudentView.html");
+    }
+  });
 </script>
 
 </body>
