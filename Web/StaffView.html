@@ -203,16 +203,18 @@
 </div>
 
 <script>
-  // For testing purposes
   const items = [
-  { id: 3, name: 'ABCD', image: 'Logos/canned_goods.jpg', categories: ['Canned', 'Grains'] },
-  { id: 1, name: 'AABB', image: 'item2.jpg', categories: ['Produce'] },
-  { id: 5, name: 'BBCD', image: 'item3.jpg', categories: ['Grains'] },
-  { id: 4, name: 'ZYXA', image: 'item4.jpg', categories: ['Canned', 'Produce'] },
-  { id: 2, name: 'DDJF', image: 'item5.jpg', categories: ['Canned'] }
+    { id: 3, name: 'ABCD', image: 'Logos/canned_goods.jpg', categories: ['Canned', 'Grains'] },
+    { id: 1, name: 'AABB', image: 'item2.jpg', categories: ['Produce'] },
+    { id: 5, name: 'BBCD', image: 'item3.jpg', categories: ['Grains'] },
+    { id: 4, name: 'ZYXA', image: 'item4.jpg', categories: ['Canned', 'Produce'] },
+    { id: 2, name: 'DDJF', image: 'item5.jpg', categories: ['Canned'] }
   ];
 
   const grid = document.getElementById('itemsGrid');
+  const sortSelect = document.getElementById('sortby');
+  const filterDiv = document.getElementById('filterCategories');
+  let filters = ['Canned', 'Produce', 'Grains'];
 
   function createItemBox(item) {
     const box = document.createElement('div');
@@ -235,41 +237,36 @@
   }
 
   function renderItems(itemList) {
-    grid.innerHTML = '';  // Clear current items
-    itemList.forEach(item => {
-      const box = createItemBox(item);
-      grid.appendChild(box);
-    });
+    grid.innerHTML = '';
+    itemList.forEach(item => grid.appendChild(createItemBox(item)));
   }
 
-  // Initial render: sort A-Z
-  const sortedAZ = [...items].sort((a, b) => a.name.localeCompare(b.name));
-  renderItems(sortedAZ);
-  document.getElementById('sortby').value = "Name A-Z";
+  function getSelectedCategories() {
+    return Array.from(filterDiv.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
+  }
 
-  document.getElementById('sortby').addEventListener('change', (e) => {
-    let sorted = [...items];
-    if (e.target.value === 'Name A-Z') {
-      sorted.sort((a, b) => a.name.localeCompare(b.name));
-    } else if (e.target.value === 'Name Z-A') {
-      sorted.sort((a, b) => b.name.localeCompare(a.name));
-    } else if (e.target.value === 'ID Ascending') {
-      sorted.sort((a, b) => a.id - b.id);
-    } else if (e.target.value === 'ID Descending') {
-      sorted.sort((a, b) => b.id - a.id);
+  function applyFiltersAndSort() {
+    const selectedCategories = getSelectedCategories();
+    let filteredItems = [...items];
+
+    if (selectedCategories.length > 0) {
+      filteredItems = filteredItems.filter(item =>
+        selectedCategories.every(cat => item.categories.includes(cat))
+      );
     }
-    renderItems(sorted);
-  });
-</script>
 
-<script>
-  const filterDiv = document.getElementById('filterCategories');
-  let filters = ['Canned Food', 'Produce', 'Grains', 'Test 1', 'Test 2'];
+    const sortValue = sortSelect.value;
+    if (sortValue === 'Name A-Z') {
+      filteredItems.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (sortValue === 'Name Z-A') {
+      filteredItems.sort((a, b) => b.name.localeCompare(a.name));
+    } else if (sortValue === 'ID Ascending') {
+      filteredItems.sort((a, b) => a.id - b.id);
+    } else if (sortValue === 'ID Descending') {
+      filteredItems.sort((a, b) => b.id - a.id);
+    }
 
-  function updateCategoryStorage() {
-    const currentCategories = Array.from(filterDiv.querySelectorAll('input[type="checkbox"]'))
-                                   .map(cb => cb.value);
-    localStorage.setItem('inventoryCategories', JSON.stringify(currentCategories));
+    renderItems(filteredItems);
   }
 
   function renderCategories() {
@@ -278,16 +275,15 @@
       const label = document.createElement('label');
       const checkbox = document.createElement('input');
       checkbox.type = 'checkbox';
-      checkbox.name = category;
       checkbox.value = category;
+      checkbox.addEventListener('change', applyFiltersAndSort);
       label.appendChild(checkbox);
       label.appendChild(document.createTextNode(category));
       filterDiv.appendChild(label);
     });
-    updateCategoryStorage();
   }
 
-  renderCategories();
+  sortSelect.addEventListener('change', applyFiltersAndSort);
 
   document.getElementById('addCategoryButton').addEventListener('click', () => {
     const newCategory = prompt("Enter new category name:");
@@ -303,6 +299,7 @@
       return cb && !cb.checked;
     });
     renderCategories();
+    applyFiltersAndSort();
   });
 
   document.getElementById('addItemButton').addEventListener('click', () => {
@@ -310,12 +307,16 @@
   });
 
   document.getElementById('logoutButton').addEventListener('click', () => {
-    const confirmLogout = confirm("Are you sure you want to log out?");
-    if (confirmLogout) {
+    if (confirm("Are you sure you want to log out?")) {
       window.location.assign("./StudentView.html");
     }
   });
+
+  renderCategories();
+  sortSelect.value = 'Name A-Z';
+  applyFiltersAndSort();
 </script>
+
 
 </body>
 </html>
