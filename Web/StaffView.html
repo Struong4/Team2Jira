@@ -175,7 +175,7 @@
     <label>Filter Categories:</label>
     <div id="filterCategories"></div>
     <button id="addCategoryButton">Add Category</button>
-    <button id="removeCategoryButton">Remove Selected Categories</button>
+    <button id="removeCategoryButton">Remove Category</button>
   </div>
 
   <div class="main">
@@ -214,7 +214,18 @@
   const grid = document.getElementById('itemsGrid');
   const sortSelect = document.getElementById('sortby');
   const filterDiv = document.getElementById('filterCategories');
-  let filters = ['Canned', 'Produce', 'Grains'];
+  let filters = ['Canned', 'Produce', 'Grains']; // default fallback
+
+  function saveCategories() {
+    localStorage.setItem('filterCategories', JSON.stringify(filters));
+  }
+
+  function loadCategories() {
+    const saved = localStorage.getItem('filterCategories');
+    if (saved) {
+      filters = JSON.parse(saved);
+    }
+  }
 
   function createItemBox(item) {
     const box = document.createElement('div');
@@ -291,22 +302,29 @@
       const trimmed = newCategory.trim();
       if (trimmed && !filters.includes(trimmed)) {
         filters.push(trimmed);
+        saveCategories();     // Save updated categories
         renderCategories();
       } else {
         alert("Category already exists or input is invalid.");
       }
     }
   });
-  
 
   document.getElementById('removeCategoryButton').addEventListener('click', () => {
-    filters = filters.filter(cat => {
-      const cb = filterDiv.querySelector(`input[value="${cat}"]`);
-      return cb && !cb.checked;
-    });
-    renderCategories();
-    applyFiltersAndSort();
+    const categoryToRemove = prompt("Enter the name of the category to remove:");
+    if (categoryToRemove) {
+      const trimmed = categoryToRemove.trim();
+      if (filters.includes(trimmed)) {
+        filters = filters.filter(cat => cat !== trimmed);
+        saveCategories();
+        renderCategories();
+        applyFiltersAndSort();
+      } else {
+        alert("Category not found.");
+      }
+    }
   });
+  
 
   document.getElementById('addItemButton').addEventListener('click', () => {
     window.location.assign("./AddNewItem.html");
@@ -318,11 +336,11 @@
     }
   });
 
+  loadCategories();           // Load from localStorage
   renderCategories();
   sortSelect.value = 'Name A-Z';
   applyFiltersAndSort();
 </script>
-
 
 </body>
 </html>
