@@ -205,11 +205,11 @@
 <script>
   // For testing purposes
   const items = [
-    { id: 3, name: 'ABCD', image: 'Logos/canned_goods.jpg' },
-    { id: 1, name: 'AABB', image: 'item2.jpg' },
-    { id: 5, name: 'BBCD', image: 'item3.jpg' },
-    { id: 4, name: 'ZYXA', image: 'item4.jpg' },
-    { id: 2, name: 'DDJF', image: 'item5.jpg' }
+  { id: 3, name: 'ABCD', image: 'Logos/canned_goods.jpg', categories: ['Canned', 'Grains'] },
+  { id: 1, name: 'AABB', image: 'item2.jpg', categories: ['Produce'] },
+  { id: 5, name: 'BBCD', image: 'item3.jpg', categories: ['Grains'] },
+  { id: 4, name: 'ZYXA', image: 'item4.jpg', categories: ['Canned', 'Produce'] },
+  { id: 2, name: 'DDJF', image: 'item5.jpg', categories: ['Canned'] }
   ];
 
   const grid = document.getElementById('itemsGrid');
