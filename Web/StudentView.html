@@ -28,14 +28,14 @@
     }
     #filterCategories {
       display: flex;
-      flex-direction: column; /* Ensures vertical stacking */
+      flex-direction: column;
     }
     .sidebar label {
-      display: block; /* Makes each label take up full width */
-      margin-bottom: 10px; /* Adds spacing between each label/checkbox pair */
+      display: block;
+      margin-bottom: 10px;
     }
     .sidebar input[type="checkbox"] {
-      margin-right: 8px; /* Adds space between the checkbox and label text */
+      margin-right: 8px;
     }
     .sidebar input {
       margin: 5px 0;
@@ -46,14 +46,14 @@
       flex-direction: column;
     }
     .header {
-      background-color: black; /* Changed to black */
+      background-color: black;
       display: flex;
       justify-content: flex-end;
       align-items: center;
       padding: 5px 10px;
     }
     .log-in {
-      background-color: rgb(253, 181, 21); /* Changed to gold */
+      background-color: rgb(253, 181, 21); 
       padding: 4px;
       display: flex;
       align-items: center;
@@ -68,35 +68,35 @@
       display: flex;
       align-items: center;
       padding: 10px;
-      background-color: rgb(253, 181, 21); /* Changed to gold */
-      color: white; /* Text color white for contrast */
+      background-color: rgb(253, 181, 21);
+      color: white;
     }
     .toolbar input[type="text"] {
       margin-right: 15px;
       padding: 5px;
       flex: 1;
-      background-color: #ffffff; /* Dark background for input */
-      color: rgb(0, 0, 0); /* White text for input */
-      border: 1px solid #ffffff; /* Subtle border */
+      background-color: #ffffff;
+      color: rgb(0, 0, 0);
+      border: 1px solid #ffffff;
     }
     .toolbar select {
       margin-right: auto;
       padding: 5px;
-      background-color: #ffffff; /* Dark background for select */
-      color: rgb(0, 0, 0); /* White text for select */
-      border: 1px solid #ffffff; /* Subtle border */
+      background-color: #ffffff;
+      color: rgb(0, 0, 0);
+      border: 1px solid #ffffff;
     }
     .toolbar button {
       margin-left: 10px;
       padding: 5px 10px;
       min-width: 75px;
-      background-color: #ffffff; /* Dark background for button */
-      color: rgb(0, 0, 0); /* White text for button */
+      background-color: #ffffff;
+      color: rgb(0, 0, 0);
       border: none;
       cursor: pointer;
     }
     .toolbar button:hover {
-      background-color: #ffffff; /* Slightly lighter button on hover */
+      background-color: #ffffff;
     }
     .content {
       flex: 1;
@@ -150,13 +150,12 @@
   <div class="sidebar">
     <img src="Logos/retriever_essential.png" alt="Retriever Essential Logo">
     <label>Filter Categories:</label>
-    <div id="filterCategories"></div> <!-- This is where the categories will be inserted -->
+    <div id="filterCategories"></div> <!-- Categories will be dynamically loaded here -->
   </div>
 
   <div class="main">
     <div class="header">
       <div class="log-in">
-        <!-- Login Button Links to Login Page -->
         <a href="StaffLogin.html">
           <button>Staff Login</button>
         </a>
@@ -177,7 +176,7 @@
 
     <div class="content">
       <div class="grid" id="itemsGrid">
-        <!-- JavaScript will add item boxes here -->
+        <!-- Items will be added dynamically here -->
       </div>
     </div>
   </div>
@@ -185,13 +184,35 @@
 
 <script>
   const items = [
-    { id: 3, name: 'ABCD', image: 'Logos/canned_goods.jpg' },
-    { id: 1, name: 'AABB', image: 'item2.jpg' },
-    { id: 5, name: 'BBCD', image: 'item3.jpg' },
-    { id: 4, name: 'ZYXA', image: 'item4.jpg' },
-    { id: 2, name: 'DDJF', image: 'item5.jpg' }
+    { id: 3, name: 'ABCD', image: 'Logos/canned_goods.jpg', categories: ['Canned', 'Grains'] },
+    { id: 1, name: 'AABB', image: 'item2.jpg', categories: ['Produce'] },
+    { id: 5, name: 'BBCD', image: 'item3.jpg', categories: ['Grains'] },
+    { id: 4, name: 'ZYXA', image: 'item4.jpg', categories: ['Canned', 'Produce'] },
+    { id: 2, name: 'DDJF', image: 'item5.jpg', categories: ['Cat4'] }
   ];
 
+  const filterCategoriesContainer = document.getElementById('filterCategories');
+  
+  // Load categories from localStorage (from StaffView)
+  const categories = JSON.parse(localStorage.getItem('inventoryCategories')) || [];
+
+  function renderCategories() {
+    filterCategoriesContainer.innerHTML = '';  // Clear existing categories
+    categories.forEach(category => {
+      const label = document.createElement('label');
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.value = category;
+      label.appendChild(checkbox);
+      label.appendChild(document.createTextNode(category));
+      filterCategoriesContainer.appendChild(label);
+    });
+  }
+
+  // Call renderCategories to display the categories
+  renderCategories();
+
+  // Render the items as before
   const grid = document.getElementById('itemsGrid');
 
   function renderItems(itemList) {
@@ -208,35 +229,8 @@
     });
   }
 
-  // Initial default sort: Name A-Z
-  const sortedAZ = [...items].sort((a, b) => a.name.localeCompare(b.name));
-  renderItems(sortedAZ);
-  document.getElementById('sortby').value = "Name A-Z";
-
-  document.getElementById('sortby').addEventListener('change', (e) => {
-    let sorted = [...items];
-
-    switch (e.target.value) {
-      case 'Name A-Z':
-        sorted.sort((a, b) => a.name.localeCompare(b.name));
-        break;
-      case 'Name Z-A':
-        sorted.sort((a, b) => b.name.localeCompare(a.name));
-        break;
-      case 'ID Ascending':
-        sorted.sort((a, b) => a.id - b.id);
-        break;
-      case 'ID Descending':
-        sorted.sort((a, b) => b.id - a.id);
-        break;
-      default:
-        break;
-    }
-
-    renderItems(sorted);
-  });
+  renderItems(items); // Initial render of items
 </script>
-
 
 </body>
 </html>
