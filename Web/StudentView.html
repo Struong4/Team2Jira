@@ -255,11 +255,19 @@
       box.innerHTML = `
         <h4>${item.name}</h4>
         <img src="${item.image}" alt="${item.name}">
-        <button>Item Details</button>
+        <button data-id="${item.id}">Item Details</button>
       `;
+  
+      const button = box.querySelector('button');
+      button.addEventListener('click', () => {
+        // Navigate to ViewItem.html with item ID as a query parameter
+        window.location.href = `ViewItem.html?id=${item.id}`;
+      });
+  
       grid.appendChild(box);
     });
   }
+  
 
   function updateDisplay() {
     const filtered = getFilteredItems();
