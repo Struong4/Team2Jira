@@ -52,14 +52,12 @@
       align-items: center;
       padding: 5px 10px;
     }
-    .log-in {
-      background-color: rgb(253, 181, 21); 
-      padding: 4px;
-      display: flex;
-      align-items: center;
+    .header .log-in,
+    .header .landing-page {
+      margin-left: 10px; /* Added space between buttons */
     }
-    .log-in button {
-      background-color: white;
+    .log-in button, .landing-page button {
+      background-color: rgb(253, 181, 21);
       border: none;
       padding: 5px;
       cursor: pointer;
@@ -160,6 +158,11 @@
           <button>Staff Login</button>
         </a>
       </div>
+      <div class="landing-page">
+        <a href="LandingPage.html">
+          <button>About Us</button>
+        </a>
+      </div>
     </div>
 
     <div class="toolbar">
@@ -174,7 +177,6 @@
       <a href="Checkout.html">
         <button><img src="Logos/CheckoutCart1.jpg" alt="Cart" style="height:20px;"> Go To Cart</button>
       </a>
-      
     </div>
 
     <div class="content">
@@ -286,7 +288,6 @@
   searchInput.addEventListener('input', updateDisplay);
   sortSelect.addEventListener('change', updateDisplay);
 </script>
-
 
 </body>
 </html>
