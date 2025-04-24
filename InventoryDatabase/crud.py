@@ -420,7 +420,7 @@ def showInventory(origins=[], categories=[]):
 
     # append WHERE clause if needed
     if conditions:
-        query += " WHERE " + " AND ".join(conditions)
+        query += " WHERE " + " OR ".join(conditions)
 
     cursor.execute(query, params)
     rows = cursor.fetchall()
@@ -712,6 +712,33 @@ if __name__ == "__main__":
     print(updateItem("12ABCDE", "1111111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "whole milk", 6.0, 5, 5, "a carton of whole milk", 3))
 
     displayAllTables()
+
+    print("ENTIRE INVENTORY")
+    inventory = showInventory()
+
+    for item in inventory:
+        print(item, inventory[item])
+
+    print("FILTER ALDIS AND WALMART")
+    inventory = showInventory(origins=['aldis', 'walmart'])
+    for item in inventory:
+        print(item, inventory[item])
+
+    print("FILTER FRUIT AND TROPICAL")
+    inventory = showInventory(categories=['fruit', 'tropical'])
+    for item in inventory:
+        print(item, inventory[item])
+
+    print("FILTER FRUIT AND HMART")
+    inventory = showInventory(origins=['h mart'], categories=['fruit'])
+    for item in inventory:
+        print(item, inventory[item])
+
+    print("NONEXISTING ORIGINS AND CATEGORIES")
+    inventory = showInventory(origins=['weis'], categories=['meat'])
+    for item in inventory:
+        print(item, inventory[item])
+
 
 
     # print("TESTING RESTOCK ITMES")
