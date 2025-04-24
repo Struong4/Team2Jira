@@ -192,31 +192,63 @@
   ];
 
   const filterCategoriesContainer = document.getElementById('filterCategories');
-  
-  // Load categories from localStorage (from StaffView)
+  const searchInput = document.querySelector('.toolbar input[type="text"]');
+  const sortSelect = document.getElementById('sortby');
+  const grid = document.getElementById('itemsGrid');
+
+  // Load categories from localStorage
   const categories = JSON.parse(localStorage.getItem('inventoryCategories')) || [];
 
   function renderCategories() {
-    filterCategoriesContainer.innerHTML = '';  // Clear existing categories
+    filterCategoriesContainer.innerHTML = '';
     categories.forEach(category => {
       const label = document.createElement('label');
       const checkbox = document.createElement('input');
       checkbox.type = 'checkbox';
       checkbox.value = category;
+      checkbox.addEventListener('change', updateDisplay);
       label.appendChild(checkbox);
       label.appendChild(document.createTextNode(category));
       filterCategoriesContainer.appendChild(label);
     });
   }
 
-  // Call renderCategories to display the categories
-  renderCategories();
+  function getFilteredItems() {
+    const searchQuery = searchInput.value.toLowerCase();
+    const selectedCategories = Array.from(
+      filterCategoriesContainer.querySelectorAll('input[type="checkbox"]:checked')
+    ).map(cb => cb.value);
 
-  // Render the items as before
-  const grid = document.getElementById('itemsGrid');
+    return items.filter(item => {
+      const matchesSearch = item.name.toLowerCase().includes(searchQuery);
+      const matchesCategory = selectedCategories.length === 0 ||
+        item.categories.some(cat => selectedCategories.includes(cat));
+      return matchesSearch && matchesCategory;
+    });
+  }
+
+  function sortItems(itemList) {
+    const option = sortSelect.value;
+    const sorted = [...itemList];
+    switch (option) {
+      case 'Name A-Z':
+        sorted.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case 'Name Z-A':
+        sorted.sort((a, b) => b.name.localeCompare(a.name));
+        break;
+      case 'ID Ascending':
+        sorted.sort((a, b) => a.id - b.id);
+        break;
+      case 'ID Descending':
+        sorted.sort((a, b) => b.id - a.id);
+        break;
+    }
+    return sorted;
+  }
 
   function renderItems(itemList) {
-    grid.innerHTML = '';  // Clear existing items
+    grid.innerHTML = '';
     itemList.forEach(item => {
       const box = document.createElement('div');
       box.className = 'item-box';
@@ -229,8 +261,21 @@
     });
   }
 
-  renderItems(items); // Initial render of items
+  function updateDisplay() {
+    const filtered = getFilteredItems();
+    const sorted = sortItems(filtered);
+    renderItems(sorted);
+  }
+
+  // Initial setup
+  renderCategories();
+  renderItems(items);
+
+  // Event listeners
+  searchInput.addEventListener('input', updateDisplay);
+  sortSelect.addEventListener('change', updateDisplay);
 </script>
+
 
 </body>
 </html>

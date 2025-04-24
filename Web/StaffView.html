@@ -185,7 +185,7 @@
     </div>
 
     <div class="toolbar">
-      <input type="text" placeholder="Search...">
+      <input type="text" id="searchInput" placeholder="Search...">
       <label for="sortby">Sort by:</label>
       <select id="sortby">
         <option>Name A-Z</option>
@@ -256,16 +256,28 @@
     return Array.from(filterDiv.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
   }
 
+  const searchInput = document.getElementById('searchInput'); // NEW
+
   function applyFiltersAndSort() {
+    const searchText = searchInput.value.trim().toLowerCase(); // NEW
     const selectedCategories = getSelectedCategories();
     let filteredItems = [...items];
 
+    // Filter by categories
     if (selectedCategories.length > 0) {
       filteredItems = filteredItems.filter(item =>
         selectedCategories.every(cat => item.categories.includes(cat))
       );
     }
 
+    // Filter by search text
+    if (searchText) {
+      filteredItems = filteredItems.filter(item =>
+        item.name.toLowerCase().includes(searchText)
+      );
+    }
+
+    // Sort logic
     const sortValue = sortSelect.value;
     if (sortValue === 'Name A-Z') {
       filteredItems.sort((a, b) => a.name.localeCompare(b.name));
@@ -279,6 +291,9 @@
 
     renderItems(filteredItems);
   }
+
+  // Add event listener to search input
+  searchInput.addEventListener('input', applyFiltersAndSort); // NEW
 
   function renderCategories() {
     filterDiv.innerHTML = '';
