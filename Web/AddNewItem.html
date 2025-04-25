@@ -189,12 +189,7 @@
                 <!-- Category Checkbox Group -->
                 <div class="form-group checkbox-group">
                     <label class="checkbox-label">Category:</label>
-                    <div class="checkbox-options">
-                        <label><input type="checkbox"> Canned</label>
-                        <label><input type="checkbox"> Produce</label>
-                        <label><input type="checkbox"> Grains</label>
-                        <label><input type="checkbox"> Cat4</label>
-                    </div>
+                    <div class="checkbox-options" id="categoryOptions"></div>
                 </div>
 
                 <div class="form-group">
@@ -236,7 +231,9 @@
         const logoInput = document.getElementById('logoInput');
         const confirmButton = document.getElementById('confirmButton');
         const originCheckboxes = document.querySelectorAll('.origin-checkbox');
-        
+        const catContainer = document.getElementById('categoryOptions');
+        const storedCategories = JSON.parse(localStorage.getItem('inventoryCategories')) || [];
+
         // Drag over effect
         dropzone.addEventListener('dragover', (e) => {
             e.preventDefault();
@@ -314,6 +311,17 @@
         // Listen for changes to checkboxes
         originCheckboxes.forEach(checkbox => {
             checkbox.addEventListener('change', validateForm);
+        });
+
+        // Dynamically add category checkboxes
+        storedCategories.forEach(category => {
+            const label = document.createElement('label');
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.value = category;
+            label.appendChild(checkbox);
+            label.appendChild(document.createTextNode(' ' + category));
+            catContainer.appendChild(label);
         });
     </script>
 </body>
