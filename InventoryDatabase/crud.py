@@ -5,6 +5,8 @@ import time
 from random import randint
 import random
 import string
+import plotly.express as px
+import pandas as pd
 
 INVENTORY = "inventory.db"
 CREATE_SCRIPT = "create_all.sql"
@@ -625,6 +627,55 @@ def randomPastDatetime(max_days_back=30):
     random_past_time = now - timedelta(seconds=random_seconds)
     return random_past_time.strftime("%Y-%m-%d %H:%M:%S")
 
+def busyHoursAnalytics():
+    order_datetimes = []
+    fig = None
+    # establishes a connection with the sql database
+    conn = sqlite3.connect(INVENTORY)
+
+    # gets the sql cursor
+    cursor = conn.cursor()
+
+    # gets all the order transactinos
+    cursor.execute(f"SELECT * FROM orders")
+    rows = cursor.fetchall()
+
+    if rows:
+        # goes through each transaction and extracts the datetimes
+        for row in rows:
+            order_datetime = row[1].split()[1]
+            order_datetimes.append(order_datetime)
+
+        # converts it to pandas dataframe
+        df = pd.DataFrame({"datetime": pd.to_datetime(order_datetimes)})
+
+        # extracts the hour
+        df["hour"] = df["datetime"].dt.hour
+        
+        # renders the histogram
+        fig = px.histogram(
+            df,
+            x="hour",
+            nbins=24,  # 24 hours in a day
+            title="Busy Hours by Order Transactions",
+            labels={"hour": "Hour of Day", "count": "Occurrences"},
+            opacity=0.8
+        )
+
+        fig.update_layout(
+            bargap=0.1,
+            xaxis=dict(tickmode="linear", dtick=1),  # Show every hour
+        )
+    else:
+        print("No records found.")
+
+    
+
+    cursor.close()
+    conn.close()
+
+    return fig
+
 
 # where we'll test the code to make sure it works
 if __name__ == "__main__":
@@ -647,6 +698,12 @@ if __name__ == "__main__":
 
     for item in inventory:
         print(item, inventory[item])
+
+    print("***** TESTING BUSY HOURS ANALYTICS *****")
+    busyHoursHistogram = busyHoursAnalytics()
+
+    if busyHoursHistogram:
+        busyHoursHistogram.show()
 
     # print("TESTING ADD STAFF")
     # # testing normal case for add staff
