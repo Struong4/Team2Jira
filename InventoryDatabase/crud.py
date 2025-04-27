@@ -3,6 +3,8 @@ import re
 from datetime import datetime
 import time
 from random import randint
+import random
+import string
 
 INVENTORY = "inventory.db"
 CREATE_SCRIPT = "create_all.sql"
@@ -420,7 +422,7 @@ def showInventory(origins=[], categories=[]):
 
     # append WHERE clause if needed
     if conditions:
-        query += " WHERE " + " OR ".join(conditions)
+        query += " WHERE " + " AND ".join(conditions)
 
     cursor.execute(query, params)
     rows = cursor.fetchall()
@@ -543,6 +545,46 @@ def addNewStaff(staff_id, staff_first_name, staff_last_name, staff_username, sta
 
     return prompt
 
+def simulateAddingRandomItems(num_items=50):
+    item_names = ["Milk", "Orange", "Apple", "Banana", "Chicken", "Rice", "Beef", "Yogurt", "Cereal", "Pork", "Bread", "Cheese", "Butter", "Fish", "Tomato", "Lettuce", "Spinach", "Grapes", "Watermelon", "Strawberry"]
+    origins_list = ["Walmart", "Target", "H Mart", "Aldi", "Costco", "Trader Joe's", "Whole Foods", "Safeway", "Kroger"]
+    categories_list = ["Dairy", "Fruit", "Meat", "Vegetable", "Grain", "Beverage", "Snack", "Frozen", "Condiment", "Seafood"]
+
+    for _ in range(num_items):
+        # Create a random 10-digit item ID
+        item_id = "".join(random.choices(string.digits, k=10))
+
+        # Randomly choose an item name or create a new random one
+        item_name = random.choice(item_names) + ''.join(random.choices(string.ascii_lowercase, k=3))
+
+        # Generate random weight between 0.5 and 20 lbs
+        weight = round(random.uniform(0.5, 20.0), 2)
+
+        # Generate random quantity between 1 and 100
+        quantity = random.randint(1, 100)
+
+        # Generate random price between 1 and 100 dollars
+        price = round(random.uniform(1.0, 100.0), 2)
+
+        # Randomly select origins (1 to 3 random ones)
+        origins = random.sample(origins_list, random.randint(1, 3))
+
+        # Randomly select categories (1 to 2 random ones)
+        categories = random.sample(categories_list, random.randint(1, 2))
+
+        # Small description
+        description = f"A random {item_name.lower()}."
+
+        # Random quantity limit
+        quantity_limit = random.randint(0, 50)
+
+        # Optional: dummy image string
+        image_str = ""
+
+        result = addNewItem(item_id, item_name, weight, quantity, price, description, quantity_limit, origins, categories, image_str)
+        print(result)
+
+
 
 # where we'll test the code to make sure it works
 if __name__ == "__main__":
@@ -553,6 +595,15 @@ if __name__ == "__main__":
 
     print("BEFORE TESTING ADD NEW ITEMS")
     displayAllTables()
+
+    simulateAddingRandomItems(100)
+    #showInventory()
+
+    print("INVENTORY")
+    inventory = showInventory()
+
+    for item in inventory:
+        print(item, inventory[item])
 
     # print("TESTING ADD STAFF")
     # # testing normal case for add staff
@@ -578,35 +629,35 @@ if __name__ == "__main__":
     # displayAllTables()
 
     # normal test cases for adding items
-    print(addNewItem("1111111111", "milk", 5.0, 10, 10, "a carton of milk", 0, ["walmart", "target", "h mart"], ["dairy", "white"]))
-    print(addNewItem("2222222222", "orange", 1.0, 10, 10, "an orange", 0, ["walmart", "aldis"], ["fruit"]))
-    print(addNewItem("3333333333", "apple", 1.0, 10, 10, "an apple", 0, ["walmart"], ["fruit", "red"]))
+    # print(addNewItem("1111111111", "milk", 5.0, 10, 10, "a carton of milk", 0, ["walmart", "target", "h mart"], ["dairy", "white"]))
+    # print(addNewItem("2222222222", "orange", 1.0, 10, 10, "an orange", 0, ["walmart", "aldis"], ["fruit"]))
+    # print(addNewItem("3333333333", "apple", 1.0, 10, 10, "an apple", 0, ["walmart"], ["fruit", "red"]))
 
-    # edge cases for adding items
-    print(addNewItem("4444444444", "banana", 1.0, 10, 10, "an banana"))
-    print(addNewItem(5555555555, "chicken", 1.0, 1, 0, "an chicken"))
-    print(addNewItem(6666666666, "pork", 1.0, 1, 0, "an pork"))
+    # # edge cases for adding items
+    # print(addNewItem("4444444444", "banana", 1.0, 10, 10, "an banana"))
+    # print(addNewItem(5555555555, "chicken", 1.0, 1, 0, "an chicken"))
+    # print(addNewItem(6666666666, "pork", 1.0, 1, 0, "an pork"))
 
-    # error cases for adding items
-    # unique constraints
-    print(addNewItem("4444444444", "cereal", 1.0, 1, 0, "an cereal"))
+    # # error cases for adding items
+    # # unique constraints
+    # print(addNewItem("4444444444", "cereal", 1.0, 1, 0, "an cereal"))
 
-    # check contraints
-    print(addNewItem("7777777777", "yogurt", -1.0, 1, 0, "an yogurt"))
-    print(addNewItem("8888888888", "sugar", 1.0, -1, 0, "an sugar"))
-    print(addNewItem("9999a99999", "salt", 1.0, 1, 0, "an salt"))
-    print(addNewItem("9999999999", "sugar", 1.0, -1, 0, "an sugar"))
-    print(addNewItem("9999999999", "sugar", 1.0, 1, -5, "an sugar"))
+    # # check contraints
+    # print(addNewItem("7777777777", "yogurt", -1.0, 1, 0, "an yogurt"))
+    # print(addNewItem("8888888888", "sugar", 1.0, -1, 0, "an sugar"))
+    # print(addNewItem("9999a99999", "salt", 1.0, 1, 0, "an salt"))
+    # print(addNewItem("9999999999", "sugar", 1.0, -1, 0, "an sugar"))
+    # print(addNewItem("9999999999", "sugar", 1.0, 1, -5, "an sugar"))
 
-    # data constraints
-    print(addNewItem("000000000", "rice", 1.0, 1, 0, "a rice"))
-    print(addNewItem("1111122222", "eggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg", 1, 1.0, "an sugar", 5))
-    print(addNewItem("4444455555", "meat", 1, 1.0, 10, 10))
-    print(addNewItem("5555566666", "beef", 1, 1.0, 10, "an beef", 5, "hello", []))
-    print(addNewItem("6666677777", "blueberry", 1, 1.0, 10, "an blueberry", 5, [], "hi"))
+    # # data constraints
+    # print(addNewItem("000000000", "rice", 1.0, 1, 0, "a rice"))
+    # print(addNewItem("1111122222", "eggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg", 1, 1.0, "an sugar", 5))
+    # print(addNewItem("4444455555", "meat", 1, 1.0, 10, 10))
+    # print(addNewItem("5555566666", "beef", 1, 1.0, 10, "an beef", 5, "hello", []))
+    # print(addNewItem("6666677777", "blueberry", 1, 1.0, 10, "an blueberry", 5, [], "hi"))
 
-    print("AFTER TESTING ADD NEW ITEMS")
-    displayAllTables()
+    # print("AFTER TESTING ADD NEW ITEMS")
+    # displayAllTables()
 
     # print("INVENTORY")
     # inventory = showInventory()
@@ -654,90 +705,90 @@ if __name__ == "__main__":
     #     print(item, inventory[item])
     
 
-    print("TESTING UPDATE ITMES")
-    addNewStaff("AB12345", "Your", "Mom", "AB12345", "password")
+    # print("TESTING UPDATE ITMES")
+    # addNewStaff("AB12345", "Your", "Mom", "AB12345", "password")
 
-    # normal case
-    print(updateItem("AB12345", "1111111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "almond milk", 6.0, 5, 5, "a carton of almond milk", 3, ["walmart", "target", "h mart"], ["dairy", "white"]))
-    print(updateItem("AB12345", "2222222222", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "tangerine", 1.5, 1, 10, "a tangerine", 4, ["walmart", "aldis"], ["fruit"]))
-    print(updateItem("AB12345", "3333333333", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "cherry", 0.5, 20, 0.5, "a cherry", 10, ["walmart"], ["fruit", "red"]))
+    # # normal case
+    # print(updateItem("AB12345", "1111111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "almond milk", 6.0, 5, 5, "a carton of almond milk", 3, ["walmart", "target", "h mart"], ["dairy", "white"]))
+    # print(updateItem("AB12345", "2222222222", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "tangerine", 1.5, 1, 10, "a tangerine", 4, ["walmart", "aldis"], ["fruit"]))
+    # print(updateItem("AB12345", "3333333333", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "cherry", 0.5, 20, 0.5, "a cherry", 10, ["walmart"], ["fruit", "red"]))
 
-    # edge case: add origins and categories
-    print(updateItem("AB12345", '4444444444', datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 'banana', 1.0, 50, 10.0, 'a banana', 10, ['h mart', 'lotte mart'], ["yellow", "tropical"]))
-    displayAllTables()
+    # # edge case: add origins and categories
+    # print(updateItem("AB12345", '4444444444', datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 'banana', 1.0, 50, 10.0, 'a banana', 10, ['h mart', 'lotte mart'], ["yellow", "tropical"]))
+    # displayAllTables()
 
-    time.sleep(5)
-    # edge case: change origins
-    print(updateItem("AB12345", "1111111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "almond milk", 6.0, 5, 5, "a carton of almond milk", 3, ["aldis", "giant"], ["dairy", "white"]))
-    displayAllTables()
+    # time.sleep(5)
+    # # edge case: change origins
+    # print(updateItem("AB12345", "1111111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "almond milk", 6.0, 5, 5, "a carton of almond milk", 3, ["aldis", "giant"], ["dairy", "white"]))
+    # displayAllTables()
 
-    time.sleep(5)
-    # edge case: change categories
-    print(updateItem("AB12345", "1111111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "almond milk", 6.0, 5, 5, "a carton of almond milk", 3, ["aldis", "giant"], ["cow"]))
-    displayAllTables()
+    # time.sleep(5)
+    # # edge case: change categories
+    # print(updateItem("AB12345", "1111111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "almond milk", 6.0, 5, 5, "a carton of almond milk", 3, ["aldis", "giant"], ["cow"]))
+    # displayAllTables()
 
-    time.sleep(5)
-    # edge case: no origins and categories
-    print(updateItem("AB12345", "1111111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "almond milk", 6.0, 5, 5, "a carton of almond milk", 3))
-    displayAllTables()
+    # time.sleep(5)
+    # # edge case: no origins and categories
+    # print(updateItem("AB12345", "1111111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "almond milk", 6.0, 5, 5, "a carton of almond milk", 3))
+    # displayAllTables()
 
-    time.sleep(5)
-    # error case: invalid item ID format
-    print(updateItem("AB12345", "11111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "whole milk", 6.0, 5, 5, "a carton of whole milk", 3))
-    print(updateItem("AB12345", "11aa1a1a11", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "whole milk", 6.0, 5, 5, "a carton of whole milk", 3))
+    # time.sleep(5)
+    # # error case: invalid item ID format
+    # print(updateItem("AB12345", "11111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "whole milk", 6.0, 5, 5, "a carton of whole milk", 3))
+    # print(updateItem("AB12345", "11aa1a1a11", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "whole milk", 6.0, 5, 5, "a carton of whole milk", 3))
 
-    # error case: nonexisting item ID
-    print(updateItem("AB12345", "9999999999", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "whole milk", 6.0, 5, 5, "a carton of whole milk", 3))
+    # # error case: nonexisting item ID
+    # print(updateItem("AB12345", "9999999999", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "whole milk", 6.0, 5, 5, "a carton of whole milk", 3))
 
-    # error case: invalid quantity
-    print(updateItem("AB12345", "1111111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "whole milk", 6.0, -5, 5, "a carton of whole milk", 3))
+    # # error case: invalid quantity
+    # print(updateItem("AB12345", "1111111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "whole milk", 6.0, -5, 5, "a carton of whole milk", 3))
 
-    # error case: invalid price
-    print(updateItem("AB12345", "1111111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "whole milk", 6.0, 5, -5, "a carton of whole milk", 3))
+    # # error case: invalid price
+    # print(updateItem("AB12345", "1111111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "whole milk", 6.0, 5, -5, "a carton of whole milk", 3))
 
-    # error case: datetime > now
-    print(updateItem("AB12345", "1111111111", "2030-04-03  12:00:00", "whole milk", 6.0, 5, 5, "a carton of whole milk", 3))
+    # # error case: datetime > now
+    # print(updateItem("AB12345", "1111111111", "2030-04-03  12:00:00", "whole milk", 6.0, 5, 5, "a carton of whole milk", 3))
 
-    # error case invalid weight
-    print(updateItem("AB12345", "1111111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "whole milk", -6.0, 5, 5, "a carton of whole milk", 3))
+    # # error case invalid weight
+    # print(updateItem("AB12345", "1111111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "whole milk", -6.0, 5, 5, "a carton of whole milk", 3))
 
-    # error case: invalid quantity limit
-    print(updateItem("AB12345", "1111111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "whole milk", 6.0, 5, 5, "a carton of whole milk", -3))
+    # # error case: invalid quantity limit
+    # print(updateItem("AB12345", "1111111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "whole milk", 6.0, 5, 5, "a carton of whole milk", -3))
 
-    # error case: nonexistent staff ID
-    print(updateItem("GB70937", "1111111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "whole milk", 6.0, 5, 5, "a carton of whole milk", 3))
+    # # error case: nonexistent staff ID
+    # print(updateItem("GB70937", "1111111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "whole milk", 6.0, 5, 5, "a carton of whole milk", 3))
 
 
-    # error case: incorrect staff ID format
-    print(updateItem("12ABCDE", "1111111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "whole milk", 6.0, 5, 5, "a carton of whole milk", 3))
+    # # error case: incorrect staff ID format
+    # print(updateItem("12ABCDE", "1111111111", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "whole milk", 6.0, 5, 5, "a carton of whole milk", 3))
 
-    displayAllTables()
+    # displayAllTables()
 
-    print("ENTIRE INVENTORY")
-    inventory = showInventory()
+    # print("ENTIRE INVENTORY")
+    # inventory = showInventory()
 
-    for item in inventory:
-        print(item, inventory[item])
+    # for item in inventory:
+    #     print(item, inventory[item])
 
-    print("FILTER ALDIS AND WALMART")
-    inventory = showInventory(origins=['aldis', 'walmart'])
-    for item in inventory:
-        print(item, inventory[item])
+    # print("FILTER ALDIS AND WALMART")
+    # inventory = showInventory(origins=['aldis', 'walmart'])
+    # for item in inventory:
+    #     print(item, inventory[item])
 
-    print("FILTER FRUIT AND TROPICAL")
-    inventory = showInventory(categories=['fruit', 'tropical'])
-    for item in inventory:
-        print(item, inventory[item])
+    # print("FILTER FRUIT AND TROPICAL")
+    # inventory = showInventory(categories=['fruit', 'tropical'])
+    # for item in inventory:
+    #     print(item, inventory[item])
 
-    print("FILTER FRUIT AND HMART")
-    inventory = showInventory(origins=['h mart'], categories=['fruit'])
-    for item in inventory:
-        print(item, inventory[item])
+    # print("FILTER FRUIT AND HMART")
+    # inventory = showInventory(origins=['h mart'], categories=['fruit'])
+    # for item in inventory:
+    #     print(item, inventory[item])
 
-    print("NONEXISTING ORIGINS AND CATEGORIES")
-    inventory = showInventory(origins=['weis'], categories=['meat'])
-    for item in inventory:
-        print(item, inventory[item])
+    # print("NONEXISTING ORIGINS AND CATEGORIES")
+    # inventory = showInventory(origins=['weis'], categories=['meat'])
+    # for item in inventory:
+    #     print(item, inventory[item])
 
 
 
