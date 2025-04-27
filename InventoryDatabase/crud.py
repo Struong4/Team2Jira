@@ -1,6 +1,6 @@
 import sqlite3
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 import time
 from random import randint
 import random
@@ -12,6 +12,10 @@ DROP_SCRIPT = "drop_all.sql"
 
 ID_REG_EXP = r"^[A-Z]{2}\d{5}$"
 NAME_PATTERN = r"^[A-Z][a-z]+(?:[-' ][A-Z][a-z]+)*$"
+
+ITEM_NAMES = ["Milk", "Orange", "Apple", "Banana", "Chicken", "Rice", "Beef", "Yogurt", "Cereal", "Pork", "Bread", "Cheese", "Butter", "Fish", "Tomato", "Lettuce", "Spinach", "Grapes", "Watermelon", "Strawberry"]
+ORIGINS_LIST = ["Walmart", "Target", "H Mart", "Aldi", "Costco", "Trader Joe's", "Whole Foods", "Safeway", "Kroger"]
+CATEGORIES_LIST = ["Dairy", "Fruit", "Meat", "Vegetable", "Grain", "Beverage", "Snack", "Frozen", "Condiment", "Seafood"]
 
 def createInventory(create_script):
     runSQLScript(create_script)
@@ -546,16 +550,14 @@ def addNewStaff(staff_id, staff_first_name, staff_last_name, staff_username, sta
     return prompt
 
 def simulateAddingRandomItems(num_items=50):
-    item_names = ["Milk", "Orange", "Apple", "Banana", "Chicken", "Rice", "Beef", "Yogurt", "Cereal", "Pork", "Bread", "Cheese", "Butter", "Fish", "Tomato", "Lettuce", "Spinach", "Grapes", "Watermelon", "Strawberry"]
-    origins_list = ["Walmart", "Target", "H Mart", "Aldi", "Costco", "Trader Joe's", "Whole Foods", "Safeway", "Kroger"]
-    categories_list = ["Dairy", "Fruit", "Meat", "Vegetable", "Grain", "Beverage", "Snack", "Frozen", "Condiment", "Seafood"]
+    
 
     for _ in range(num_items):
         # Create a random 10-digit item ID
         item_id = "".join(random.choices(string.digits, k=10))
 
         # Randomly choose an item name or create a new random one
-        item_name = random.choice(item_names) + ''.join(random.choices(string.ascii_lowercase, k=3))
+        item_name = random.choice(ITEM_NAMES) + ''.join(random.choices(string.ascii_lowercase, k=3))
 
         # Generate random weight between 0.5 and 20 lbs
         weight = round(random.uniform(0.5, 20.0), 2)
@@ -567,10 +569,10 @@ def simulateAddingRandomItems(num_items=50):
         price = round(random.uniform(1.0, 100.0), 2)
 
         # Randomly select origins (1 to 3 random ones)
-        origins = random.sample(origins_list, random.randint(1, 3))
+        origins = random.sample(ORIGINS_LIST, random.randint(1, 3))
 
         # Randomly select categories (1 to 2 random ones)
-        categories = random.sample(categories_list, random.randint(1, 2))
+        categories = random.sample(CATEGORIES_LIST, random.randint(1, 2))
 
         # Small description
         description = f"A random {item_name.lower()}."
@@ -584,6 +586,44 @@ def simulateAddingRandomItems(num_items=50):
         result = addNewItem(item_id, item_name, weight, quantity, price, description, quantity_limit, origins, categories, image_str)
         print(result)
 
+def simulateBuyingRandomItems(num_buys=20):
+    # First, fetch current inventory
+    inventory = showInventory()
+
+    if not inventory:
+        print("⚠️ No items available to buy!")
+        return
+
+    item_ids = list(inventory.keys())
+
+    for _ in range(num_buys):
+        # Pick a random item
+        item_id = random.choice(item_ids)
+        item_info = inventory[item_id]
+
+        # Pick a random quantity to buy (at most the current stock)
+        max_quantity = item_info["Quantity"]
+        if max_quantity == 0:
+            continue  # Skip if item has no stock left
+
+        order_quantity = random.randint(1, max_quantity)
+
+        # Current datetime
+        order_datetime = randomPastDatetime(5)
+
+        # Call your existing buyItem function
+        result = buyItem(item_id, order_datetime, order_quantity)
+        print(result)
+
+def randomPastDatetime(max_days_back=30):
+    """
+    Returns a random datetime string within the past `max_days_back` days, up to now.
+    """
+    now = datetime.now()
+    # Random number of seconds between 0 and max_days_back days
+    random_seconds = random.randint(0, max_days_back * 24 * 60 * 60)
+    random_past_time = now - timedelta(seconds=random_seconds)
+    return random_past_time.strftime("%Y-%m-%d %H:%M:%S")
 
 
 # where we'll test the code to make sure it works
@@ -596,8 +636,11 @@ if __name__ == "__main__":
     print("BEFORE TESTING ADD NEW ITEMS")
     displayAllTables()
 
+    print("***** ADDING RANDOM ITEMS *****")
     simulateAddingRandomItems(100)
-    #showInventory()
+
+    print("***** BUYING RANDOM ITEMS *****")
+    simulateBuyingRandomItems(50)
 
     print("INVENTORY")
     inventory = showInventory()
