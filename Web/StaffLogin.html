@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Screen</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f4f4f9;
+    }
+
+    .login-container {
+      background-color: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      width: 300px;
+      text-align: center;
+    }
+
+    .login-container h2 {
+      margin-bottom: 20px;
+    }
+
+    .login-container input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    /* Login Button (Green) */
+    .login-container button {
+      width: 100%;
+      padding: 10px;
+      background-color: #4CAF50; /* Green color */
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .login-container button:hover {
+      background-color: #45a049; /* Darker green on hover */
+    }
+
+    /* Cancel Button (Red) */
+    .cancel-button {
+      width: 100%;
+      padding: 10px;
+      background-color: #f44336; /* Red color */
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .cancel-button:hover {
+      background-color: #da190b; /* Darker red on hover */
+    }
+
+    .error-message {
+      color: red;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="login-container">
+  <h2>Staff Login</h2>
+  <form id="loginForm" onsubmit="return validateLogin(event)">
+    <input type="text" id="username" name="username" placeholder="Username" required>
+    <input type="password" id="password" name="password" placeholder="Password" required>
+    <button type="submit">Login</button> <!-- Green Login Button -->
+  </form>
+  <!-- Cancel button, now styled separately from the form button -->
+  <a href="StudentView.html">
+    <button class="cancel-button">Cancel</button> <!-- Red Cancel Button -->
+  </a>
+</div>
+
+<script>
+    // Predefined username and password for validation (you would typically store this in a database)
+    const validUsername = 'Staff2';
+    const validPassword = '1234';
+
+    function validateLogin(event) {
+      event.preventDefault(); // Prevent form submission, which would reload the page
+
+      // Get values from the input fields
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      // Check if an error message already exists
+      const existingError = document.querySelector('.error-message');
+      if (existingError) {
+        existingError.remove(); // Remove existing error message if it exists
+      }
+
+      // Validate username and password
+      if (username === validUsername && password === validPassword) {
+        // If login is successful, redirect to staffView.html
+        window.location.href = 'StaffView.html'; // Redirect to staffView page
+        return true;
+      } else {
+        // If validation fails, show an error message (optional)
+        const errorMessage = document.createElement('div');
+        errorMessage.classList.add('error-message');
+        errorMessage.textContent = 'Invalid username or password. Please try again.';
+        document.querySelector('.login-container').appendChild(errorMessage);
+        return false;
+      }
+    }
+</script>
+
+</body>
+</html>
