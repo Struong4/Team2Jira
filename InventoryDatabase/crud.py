@@ -669,7 +669,56 @@ def busyHoursAnalytics():
     else:
         print("No records found.")
 
+    cursor.close()
+    conn.close()
+
+    return fig
+
+def popularItemsAnalytics():
+    items = {}
+    fig = None
+    # establishes a connection with the sql database
+    conn = sqlite3.connect(INVENTORY)
+
+    # gets the sql cursor
+    cursor = conn.cursor()
+
+    # gets all the order transactinos
+    cursor.execute(f"SELECT * FROM orders")
+    rows = cursor.fetchall()
+
+    if rows:
+        # goes through each transaction and extracts the datetimes
+        for row in rows:
+
+            cursor.execute("SELECT item_name FROM item WHERE item_id = ?", (row[0],))
+            name = cursor.fetchone()[0]
+            quantity = row[2]
+            
+            if name not in items:
+                items[name] = 0
+            
+            items[name] += quantity
+        
+        # converts it to pandas dataframe
+        df = pd.DataFrame(list(items.items()), columns=["Item name", "Quantity Ordered"])
     
+        # renders the bar chart
+        fig = px.bar(
+            df.sort_values(by="Quantity Ordered", ascending=False),
+            x="Item name",
+            y="Quantity Ordered",
+            title="Popular Items Ordered",
+            labels={"Item name": "Items", "Quantity Ordered": "Quantity"},
+            opacity=0.8
+        )
+
+        fig.update_layout(
+            bargap=0.2,
+            xaxis_tickangle=-45,  # Tilt x-axis labels
+        )
+    else:
+        print("No records found.")
 
     cursor.close()
     conn.close()
@@ -688,7 +737,7 @@ if __name__ == "__main__":
     displayAllTables()
 
     print("***** ADDING RANDOM ITEMS *****")
-    simulateAddingRandomItems(100)
+    simulateAddingRandomItems(10)
 
     print("***** BUYING RANDOM ITEMS *****")
     simulateBuyingRandomItems(50)
@@ -699,11 +748,17 @@ if __name__ == "__main__":
     for item in inventory:
         print(item, inventory[item])
 
-    print("***** TESTING BUSY HOURS ANALYTICS *****")
-    busyHoursHistogram = busyHoursAnalytics()
+    print("***** TESTING POPULAR ITEMS *****")
+    popularItemsBarChart = popularItemsAnalytics()
 
-    if busyHoursHistogram:
-        busyHoursHistogram.show()
+    if popularItemsBarChart:
+        popularItemsBarChart.show()
+
+    # print("***** TESTING BUSY HOURS ANALYTICS *****")
+    # busyHoursHistogram = busyHoursAnalytics()
+
+    # if busyHoursHistogram:
+    #     busyHoursHistogram.show()
 
     # print("TESTING ADD STAFF")
     # # testing normal case for add staff
