@@ -5,16 +5,6 @@
 
 -- SET SQL_SAFE_UPDATES = 0;
 
--- creates a table for student
-CREATE TABLE IF NOT EXISTS student (
-	student_id CHAR(7) NOT NULL,
-    student_first_name VARCHAR(50) NOT NULL,
-    student_last_name VARCHAR(50) NOT NULL,
-    PRIMARY KEY (student_id),
-    CHECK (student_id REGEXP "^[A-Z]{2}\d{5}$" AND student_first_name REGEXP "^[A-Z][a-z]+(?:[-' ][A-Z][a-z]+)*$" AND 
-    student_last_name REGEXP "^[A-Z][a-z]+(?:[-' ][A-Z][a-z]+)*$")
-);
-
 -- creates a table for item
 CREATE TABLE IF NOT EXISTS item (
 	item_id CHAR(10) NOT NULL,
@@ -24,6 +14,7 @@ CREATE TABLE IF NOT EXISTS item (
     descript VARCHAR(500),
     quantity INT NOT NULL,
     quantity_limit INT,
+    image_str TEXT,
     PRIMARY KEY (item_id),
     CHECK (item_id REGEXP "^\d+$" AND weight_lbs >= 0 AND price >= 0 AND quantity >= 0 AND quantity_limit >= 0)
 );
@@ -51,21 +42,21 @@ CREATE TABLE IF NOT EXISTS staff (
 	staff_id CHAR(7) NOT NULL,
     staff_first_name VARCHAR(50) NOT NULL,
     staff_last_name VARCHAR(50) NOT NULL,
+    staff_username CHAR(7) NOT NULL,
+    staff_password VARCHAR(50) NOT NULL,
     PRIMARY KEY (staff_id),
     CHECK (staff_id REGEXP "^[A-Z]{2}\d{5}$" AND staff_first_name REGEXP "^[A-Z][a-z]+(?:[-' ][A-Z][a-z]+)*$" AND 
-    staff_last_name REGEXP "^[A-Z][a-z]+(?:[-' ][A-Z][a-z]+)*$")
+    staff_last_name REGEXP "^[A-Z][a-z]+(?:[-' ][A-Z][a-z]+)*$" and staff_username REGEXP "^[A-Z]{2}\d{5}$")
 );
 
--- creates a table for buys
-CREATE TABLE IF NOT EXISTS buys (
-	student_id CHAR(7) NOT NULL,
+-- creates a table for orders
+CREATE TABLE IF NOT EXISTS orders (
     item_id CHAR(10) NOT NULL,
-    buy_datetime DATETIME NOT NULL,
-    buy_quantity INT NOT NULL,
-    PRIMARY KEY (student_id, item_id, buy_datetime),
-    FOREIGN KEY (student_id) REFERENCES student(student_id),
+    order_datetime DATETIME NOT NULL,
+    order_quantity INT NOT NULL,
+    PRIMARY KEY (item_id, order_datetime),
     FOREIGN KEY (item_id) REFERENCES item(item_id),
-    CHECK (student_id REGEXP "^[A-Z]{2}\d{5}$" AND item_id REGEXP "^\d+$" AND buy_quantity > 0)
+    CHECK (item_id REGEXP "^\d+$" AND order_quantity > 0)
 );
 
 -- creates a table for updates
@@ -91,41 +82,32 @@ CREATE TABLE IF NOT EXISTS restock (
     CHECK (staff_id REGEXP "^[A-Z]{2}\d{5}$" AND item_id REGEXP "^\d+$" AND restock_quantity > 0)
 );
 
--- declares a trigger to buy an item
-CREATE TRIGGER before_buy_stock
-BEFORE INSERT ON buys
+-- declares a trigger to orders an item
+CREATE TRIGGER before_order_stock
+BEFORE INSERT ON orders
 FOR EACH ROW
-WHEN (SELECT quantity FROM item WHERE item_id = NEW.item_id) < NEW.buy_quantity
+WHEN (SELECT quantity FROM item WHERE item_id = NEW.item_id) < NEW.order_quantity
 BEGIN
     SELECT RAISE(ABORT, 'Not enough stock available');
 END;
 
--- Prevents purchase if student_id does not exist
-CREATE TRIGGER before_buy_student
-BEFORE INSERT ON buys
-FOR EACH ROW
-WHEN (SELECT COUNT(*) FROM student WHERE student_id = NEW.student_id) = 0
-BEGIN
-    SELECT RAISE(ABORT, 'Invalid student ID');
-END;
-
 -- Prevents purchase if item_id does not exist
-CREATE TRIGGER before_buy_item
-BEFORE INSERT ON buys
+CREATE TRIGGER before_order_item
+BEFORE INSERT ON orders
 FOR EACH ROW
 WHEN (SELECT COUNT(*) FROM item WHERE item_id = NEW.item_id) = 0
 BEGIN
     SELECT RAISE(ABORT, 'Invalid item ID');
 END;
 
--- declares a trigger after buying an item
-CREATE TRIGGER after_buy
-AFTER INSERT ON buys
+-- declares a trigger after ordering an item
+CREATE TRIGGER after_order
+AFTER INSERT ON orders
 FOR EACH ROW
 BEGIN
     -- Deduct the purchased quantity from the item inventory
     UPDATE item
-    SET quantity = quantity - NEW.buy_quantity
+    SET quantity = quantity - NEW.order_quantity
     WHERE item_id = NEW.item_id;
 END;
 
