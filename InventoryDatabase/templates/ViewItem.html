@@ -131,12 +131,12 @@
       <div class="form-container">
         <div class="form-group">
           <label>Product Name</label>
-          <input type="text" readonly value="Example Product">
+          <input type="text" id="itemID" value="{{ item['Item name'] }}">
         </div>
 
         <div class="form-group">
           <label>Item ID</label>
-          <input type="text" readonly value="1234567890">
+          <input type="text" id="itemID" value="{{ item['Item ID'] }}">
         </div>
 
         <div class="form-group">
@@ -158,27 +158,28 @@
 
         <div class="form-group">
           <label>Price</label>
-          <input type="text" readonly value="$5.99">
+          <input type="text" id="itemID" value="{{ item['Price'] }}">
+
         </div>
 
         <div class="form-group">
           <label>Weight</label>
-          <input type="text" readonly value="1.5 lbs">
+          <input type="text" id="itemID" value="{{ item['Weight'] }}">
         </div>
 
         <div class="form-group">
           <label>Description</label>
-          <textarea rows="4" readonly>This is a test description of the product.</textarea>
+          <textarea id="description" rows="4">{{ item['Description'] }}</textarea>
         </div>
 
         <div class="form-group">
           <label>Available Quantity</label>
-          <input type="number" readonly value="50">
+          <input type="number" id="availableQuantity" min="0" max="10000" value="{{ item['Available Quantity'] }}">
         </div>
 
         <div class="form-group">
           <label>Quantity Limit</label>
-          <input type="number" readonly value="5">
+          <input type="number" id="quantityLimit" min="1" max="10000" value="{{ item['Quantity Limit'] }}">
         </div>
 
         <div class="actions">
