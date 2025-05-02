@@ -145,85 +145,88 @@
 </head>
 <body>
     <div class="container">
-        <header>
-            Edit Inventory Object
-        </header>
-
+        <header>Edit Inventory Object</header>
+    
         <div class="main-container">
-            <!-- Logo Drag and Drop Zone -->
-            <div class="logo-dropzone" id="logoDropzone">
-                <img id="logoPreview" src="Logos/Upload Image.png" alt="Logo">
-                <input type="file" accept="image/*" id="logoInput">
+          <div class="logo-dropzone" id="logoDropzone">
+            <img id="logoPreview" src="{{ item['Image'] or 'Logos/Upload Image.png' }}" alt="Logo">
+            <input type="file" accept="image/*" id="logoInput" />
+          </div>
+    
+          <div class="form-container">
+            <!-- Product Name -->
+            <div class="form-group">
+              <label for="productName">Product Name<span class="required-symbol">*</span></label>
+              <input type="text" id="productName" value="{{ item['Item name'] }}">
             </div>
-
-            <!-- Form Content -->
-            <div class="form-container">
-                <div class="form-group">
-                    <label for="productName">Product Name<span class="required-symbol">*</span></label>
-                    <input type="text" id="productName">
-                </div>
-
-                <!-- Item ID -->
-                <div class="form-group">
-                    <label for="itemID">Item ID<span class="required-symbol">*</span></label>
-                    <div class="input-group">
-                        <input type="text" id="itemID">
-                        <button type="button" class="generate-id-btn" onclick="generateItemID()">Generate ID</button>
-                    </div>
-                </div>
-
-                <!-- Origin Checkbox Group -->
-                <div class="form-group checkbox-group">
-                    <label class="checkbox-label">Origin<span class="required-symbol">*</span></label>
-                    <div class="checkbox-options">
-                        <label><input type="checkbox" class="origin-checkbox"> Patel Brothers</label>
-                        <label><input type="checkbox" class="origin-checkbox"> MD Food Bank</label>
-                        <label><input type="checkbox" class="origin-checkbox"> Donated</label>
-                        <label>
-                            <input type="checkbox" id="otherOriginCheckbox">
-                            <input type="text" id="otherOriginInput" placeholder="Enter custom origin" style="margin-left:5px;">
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Category Checkbox Group -->
-                <div class="form-group checkbox-group">
-                    <label class="checkbox-label">Category:</label>
-                    <div class="checkbox-options" id="categoryOptions"></div>
-                </div>
-
-                <div class="form-group">
-                    <label for="price">Price</label>
-                    <input type="text" id="price">
-                </div>
-
-                <div class="form-group">
-                    <label for="weight">Weight</label>
-                    <input type="text" id="weight">
-                </div>
-
-                <div class="form-group">
-                    <label for="description">Description<span class="required-symbol">*</span></label>
-                    <textarea id="description" rows="4"></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label for="availableQuantity">Available Quantity<span class="required-symbol">*</span></label>
-                    <input type="number" id="availableQuantity" min="0" max="10000">
-                </div>
-
-                <div class="form-group">
-                    <label for="quantityLimit">Quantity Limit<span class="required-symbol">*</span></label>
-                    <input type="number" id="quantityLimit" min="1" max="10000">
-                </div>
-
-                <div class="actions">
-                    <button class="confirm" onclick="window.location.href='StaffView.html'" id="confirmButton" disabled>Confirm</button>
-                    <button class="cancel" onclick="window.location.href='StaffView.html'">Cancel</button>
-                </div>
+    
+            <!-- Item ID -->
+            <div class="form-group">
+              <label for="itemID">Item ID<span class="required-symbol">*</span></label>
+              <div class="input-group">
+                <input type="text" id="itemID" value="{{ item['Item ID'] }}">
+                <button type="button" class="generate-id-btn" onclick="generateItemID()">Generate ID</button>
+              </div>
             </div>
+    
+            <!-- Origin -->
+            <div class="form-group checkbox-group">
+              <label class="checkbox-label">Origin<span class="required-symbol">*</span></label>
+              <div class="checkbox-options">
+                {% for origin in ['Patel Brothers', 'MD Food Bank', 'Donated'] %}
+                <label>
+                  <input type="checkbox" class="origin-checkbox" {% if origin in item['Origin'] %}checked{% endif %}> {{ origin }}
+                </label>
+                {% endfor %}
+                <label>
+                  <input type="checkbox" id="otherOriginCheckbox">
+                  <input type="text" id="otherOriginInput" placeholder="Enter custom origin" style="margin-left:5px;">
+                </label>
+              </div>
+            </div>
+    
+            <!-- Category -->
+            <div class="form-group checkbox-group">
+              <label class="checkbox-label">Category:</label>
+              <div class="checkbox-options" id="categoryOptions"></div>
+            </div>
+    
+            <!-- Price -->
+            <div class="form-group">
+              <label for="price">Price</label>
+              <input type="text" id="price" value="{{ item['Price'] }}">
+            </div>
+    
+            <!-- Weight -->
+            <div class="form-group">
+              <label for="weight">Weight</label>
+              <input type="text" id="weight" value="{{ item['Weight'] }}">
+            </div>
+    
+            <!-- Description -->
+            <div class="form-group">
+              <label for="description">Description<span class="required-symbol">*</span></label>
+              <textarea id="description" rows="4">{{ item['Description'] }}</textarea>
+            </div>
+    
+            <!-- Quantities -->
+            <div class="form-group">
+              <label for="availableQuantity">Available Quantity<span class="required-symbol">*</span></label>
+              <input type="number" id="availableQuantity" min="0" max="10000" value="{{ item['Available Quantity'] }}">
+            </div>
+    
+            <div class="form-group">
+              <label for="quantityLimit">Quantity Limit<span class="required-symbol">*</span></label>
+              <input type="number" id="quantityLimit" min="1" max="10000" value="{{ item['Quantity Limit'] }}">
+            </div>
+    
+            <div class="actions">
+              <button class="confirm" onclick="window.location.href='/staff'" id="confirmButton" disabled>Confirm</button>
+              <button class="cancel" onclick="window.location.href='/staff'">Cancel</button>
+            </div>
+          </div>
         </div>
-    </div>
+      </div>
 
     <script>
         const dropzone = document.getElementById('logoDropzone');
@@ -274,8 +277,15 @@
 
         // Generate 10-digit item ID
         function generateItemID() {
-            const itemID = Math.floor(1000000000 + Math.random() * 9000000000);  // Generates a 10-digit number
-            document.getElementById('itemID').value = itemID;  // Sets the ID into the input field
+            fetch('/generate_unique_id')
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('itemID').value = data.item_id;
+            })
+            .catch(err => {
+                alert("Failed to generate unique ID.");
+                console.error(err);
+            });
         }
 
         // Enable Confirm button if all required fields are filled
