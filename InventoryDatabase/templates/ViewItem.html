@@ -99,21 +99,31 @@
 
     .actions {
       text-align: right;
+      margin-top: 20px;
     }
 
-    .actions .cancel {
+    .actions button {
       padding: 10px 15px;
       border: none;
       border-radius: 4px;
-      background-color: #ff0000;
-      color: white;
       cursor: pointer;
     }
 
-    .required-symbol {
+    .addToCart {
+      background-color: #00aa00;
+      color: white;
+      margin-right: 10px;
+    }
+
+    .cancel {
+      background-color: #ff0000;
+      color: white;
+    }
+
+    .invalid-msg {
       color: red;
-      font-size: 18px;
-      margin-left: 5px;
+      font-size: 14px;
+      display: none;
     }
   </style>
 </head>
@@ -131,61 +141,94 @@
       <div class="form-container">
         <div class="form-group">
           <label>Product Name</label>
-          <input type="text" readonly value="Example Product">
+          <input type="text" id="productName" value="{{ item['Item name'] }}" readonly>
         </div>
 
         <div class="form-group">
           <label>Item ID</label>
-          <input type="text" readonly value="1234567890">
-        </div>
-
-        <div class="form-group">
-          <label>Origin</label>
-          <div class="info-group">
-            <div class="info-box">Patel Brothers</div>
-            <div class="info-box">Other Source</div>
-          </div>
+          <input type="text" id="itemID" value="{{ item['Item ID'] }}" readonly>
         </div>
 
         <div class="form-group">
           <label>Category:</label>
           <div class="info-group">
-            <div class="info-box">Snacks</div>
-            <div class="info-box">Beverages</div>
-            <div class="info-box">Grains</div>
+            {% for cat in item['Categories'] %}
+              <div class="info-box">{{ cat }}</div>
+            {% endfor %}
           </div>
         </div>
 
         <div class="form-group">
-          <label>Price</label>
-          <input type="text" readonly value="$5.99">
-        </div>
-
-        <div class="form-group">
           <label>Weight</label>
-          <input type="text" readonly value="1.5 lbs">
+          <input type="text" id="weight" value="{{ item['Weight'] }}" readonly>
         </div>
 
         <div class="form-group">
           <label>Description</label>
-          <textarea rows="4" readonly>This is a test description of the product.</textarea>
+          <textarea id="description" rows="4" readonly>{{ item['Description'] }}</textarea>
         </div>
 
         <div class="form-group">
           <label>Available Quantity</label>
-          <input type="number" readonly value="50">
+          <input type="number" id="availableQuantity" value="{{ item['Available Quantity'] }}" readonly>
         </div>
 
         <div class="form-group">
           <label>Quantity Limit</label>
-          <input type="number" readonly value="5">
+          <input type="number" id="quantityLimit" value="{{ item['Quantity Limit'] }}" readonly>
+        </div>
+
+        <!-- Editable Quantity Box -->
+        <div class="form-group">
+          <label>Quantity to Add to Cart</label>
+          <input type="number" id="addQuantity" min="1" value="1">
+          <div class="invalid-msg" id="limitError">Exceeds quantity limit per user.</div>
+          <div class="invalid-msg" id="stockError">Not enough stock available.</div>
         </div>
 
         <div class="actions">
+          <button class="addToCart" onclick="validateAndAddToCart()">Add To Cart</button>
           <button class="cancel" onclick="window.location.href='/student'">Back</button>
         </div>
       </div>
     </div>
   </div>
+  <script>
+    function validateAndAddToCart() {
+      const qty = parseInt(document.getElementById('addQuantity').value);
+      const limit = parseInt(document.getElementById('quantityLimit').value);
+      const available = parseInt(document.getElementById('availableQuantity').value);
+      const limitError = document.getElementById('limitError');
+      const stockError = document.getElementById('stockError');
+  
+      // Hide both errors initially
+      limitError.style.display = "none";
+      stockError.style.display = "none";
+  
+      let valid = true;
+  
+      if (qty > limit) {
+        limitError.style.display = "block";
+        valid = false;
+      }
+  
+      if (qty > available) {
+        stockError.style.display = "block";
+        valid = false;
+      }
+  
+      if (qty < 1) {
+        alert("Quantity must be at least 1.");
+        valid = false;
+      }
+  
+      if (valid) {
+        alert("Added " + qty + " items to cart!");
+        // TODO: Add item to cart storage or send to backend
+        window.location.href = "/student";
+      }
+    }
+  </script>
+  
 </body>
 </html>
