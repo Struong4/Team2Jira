@@ -748,7 +748,13 @@ def getItemByID(item_id):
     conn.close()
     return item
 
-
+def itemIDExists(item_id):
+    conn = sqlite3.connect("inventory.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT 1 FROM item WHERE item_id = ?", (item_id,))
+    exists = cursor.fetchone() is not None
+    conn.close()
+    return exists
 
 # where we'll test the code to make sure it works
 if __name__ == "__main__":

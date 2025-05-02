@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
-from crud import showInventory, getItemByID
+from crud import showInventory, getItemByID, itemIDExists
+import random
 
 app = Flask(__name__)
 app.secret_key = "your-secret-key"
@@ -70,6 +71,12 @@ def view_item():
 
     return render_template('ViewItem.html', item=item)
 
+@app.route('/generate_unique_id')
+def generate_unique_id():
+    while True:
+        new_id = random.randint(1000000000, 9999999999)
+        if not itemIDExists(new_id):
+            return {'item_id': new_id}
 
 @app.route('/api/items')
 def get_items():
