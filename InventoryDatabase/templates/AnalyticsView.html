@@ -41,7 +41,20 @@
             fetch(endpoint)
                 .then(response => response.json())
                 .then(data => {
-                    document.getElementById('chart-container').innerHTML = data.plot_html;
+                    const container = document.getElementById('chart-container');
+                    container.innerHTML = data.plot_html;
+
+                    // 🛠 Extract and run all <script> tags manually
+                    const scripts = container.querySelectorAll('script');
+                    scripts.forEach(oldScript => {
+                        const newScript = document.createElement('script');
+                        if (oldScript.src) {
+                            newScript.src = oldScript.src;
+                        } else {
+                            newScript.textContent = oldScript.textContent;
+                        }
+                        document.body.appendChild(newScript); // attach to body, not container
+                    });
                 })
                 .catch(error => {
                     console.error('Error loading chart:', error);
