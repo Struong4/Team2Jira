@@ -157,7 +157,7 @@
             </div>
 
             <!-- Form Content -->
-            <div class="form-container">
+            <form class="form-container" action="/add_item" method="POST" enctype="multipart/form-data">
                 <div class="form-group">
                     <label for="productName">Product Name<span class="required-symbol">*</span></label>
                     <input type="text" id="productName">
@@ -218,7 +218,7 @@
                 </div>
 
                 <div class="actions">
-                    <button class="confirm" onclick="window.location.href='/staff'" id="confirmButton" disabled>Confirm</button>
+                    <button type="submit" class="confirm" id="confirmButton" disabled>Confirm</button>
                     <button class="cancel" onclick="window.location.href='/staff'">Cancel</button>
                 </div>
             </div>
