@@ -64,11 +64,11 @@ def add_item():
     if 'otherOriginCheckbox' in request.form and request.form.get('otherOriginInput'):
         origins.append(request.form.get('otherOriginInput'))
 
-    origin_str = ', '.join(origins)
+    #origin_str = ', '.join(origins)
 
     # Handle categories
     categories = request.form.getlist('category')  # if checkboxes have name="category"
-    categories_str = ', '.join(categories)
+    #categories_str = ', '.join(categories)
 
     # Handle image upload
     image_file = request.files.get('logoInput')
@@ -78,7 +78,8 @@ def add_item():
         image_file.save(image_path)
 
     # Call database insert function
-    result = addNewItem(item_id, name, weight, available_quantity, price, description, quantity_limit, origin_str, categories_str, image_path)
+    #print(f"item id length {len(item_id)}")
+    result = addNewItem(item_id, name, weight, available_quantity, price, description, quantity_limit, origins, categories, image_path)
     print(result)
     return redirect(url_for('staff_view'))
 
