@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
-from crud import showInventory, getItemByID, itemIDExists
+from crud import showInventory, getItemByID, itemIDExists, busyHoursAnalytics, popularItemsAnalytics
+import plotly.io as pio
 import random
 
 app = Flask(__name__)
@@ -91,6 +92,22 @@ def get_items():
         for item_id, data in inventory.items()
     ]
     return jsonify(formatted)
+
+@app.route('/api/busy_hours')
+def api_busy_hours():
+    fig = busyHoursAnalytics()
+    html = pio.to_html(fig, full_html=False)
+    return jsonify({'plot_html': html})
+
+@app.route('/api/popular_items')
+def api_popular_items():
+    fig = popularItemsAnalytics()
+    html = pio.to_html(fig, full_html=False)
+    return jsonify({'plot_html': html})
+
+@app.route('/analytics')
+def analytics_page():
+    return render_template('AnalyticsView.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
