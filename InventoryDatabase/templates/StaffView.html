@@ -70,15 +70,15 @@
     .toolbar {
       display: flex;
       align-items: center;
-      flex-wrap: wrap;
       padding: 10px;
       background-color: rgb(253, 181, 21);
       color: rgb(255, 255, 255);
+      flex-wrap: wrap;
     }
     .toolbar input[type="text"] {
       margin-right: 15px;
       padding: 5px;
-      width: 200px;  /* instead of flex: 1 */
+      width: 200px;
       border: 1px solid #ccc;
     }
     .toolbar select {
@@ -172,7 +172,7 @@
 
 <div class="container">
   <div class="sidebar">
-    <img src="Logos/retriever_essential.png" alt="Retriever Essential Logo">
+    <img src="/static/Logos/retriever_essential.png" alt="Retriever Essential Logo">
     <label>Filter Categories:</label>
     <div id="filterCategories"></div>
     <button id="addCategoryButton">Add Category</button>
@@ -194,7 +194,9 @@
         <option>ID Ascending</option>
         <option>ID Descending</option>
       </select>
-      <button id="addItemButton"><img src="Logos/Add.png" alt="Cart" style="height:20px;"> Add New Item</button>
+      <button id="addItemButton">
+        <img src="/static/Logos/Add.png" alt="Cart" style="height:20px;"> Add New Item
+      </button>
       <button id="analyticsViewButton">Analytics View</button>
     </div>
 
@@ -205,18 +207,13 @@
 </div>
 
 <script>
-  const items = [
-    { id: 3, name: 'ABCD', image: 'Logos/canned_goods.jpg', categories: ['Canned', 'Grains'] },
-    { id: 1, name: 'AABB', image: 'item2.jpg', categories: ['Produce'] },
-    { id: 5, name: 'BBCD', image: 'item3.jpg', categories: ['Grains'] },
-    { id: 4, name: 'ZYXA', image: 'item4.jpg', categories: ['Canned', 'Produce'] },
-    { id: 2, name: 'DDJF', image: 'item5.jpg', categories: ['Canned'] }
-  ];
-
   const grid = document.getElementById('itemsGrid');
   const sortSelect = document.getElementById('sortby');
   const filterDiv = document.getElementById('filterCategories');
-  let filters = ['Canned', 'Produce', 'Grains']; // default fallback
+  const searchInput = document.getElementById('searchInput');
+
+  let filters = ['Canned', 'Produce', 'Grains'];
+  let items = [];
 
   function saveCategories() {
     localStorage.setItem('filterCategories', JSON.stringify(filters));
@@ -224,9 +221,11 @@
 
   function loadCategories() {
     const saved = localStorage.getItem('filterCategories');
-    if (saved) {
-      filters = JSON.parse(saved);
-    }
+    if (saved) filters = JSON.parse(saved);
+  }
+
+  function getSelectedCategories() {
+    return Array.from(filterDiv.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
   }
 
   function createItemBox(item) {
@@ -234,17 +233,19 @@
     box.className = 'item-box';
     box.innerHTML = `
       <h4>${item.name}</h4>
-      <img src="${item.image}" alt="">
+      <img src="${item.image || '/static/Logos/default.png'}" alt="Item Image">
       <div class="button-container">
         <button class="editItemButton">Edit Item</button>
         <button class="removeItemButton">Remove Item</button>
       </div>
     `;
     box.querySelector('.editItemButton').addEventListener('click', () => {
-      window.location.assign("./EditExistingItem.html");
+      window.location.assign('/edit?id=\${item.id}');
     });
     box.querySelector('.removeItemButton').addEventListener('click', () => {
-      box.remove();
+      if (confirm("Are you sure you want to remove this item?")) {
+        box.remove(); // Consider adding an API DELETE call here
+      }
     });
     return box;
   }
@@ -254,32 +255,23 @@
     itemList.forEach(item => grid.appendChild(createItemBox(item)));
   }
 
-  function getSelectedCategories() {
-    return Array.from(filterDiv.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
-  }
-
-  const searchInput = document.getElementById('searchInput'); // NEW
-
   function applyFiltersAndSort() {
-    const searchText = searchInput.value.trim().toLowerCase(); // NEW
+    const searchText = searchInput.value.trim().toLowerCase();
     const selectedCategories = getSelectedCategories();
     let filteredItems = [...items];
 
-    // Filter by categories
     if (selectedCategories.length > 0) {
       filteredItems = filteredItems.filter(item =>
         selectedCategories.every(cat => item.categories.includes(cat))
       );
     }
 
-    // Filter by search text
     if (searchText) {
       filteredItems = filteredItems.filter(item =>
         item.name.toLowerCase().includes(searchText)
       );
     }
 
-    // Sort logic
     const sortValue = sortSelect.value;
     if (sortValue === 'Name A-Z') {
       filteredItems.sort((a, b) => a.name.localeCompare(b.name));
@@ -293,9 +285,6 @@
 
     renderItems(filteredItems);
   }
-
-  // Add event listener to search input
-  searchInput.addEventListener('input', applyFiltersAndSort); // NEW
 
   function renderCategories() {
     filterDiv.innerHTML = '';
@@ -311,15 +300,24 @@
     });
   }
 
-  sortSelect.addEventListener('change', applyFiltersAndSort);
+  function fetchItems() {
+    fetch('/api/items')
+      .then(res => res.json())
+      .then(data => {
+        items = data;
+        applyFiltersAndSort();
+      })
+      .catch(err => console.error("Failed to fetch items:", err));
+  }
 
+  // Event listeners
   document.getElementById('addCategoryButton').addEventListener('click', () => {
     const newCategory = prompt("Enter new category name:");
     if (newCategory) {
       const trimmed = newCategory.trim();
       if (trimmed && !filters.includes(trimmed)) {
         filters.push(trimmed);
-        saveCategories();     // Save updated categories
+        saveCategories();
         renderCategories();
       } else {
         alert("Category already exists or input is invalid.");
@@ -341,26 +339,28 @@
       }
     }
   });
-  
 
   document.getElementById('addItemButton').addEventListener('click', () => {
-    window.location.assign("./add");
-  });
-
-  document.getElementById('logoutButton').addEventListener('click', () => {
-    if (confirm("Are you sure you want to log out?")) {
-      window.location.assign("./StudentView.html");
-    }
+    window.location.assign("/add");
   });
 
   document.getElementById('analyticsViewButton').addEventListener('click', () => {
     window.location.assign("/analytics");
   });
 
-  loadCategories();           // Load from localStorage
+  document.getElementById('logoutButton').addEventListener('click', () => {
+    if (confirm("Are you sure you want to log out?")) {
+      window.location.assign("/logout");
+    }
+  });
+
+  // Initialize
+  loadCategories();
   renderCategories();
   sortSelect.value = 'Name A-Z';
-  applyFiltersAndSort();
+  fetchItems();
+  searchInput.addEventListener('input', applyFiltersAndSort);
+  sortSelect.addEventListener('change', applyFiltersAndSort);
 </script>
 
 </body>
