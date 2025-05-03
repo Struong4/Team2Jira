@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Analytics</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script> <!-- ✅ THIS IS THE FIX -->
+    <style>
+        .container {
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            padding: 20px;
+        }
+        .sidebar {
+            width: 200px;
+            padding: 10px;
+        }
+        .content {
+            flex-grow: 1;
+            padding: 10px;
+        }
+        button {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center;">Inventory Analytics</h1>
+    <div class="container">
+        <div class="sidebar">
+            <button onclick="loadChart('/api/busy_hours')">Show Busy Hours</button>
+            <button onclick="loadChart('/api/popular_items')">Show Popular Items</button>
+        </div>
+        <div class="content" id="chart-container">
+            <p>Select a chart to view analytics.</p>
+        </div>
+    </div>
+
+    <script>
+        function loadChart(endpoint) {
+            fetch(endpoint)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('chart-container').innerHTML = data.plot_html;
+                })
+                .catch(error => {
+                    console.error('Error loading chart:', error);
+                });
+        }
+    </script>
+</body>
+</html>

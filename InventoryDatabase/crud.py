@@ -647,7 +647,7 @@ def busyHoursAnalytics():
             order_datetimes.append(order_datetime)
 
         # converts it to pandas dataframe
-        df = pd.DataFrame({"datetime": pd.to_datetime(order_datetimes)})
+        df = pd.DataFrame({"datetime": pd.to_datetime(order_datetimes, format="%H:%M:%S")})
 
         # extracts the hour
         df["hour"] = df["datetime"].dt.hour
@@ -725,36 +725,6 @@ def popularItemsAnalytics():
 
     return fig
 
-def getItemByID(item_id):
-    conn = sqlite3.connect("inventory.db")
-    cursor = conn.cursor()
-
-    cursor.execute("SELECT * FROM item WHERE item_id = ?", (item_id,))
-    row = cursor.fetchone()
-    if not row:
-        return None
-
-    # example structure — adjust as needed
-    item = {
-        "Item name": row[1],
-        "Item ID": row[0],
-        "Price": row[2],
-        "Weight": row[3],
-        "Description": row[4],
-        "Available Quantity": row[5],
-        "Quantity Limit": row[6],
-        "Image": row[7]
-    }
-    conn.close()
-    return item
-
-def itemIDExists(item_id):
-    conn = sqlite3.connect("inventory.db")
-    cursor = conn.cursor()
-    cursor.execute("SELECT 1 FROM item WHERE item_id = ?", (item_id,))
-    exists = cursor.fetchone() is not None
-    conn.close()
-    return exists
 
 # where we'll test the code to make sure it works
 if __name__ == "__main__":
@@ -1075,9 +1045,3 @@ if __name__ == "__main__":
     # print("AFTER TESTING REMOVE ITEMS")
 
     #displayAllTables()
-
-    
-
-
-
-    #runSQLScript(DROP_SCRIPT)

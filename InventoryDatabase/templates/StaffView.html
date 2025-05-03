@@ -4,12 +4,14 @@
   <meta charset="UTF-8">
   <title>Staff Inventory Window</title>
   <style>
-    /* Your original CSS remains unchanged */
     body {
       margin: 0;
       font-family: Arial, sans-serif;
     }
-    .container { display: flex; height: 100vh; }
+    .container {
+      display: flex;
+      height: 100vh;
+    }
     .sidebar {
       display: flex;
       flex-direction: column;
@@ -24,11 +26,25 @@
       object-fit: contain;
       margin: 0 auto 10px;
     }
-    #filterCategories { display: flex; flex-direction: column; }
-    .sidebar label { display: block; margin-bottom: 10px; }
-    .sidebar input[type="checkbox"] { margin-right: 8px; }
-    .sidebar input { margin: 5px 0; }
-    .main { flex: 1; display: flex; flex-direction: column; }
+    #filterCategories {
+      display: flex;
+      flex-direction: column;
+    }
+    .sidebar label {
+      display: block;
+      margin-bottom: 10px;
+    }
+    .sidebar input[type="checkbox"] {
+      margin-right: 8px;
+    }
+    .sidebar input {
+      margin: 5px 0;
+    }
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
     .header {
       background-color: black;
       color: white;
@@ -48,10 +64,13 @@
       border-radius: 4px;
       cursor: pointer;
     }
-    .header button:hover { background-color: rgb(255, 255, 255); }
+    .header button:hover {
+      background-color: rgb(255, 255, 255);
+    }
     .toolbar {
       display: flex;
       align-items: center;
+      flex-wrap: wrap;
       padding: 10px;
       background-color: rgb(253, 181, 21);
       color: rgb(255, 255, 255);
@@ -59,7 +78,7 @@
     .toolbar input[type="text"] {
       margin-right: 15px;
       padding: 5px;
-      flex: 1;
+      width: 200px;  /* instead of flex: 1 */
       border: 1px solid #ccc;
     }
     .toolbar select {
@@ -76,7 +95,9 @@
       border: none;
       cursor: pointer;
     }
-    .toolbar button:hover { background-color: #ffffff; }
+    .toolbar button:hover {
+      background-color: #ffffff;
+    }
     .content {
       flex: 1;
       overflow: auto;
@@ -100,7 +121,9 @@
       box-shadow: 0 2px 5px rgba(255, 255, 255, 0.1);
       transition: transform 0.2s ease;
     }
-    .item-box:hover { transform: translateY(-3px); }
+    .item-box:hover {
+      transform: translateY(-3px);
+    }
     .item-box img {
       max-width: 100%;
       height: auto;
@@ -114,15 +137,23 @@
       cursor: pointer;
       border-radius: 4px;
     }
-    .item-box button:hover { opacity: 0.8; }
+    .item-box button:hover {
+      opacity: 0.8;
+    }
     .button-container {
       display: flex;
       justify-content: space-between;
       width: 100%;
       margin-top: 10px;
     }
-    .editItemButton { background: rgb(12, 116, 17); color: white; }
-    .removeItemButton { background: rgb(255, 61, 61); color: white; }
+    .editItemButton {
+      background: rgb(12, 116, 17);
+      color: white;
+    }
+    .removeItemButton {
+      background: rgb(255, 61, 61);
+      color: white;
+    }
     .sidebar button {
       margin-top: 20px;
       padding: 10px;
@@ -132,14 +163,16 @@
       border-radius: 4px;
       cursor: pointer;
     }
-    .sidebar button:hover { background-color: rgb(220, 150, 15); }
+    .sidebar button:hover {
+      background-color: rgb(220, 150, 15);
+    }
   </style>
 </head>
 <body>
 
 <div class="container">
   <div class="sidebar">
-    <img src="/static/Logos/retriever_essential.png" alt="Retriever Essential Logo">
+    <img src="Logos/retriever_essential.png" alt="Retriever Essential Logo">
     <label>Filter Categories:</label>
     <div id="filterCategories"></div>
     <button id="addCategoryButton">Add Category</button>
@@ -161,7 +194,8 @@
         <option>ID Ascending</option>
         <option>ID Descending</option>
       </select>
-      <button id="addItemButton"><img src="/static/Logos/Add.png" alt="Cart" style="height:20px;"> Add New Item</button>
+      <button id="addItemButton"><img src="Logos/Add.png" alt="Cart" style="height:20px;"> Add New Item</button>
+      <button id="analyticsViewButton">Analytics View</button>
     </div>
 
     <div class="content">
@@ -171,13 +205,18 @@
 </div>
 
 <script>
+  const items = [
+    { id: 3, name: 'ABCD', image: 'Logos/canned_goods.jpg', categories: ['Canned', 'Grains'] },
+    { id: 1, name: 'AABB', image: 'item2.jpg', categories: ['Produce'] },
+    { id: 5, name: 'BBCD', image: 'item3.jpg', categories: ['Grains'] },
+    { id: 4, name: 'ZYXA', image: 'item4.jpg', categories: ['Canned', 'Produce'] },
+    { id: 2, name: 'DDJF', image: 'item5.jpg', categories: ['Canned'] }
+  ];
+
   const grid = document.getElementById('itemsGrid');
   const sortSelect = document.getElementById('sortby');
   const filterDiv = document.getElementById('filterCategories');
-  const searchInput = document.getElementById('searchInput');
-
-  let filters = ['Canned', 'Produce', 'Grains']; // fallback
-  let items = [];
+  let filters = ['Canned', 'Produce', 'Grains']; // default fallback
 
   function saveCategories() {
     localStorage.setItem('filterCategories', JSON.stringify(filters));
@@ -185,11 +224,9 @@
 
   function loadCategories() {
     const saved = localStorage.getItem('filterCategories');
-    if (saved) filters = JSON.parse(saved);
-  }
-
-  function getSelectedCategories() {
-    return Array.from(filterDiv.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
+    if (saved) {
+      filters = JSON.parse(saved);
+    }
   }
 
   function createItemBox(item) {
@@ -197,20 +234,17 @@
     box.className = 'item-box';
     box.innerHTML = `
       <h4>${item.name}</h4>
-      <img src="${item.image || '/static/Logos/default.png'}" alt="Item Image">
+      <img src="${item.image}" alt="">
       <div class="button-container">
         <button class="editItemButton">Edit Item</button>
         <button class="removeItemButton">Remove Item</button>
       </div>
     `;
     box.querySelector('.editItemButton').addEventListener('click', () => {
-      window.location.assign(`/edit?id=${item.id}`);
+      window.location.assign("./EditExistingItem.html");
     });
     box.querySelector('.removeItemButton').addEventListener('click', () => {
-      if (confirm("Are you sure you want to remove this item?")) {
-        // TODO: send delete request to API
-        box.remove();
-      }
+      box.remove();
     });
     return box;
   }
@@ -220,23 +254,32 @@
     itemList.forEach(item => grid.appendChild(createItemBox(item)));
   }
 
+  function getSelectedCategories() {
+    return Array.from(filterDiv.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
+  }
+
+  const searchInput = document.getElementById('searchInput'); // NEW
+
   function applyFiltersAndSort() {
-    const searchText = searchInput.value.trim().toLowerCase();
+    const searchText = searchInput.value.trim().toLowerCase(); // NEW
     const selectedCategories = getSelectedCategories();
     let filteredItems = [...items];
 
+    // Filter by categories
     if (selectedCategories.length > 0) {
       filteredItems = filteredItems.filter(item =>
         selectedCategories.every(cat => item.categories.includes(cat))
       );
     }
 
+    // Filter by search text
     if (searchText) {
       filteredItems = filteredItems.filter(item =>
         item.name.toLowerCase().includes(searchText)
       );
     }
 
+    // Sort logic
     const sortValue = sortSelect.value;
     if (sortValue === 'Name A-Z') {
       filteredItems.sort((a, b) => a.name.localeCompare(b.name));
@@ -250,6 +293,9 @@
 
     renderItems(filteredItems);
   }
+
+  // Add event listener to search input
+  searchInput.addEventListener('input', applyFiltersAndSort); // NEW
 
   function renderCategories() {
     filterDiv.innerHTML = '';
@@ -265,24 +311,15 @@
     });
   }
 
-  function fetchItems() {
-    fetch('/api/items')
-      .then(res => res.json())
-      .then(data => {
-        items = data;
-        applyFiltersAndSort();
-      })
-      .catch(err => console.error("Failed to fetch items:", err));
-  }
+  sortSelect.addEventListener('change', applyFiltersAndSort);
 
-  // Event listeners
   document.getElementById('addCategoryButton').addEventListener('click', () => {
     const newCategory = prompt("Enter new category name:");
     if (newCategory) {
       const trimmed = newCategory.trim();
       if (trimmed && !filters.includes(trimmed)) {
         filters.push(trimmed);
-        saveCategories();
+        saveCategories();     // Save updated categories
         renderCategories();
       } else {
         alert("Category already exists or input is invalid.");
@@ -304,24 +341,26 @@
       }
     }
   });
+  
 
   document.getElementById('addItemButton').addEventListener('click', () => {
-    window.location.assign("/add");
+    window.location.assign("./AddNewItem.html");
   });
 
   document.getElementById('logoutButton').addEventListener('click', () => {
     if (confirm("Are you sure you want to log out?")) {
-      window.location.assign("/logout");
+      window.location.assign("./StudentView.html");
     }
-  });  
+  });
 
-  // Initialize
-  loadCategories();
+  document.getElementById('analyticsViewButton').addEventListener('click', () => {
+    window.location.assign("/analytics");
+  });
+
+  loadCategories();           // Load from localStorage
   renderCategories();
   sortSelect.value = 'Name A-Z';
-  fetchItems();
-  searchInput.addEventListener('input', applyFiltersAndSort);
-  sortSelect.addEventListener('change', applyFiltersAndSort);
+  applyFiltersAndSort();
 </script>
 
 </body>
