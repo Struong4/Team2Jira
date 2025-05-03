@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
-from crud import showInventory, busyHoursAnalytics, popularItemsAnalytics
+from crud import showInventory, getItemByID, itemIDExists, busyHoursAnalytics, popularItemsAnalytics
 import plotly.io as pio
+import random
 
 app = Flask(__name__)
 app.secret_key = "your-secret-key"
@@ -45,7 +46,15 @@ def add_item():
 
 @app.route('/edit')
 def edit_item():
-    return render_template('EditExistingItem.html')
+    item_id = request.args.get('id')
+    if not item_id:
+        return "Item ID is required", 400
+
+    item = getItemByID(item_id)
+    if not item:
+        return f"Item with ID {item_id} not found.", 404
+
+    return render_template('EditExistingItem.html', item=item)
 
 @app.route('/checkout')
 def checkout():
@@ -53,8 +62,22 @@ def checkout():
 
 @app.route('/view')
 def view_item():
-    return render_template('ViewItem.html')
+    item_id = request.args.get('id')
+    if not item_id:
+        return "Item ID is required", 400
 
+    item = getItemByID(item_id)
+    if not item:
+        return f"Item with ID {item_id} not found.", 404
+
+    return render_template('ViewItem.html', item=item)
+
+@app.route('/generate_unique_id')
+def generate_unique_id():
+    while True:
+        new_id = random.randint(1000000000, 9999999999)
+        if not itemIDExists(new_id):
+            return {'item_id': new_id}
 
 @app.route('/api/items')
 def get_items():
@@ -69,7 +92,6 @@ def get_items():
         for item_id, data in inventory.items()
     ]
     return jsonify(formatted)
-
 
 @app.route('/api/busy_hours')
 def api_busy_hours():
