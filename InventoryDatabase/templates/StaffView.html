@@ -70,10 +70,11 @@
     .toolbar {
       display: flex;
       align-items: center;
-      padding: 10px;
+      padding: 5px;
       background-color: rgb(253, 181, 21);
       color: rgb(255, 255, 255);
       flex-wrap: wrap;
+      gap: 10px; /* Add this line */
     }
     .toolbar input[type="text"] {
       margin-right: 15px;
@@ -86,18 +87,33 @@
       padding: 5px;
       border: 1px solid #ccc;
     }
-    .toolbar button {
-      margin-left: 10px;
-      padding: 5px 10px;
-      min-width: 75px;
+    .toolbar-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 40px;
+      width: 160px;
+      padding: 0 10px;
       background-color: rgb(255, 255, 255);
       color: rgb(0, 0, 0);
       border: none;
+      border-radius: 4px;
       cursor: pointer;
+      font-size: 14px;
+      font-family: inherit;
+      box-sizing: border-box;
     }
-    .toolbar button:hover {
-      background-color: #ffffff;
+    .toolbar-button:hover {
+      background-color: #f0f0f0;
     }
+    .toolbar-button img {
+      height: 20px;
+      width: 20px;
+      margin-right: 8px;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    
     .content {
       flex: 1;
       overflow: auto;
@@ -194,10 +210,12 @@
         <option>ID Ascending</option>
         <option>ID Descending</option>
       </select>
-      <button id="addItemButton">
-        <img src="/static/Logos/Add.png" alt="Cart" style="height:20px;"> Add New Item
+      <button id="addItemButton" class="toolbar-button">
+        <img src="/static/Logos/Add.png" alt="Cart"> Add New Item
       </button>
-      <button id="analyticsViewButton">Analytics View</button>
+      <button id="analyticsViewButton" class="toolbar-button">
+        Analytics View
+      </button>
     </div>
 
     <div class="content">
@@ -242,6 +260,7 @@
     box.querySelector('.editItemButton').addEventListener('click', () => {
       window.location.assign(`/edit?id=${item.id}`);
     });    
+      
     box.querySelector('.removeItemButton').addEventListener('click', () => {
       if (confirm("Are you sure you want to remove this item?")) {
         fetch('/api/remove_item', {
