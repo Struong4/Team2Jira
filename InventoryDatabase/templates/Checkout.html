@@ -243,11 +243,43 @@
     window.location.href = "/student";
   }
 
-  function checkout() {
-    alert("Checked out with " + totalCountSpan.textContent + " items!");
-    localStorage.removeItem('cart');
-    window.location.href = "/"; // redirect to home page
+  async function checkout() {
+    if (cartItems.length === 0) {
+      alert("Your cart is empty!");
+      return;
+    }
+  
+    const payload = {
+      items: cartItems.map(item => ({
+        item_id: item.itemID,
+        quantity: item.quantity
+      }))
+    };
+  
+    try {
+      const response = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+  
+      const result = await response.json();
+  
+      // Display the results in a popup or log
+      const messages = result.map(r => `${r.result}`).join('\n');
+      alert(messages);
+  
+      // If successful, clear cart and redirect
+      localStorage.removeItem('cart');
+      window.location.href = "/";
+    } catch (error) {
+      console.error("Checkout error:", error);
+      alert("An error occurred during checkout.");
+    }
   }
+  
 
   populateCart();
 </script>
