@@ -200,34 +200,54 @@
       const available = parseInt(document.getElementById('availableQuantity').value);
       const limitError = document.getElementById('limitError');
       const stockError = document.getElementById('stockError');
-  
+    
       // Hide both errors initially
       limitError.style.display = "none";
       stockError.style.display = "none";
-  
+    
       let valid = true;
-  
+    
       if (qty > limit) {
         limitError.style.display = "block";
         valid = false;
       }
-  
+    
       if (qty > available) {
         stockError.style.display = "block";
         valid = false;
       }
-  
+    
       if (qty < 1) {
         alert("Quantity must be at least 1.");
         valid = false;
       }
-  
+    
       if (valid) {
+        const cartItem = {
+          itemID: document.getElementById('itemID').value,
+          quantity: qty
+        };
+      
+        // Retrieve existing cart or initialize new one
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+      
+        // Check if item already in cart
+        const existingItem = cart.find(item => item.itemID === cartItem.itemID);
+        if (existingItem) {
+          existingItem.quantity += qty;
+        } else {
+          cart.push(cartItem);
+        }
+      
+        // Save back to localStorage
+        localStorage.setItem('cart', JSON.stringify(cart));
+      
         alert("Added " + qty + " items to cart!");
-        // TODO: Add item to cart storage or send to backend
-        window.location.href = "/student";
+        window.location.href = "/student";  // Redirect or change as needed
       }
+      
     }
+    
   </script>
   
 </body>

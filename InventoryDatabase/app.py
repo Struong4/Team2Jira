@@ -187,5 +187,14 @@ def remove_item():
 
     return jsonify({'success': success, 'message': result})
 
+@app.route('/api/item/<item_id>')
+def get_item_api(item_id):
+    from crud import getItemByID
+    item = getItemByID(item_id)
+    if item:
+        return jsonify(item)
+    else:
+        return jsonify({"error": "Item not found"}), 404
+
 if __name__ == '__main__':
     app.run(debug=True)

@@ -82,6 +82,12 @@
       background-color: #cc0000;
     }
 
+    .max-quantity-msg {
+      color: red;
+      font-size: 14px;
+      margin-top: 5px;
+    }
+
     .checkout-box {
       width: 300px;
       background: rgb(253, 181, 21);
@@ -151,49 +157,80 @@
 </div>
 
 <script>
-  let cartItems = [
-    { image: 'Logos/Retriever Essential.png', name: 'Item 1', weight: '5000g', quantity: 1 },
-    { image: 'Logos/Retriever Essential.png', name: 'Item 2', weight: '100g', quantity: 1 },
-    { image: 'Logos/Retriever Essential.png', name: 'Item 3', weight: '400g', quantity: 1 }
-  ];
-
+  let cartItems = JSON.parse(localStorage.getItem('cart')) || [];
   const cartList = document.getElementById('cartList');
   const totalCountSpan = document.getElementById('totalCount');
 
-  function populateCart() {
+  async function populateCart() {
     cartList.querySelectorAll('.cart-item').forEach(el => el.remove()); // Clear old items
 
-    cartItems.forEach((item, index) => {
-      const div = document.createElement('div');
-      div.className = 'cart-item';
+    for (let index = 0; index < cartItems.length; index++) {
+      const item = cartItems[index];
 
-      div.innerHTML = `
-        <img src="${item.image}" alt="${item.name}">
-        <div class="item-details">
-          <div class="item-header">
-            <strong>${item.name}</strong>
-            <span>${item.weight}</span>
+      // Fetch item details based on itemID (assuming you have an endpoint for this)
+      try {
+        const response = await fetch(`/api/item/${item.itemID}`);
+        const data = await response.json();
+
+        if (data.error) {
+          console.warn(`Item ${item.itemID} not found.`);
+          continue;
+        }
+
+        // Get available quantity and quantity limit
+        const availableQuantity = data["Available Quantity"];
+        const quantityLimit = data["Quantity Limit"];
+
+        const div = document.createElement('div');
+        div.className = 'cart-item';
+
+        div.innerHTML = `  
+          <img src="${data.Image}" alt="${data["Item name"]}">
+          <div class="item-details">
+            <div class="item-header">
+              <strong>${data["Item name"]} - </strong>
+              <span>Weight:${data.Weight} lbs </span>
+            </div>
+            <div class="item-controls">
+              <input type="number" min="1" value="${item.quantity}" 
+                     max="${Math.min(availableQuantity, quantityLimit)}" 
+                     onchange="updateQuantity(${index}, this.value, ${availableQuantity}, ${quantityLimit})">
+              <button onclick="deleteItem(${index})">Delete</button>
+              <span id="maxQuantityMsg${index}" class="max-quantity-msg"></span>
+            </div>
           </div>
-          <div class="item-controls">
-            <input type="number" min="1" value="${item.quantity}" onchange="updateQuantity(${index}, this.value)">
-            <button onclick="deleteItem(${index})">Delete</button>
-          </div>
-        </div>
-      `;
-      cartList.appendChild(div);
-    });
+        `;
+        cartList.appendChild(div);
+
+      } catch (err) {
+        console.error("Error fetching item:", err);
+      }
+    }
 
     updateTotalCount();
   }
 
-  function updateQuantity(index, value) {
-    const qty = Math.max(1, parseInt(value) || 1);
+  function updateQuantity(index, value, availableQuantity, quantityLimit) {
+    let qty = Math.max(1, parseInt(value) || 1);
+    qty = Math.min(qty, availableQuantity, quantityLimit); // Ensure quantity does not exceed limits
+
     cartItems[index].quantity = qty;
-    updateTotalCount();
-  }
+    localStorage.setItem('cart', JSON.stringify(cartItems)); // update storage
+
+    // Display "Max quantity reached" message if the max limit is reached
+    const maxQuantityMsg = document.getElementById(`maxQuantityMsg${index}`);
+    if (qty === Math.min(availableQuantity, quantityLimit)) {
+        maxQuantityMsg.textContent = `Max quantity reached: ${Math.min(availableQuantity, quantityLimit)}`;
+    } else {
+        maxQuantityMsg.textContent = "";
+    }
+
+    populateCart(); // Re-populate the cart with updated quantities
+}
 
   function deleteItem(index) {
     cartItems.splice(index, 1);
+    localStorage.setItem('cart', JSON.stringify(cartItems)); // update storage
     populateCart();
   }
 
@@ -208,7 +245,8 @@
 
   function checkout() {
     alert("Checked out with " + totalCountSpan.textContent + " items!");
-    // Send cartItems to server or redirect
+    localStorage.removeItem('cart');
+    window.location.href = "/"; // redirect to home page
   }
 
   populateCart();
