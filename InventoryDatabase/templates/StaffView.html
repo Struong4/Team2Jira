@@ -244,9 +244,27 @@
     });    
     box.querySelector('.removeItemButton').addEventListener('click', () => {
       if (confirm("Are you sure you want to remove this item?")) {
-        box.remove(); // Consider adding an API DELETE call here
+        fetch('/api/remove_item', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ item_id: item.id })
+        })
+        .then(res => res.json())
+        .then(data => {
+          alert(data.message);
+          if (data.success) {
+            box.remove(); // Remove item from UI if deleted from DB
+          }
+        })
+        .catch(err => {
+          console.error("Error removing item:", err);
+          alert("Failed to remove item.");
+        });
       }
     });
+    
     return box;
   }
 

@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
-from crud import showInventory, getItemByID, itemIDExists, busyHoursAnalytics, popularItemsAnalytics, addNewItem
+from crud import showInventory, getItemByID, itemIDExists, busyHoursAnalytics, popularItemsAnalytics, addNewItem, removeItem
 import plotly.io as pio
 
 import random
@@ -154,6 +154,19 @@ def api_popular_items():
 @app.route('/analytics')
 def analytics_page():
     return render_template('AnalyticsView.html')
+
+@app.route('/api/remove_item', methods=['POST'])
+def remove_item():
+    data = request.get_json()
+    item_id = data.get('item_id')
+
+    if not item_id:
+        return jsonify({'success': False, 'message': 'Missing item ID'}), 400
+
+    result = removeItem(item_id)
+    success = result.startswith("✅")
+
+    return jsonify({'success': success, 'message': result})
 
 if __name__ == '__main__':
     app.run(debug=True)
