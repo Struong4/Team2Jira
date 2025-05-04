@@ -56,7 +56,7 @@ def runSQLScript(sql_file):
     print(f"Executed {sql_file} on {INVENTORY}")
 
 
-def addNewItem(item_id, item_name, weight_lbs, quantity=0, price=0.00, descript="", quantity_limit=0, origins=[], categories=[], image_str=""):
+def addNewItem(item_id, item_name, weight_lbs=0.00, quantity=0, price=0.00, descript="", quantity_limit=0, origins=[], categories=[], image_str=""):
     prompt = ""
 
     item_id = str(item_id)
@@ -756,6 +756,46 @@ def itemIDExists(item_id):
     conn.close()
     return exists
 
+def initializeCategoryDatabase():
+    conn = sqlite3.connect(INVENTORY)
+    cursor = conn.cursor()
+
+    # Table to store all available filters (categories)
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS category_filters (
+            category_name TEXT PRIMARY KEY
+        )
+    """)
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+def populateDefaultCategoryFilters():
+    default_filters = [
+        'Produce', 'Dairy', 'Canned Goods', 'Snacks', 'Grains'
+    ]
+
+    conn = sqlite3.connect(INVENTORY)
+    cursor = conn.cursor()
+
+    for category in default_filters:
+        try:
+            cursor.execute("INSERT INTO category_filters (category_name) VALUES (?)", (category,))
+        except sqlite3.IntegrityError:
+            continue  # Skip if already exists
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+def getAllCategoryFilters():
+    conn = sqlite3.connect('your_database.db')
+    c = conn.cursor()
+    c.execute("SELECT DISTINCT category FROM items")  # Adjust if category is stored differently
+    categories = [row[0] for row in c.fetchall()]
+    conn.close()
+    return categories
 
 
 # where we'll test the code to make sure it works
@@ -764,6 +804,8 @@ if __name__ == "__main__":
     # creates tables using the create_all.sql script
     resetInventory(DROP_SCRIPT)
     createInventory(CREATE_SCRIPT)
+    #initializeCategoryDatabase()
+    #populateDefaultCategoryFilters()
 
     print("BEFORE TESTING ADD NEW ITEMS")
     displayAllTables()
