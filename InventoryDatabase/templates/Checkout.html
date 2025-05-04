@@ -4,6 +4,46 @@
   <meta charset="UTF-8">
   <title>Checkout</title>
   <style>
+    .main-header {
+      background-color: rgb(253, 181, 21);
+      color: #000;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between; /* Align left and right sections */
+      font-size: 24px;
+      font-weight: bold;
+      border-bottom: 3px solid #222;
+    }
+    
+    .continue-btn {
+      background: white;
+      border: 2px solid black;
+      font-size: 16px;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    
+    .continue-btn:hover {
+      background: #f1f1f1;
+    }    
+    
+    .main-header img {
+      height: 50px;
+      object-fit: contain;
+    }
+    
+    .main-header h1 {
+      margin: 0; /* Remove default gap */
+    }
+    
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+    }
+    
     body {
       margin: 0;
       font-family: Arial, sans-serif;
@@ -12,10 +52,20 @@
 
     .container {
       display: flex;
-      height: 100vh;
+      justify-content: space-between; 
+      height: 80vh;
       padding: 20px;
       box-sizing: border-box;
     }
+    
+
+    .cart-title {
+      font-size: 22px;
+      font-weight: bold;
+      text-decoration: underline;
+      margin-bottom: 10px;
+    }
+    
 
     .cart-list {
       flex: 1;
@@ -100,6 +150,18 @@
       justify-content: space-between;
     }
 
+    .button-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    
+    .button-group button + button {
+      margin-top: 0;
+      border-top: none;
+    }    
+
     .checkout-box h3, .checkout-box p {
       margin: 10px 0;
       font-size: 18px;
@@ -140,19 +202,29 @@
   </style>
 </head>
 <body>
-
-<div class="container">
-  <div class="cart-list" id="cartList">
-    <div class="header">
-      <img src="/static/Logos/retriever_essential.png" alt="Logo">
-      <button onclick="goBack()">Continue Shopping</button>
-    </div>
-    <!-- Cart items will go here -->
+<div class="main-header">
+  <div style="display: flex; align-items: center; gap: 20px;">
+    <img src="/static/Logos/retriever_essential.png" alt="Logo">
+    <h1>My Cart</h1>
   </div>
+  <button onclick="goBack()" class="continue-btn">Continue Shopping</button>
+</div>
+  
+<div class="container">
+  <div class="cart-section">
+    <h2 class="cart-title">Items in Cart</h2>
+    <div class="cart-list" id="cartList">
+      <!-- Cart items will go here -->
+    </div>
+  </div>
+
 
   <div class="checkout-box">
     <h3>Total Count: <span id="totalCount">0</span></h3>
-    <button onclick="checkout()">Checkout</button>
+    <div class="button-group">
+      <button onclick="checkout()">Checkout</button>
+      <button onclick="clearCart()">Clear Cart</button>
+    </div>    
   </div>
 </div>
 
@@ -279,7 +351,14 @@
       alert("An error occurred during checkout.");
     }
   }
-  
+
+  function clearCart() {
+    if (confirm("Are you sure you want to clear the cart?")) {
+      localStorage.removeItem('cart');
+      cartItems = [];
+      populateCart();
+    }
+  }
 
   populateCart();
 </script>
