@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, j
 from crud import showInventory, getItemByID, itemIDExists, busyHoursAnalytics, popularItemsAnalytics, addNewItem, removeItem, updateItem
 import plotly.io as pio
 from datetime import datetime
+import os
 
 import random
 
@@ -74,7 +75,7 @@ def add_item():
     #categories_str = ', '.join(categories)
 
     # Handle image upload
-    image_file = request.files.get('logoInput')
+    image_file = request.files.get('logoImage')
     image_path = 'static/Logos/default.png'  # fallback
     if image_file and image_file.filename:
         image_path = os.path.join('static', 'Logos', item_id + '_' + image_file.filename)
