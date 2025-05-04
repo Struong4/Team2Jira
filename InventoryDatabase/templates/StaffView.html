@@ -240,8 +240,8 @@
       </div>
     `;
     box.querySelector('.editItemButton').addEventListener('click', () => {
-      window.location.assign('/edit?id=\${item.id}');
-    });
+      window.location.assign(`/edit?id=${item.id}`);
+    });    
     box.querySelector('.removeItemButton').addEventListener('click', () => {
       if (confirm("Are you sure you want to remove this item?")) {
         box.remove(); // Consider adding an API DELETE call here

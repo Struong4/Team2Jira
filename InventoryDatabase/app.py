@@ -89,14 +89,18 @@ def add_item():
 @app.route('/edit')
 def edit_item():
     item_id = request.args.get('id')
+    print(f"[DEBUG] item_id received: {item_id} (type: {type(item_id)})")
+
     if not item_id:
         return "Item ID is required", 400
 
     item = getItemByID(item_id)
     if not item:
+        print(f"[DEBUG] No item found for ID: {item_id}")
         return f"Item with ID {item_id} not found.", 404
 
     return render_template('EditExistingItem.html', item=item)
+
 
 @app.route('/checkout')
 def checkout():
