@@ -233,7 +233,7 @@
     box.className = 'item-box';
     box.innerHTML = `
       <h4>${item.name}</h4>
-      <img src="${item.image || '/static/Logos/default.png'}" alt="Item Image">
+      <img src="${item.image || '/static/Logos/default.png'}" alt="">
       <div class="button-container">
         <button class="editItemButton">Edit Item</button>
         <button class="removeItemButton">Remove Item</button>
@@ -252,6 +252,16 @@
 
   function renderItems(itemList) {
     grid.innerHTML = '';
+    if (itemList.length === 0) {
+      const emptyMessage = document.createElement('div');
+      emptyMessage.textContent = "No Items in Inventory";
+      emptyMessage.style.textAlign = "center";
+      emptyMessage.style.color = "#777";
+      emptyMessage.style.fontSize = "20px";
+      emptyMessage.style.marginTop = "40px";
+      grid.appendChild(emptyMessage);
+      return;
+    }
     itemList.forEach(item => grid.appendChild(createItemBox(item)));
   }
 
@@ -341,7 +351,7 @@
   });
 
   document.getElementById('addItemButton').addEventListener('click', () => {
-    window.location.assign("/add");
+    window.location.assign("/add_item");
   });
 
   document.getElementById('analyticsViewButton').addEventListener('click', () => {

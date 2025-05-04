@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
-from crud import showInventory, getItemByID, itemIDExists, busyHoursAnalytics, popularItemsAnalytics
+from crud import showInventory, getItemByID, itemIDExists, busyHoursAnalytics, popularItemsAnalytics, addNewItem
 import plotly.io as pio
+
 import random
 
 app = Flask(__name__)
@@ -40,9 +41,50 @@ def logout():
 def student_view():
     return render_template('StudentView.html')
 
-@app.route('/add')
-def add_item():
+@app.route('/add_item')
+def add_item_form():
+    if not session.get('staff_logged_in'):
+        return redirect('/login')
     return render_template('AddNewItem.html')
+
+
+@app.route('/add_item', methods=['POST'])
+def add_item():
+    name = request.form.get('productName')
+    item_id = request.form.get('itemID')
+    price = request.form.get('price')
+    weight = request.form.get('weight')
+    description = request.form.get('description')
+    available_quantity = int(request.form.get('availableQuantity') or 0)
+    quantity_limit = int(request.form.get('quantityLimit') or 1)
+    
+    # Handle origin checkboxes
+    origins = []
+    for origin in ['Patel Brothers', 'MD Food Bank', 'Donated']:
+        if origin in request.form:
+            origins.append(origin)
+    if 'otherOriginCheckbox' in request.form and request.form.get('otherOriginInput'):
+        origins.append(request.form.get('otherOriginInput'))
+
+    #origin_str = ', '.join(origins)
+
+    # Handle categories
+    categories = request.form.getlist('category')  # if checkboxes have name="category"
+    #categories_str = ', '.join(categories)
+
+    # Handle image upload
+    image_file = request.files.get('logoInput')
+    image_path = 'static/Logos/default.png'  # fallback
+    if image_file and image_file.filename:
+        image_path = os.path.join('static', 'Logos', item_id + '_' + image_file.filename)
+        image_file.save(image_path)
+
+    # Call database insert function
+    #print(f"item id length {len(item_id)}")
+    result = addNewItem(item_id, name, weight, available_quantity, price, description, quantity_limit, origins, categories, image_path)
+    print(result)
+    return redirect(url_for('staff_view'))
+
 
 @app.route('/edit')
 def edit_item():

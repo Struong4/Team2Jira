@@ -260,6 +260,18 @@ function fetchItems() {
 
   function renderItems(itemList) {
     grid.innerHTML = '';
+    
+    if (itemList.length === 0) {
+      const emptyMessage = document.createElement('div');
+      emptyMessage.textContent = 'No items found in the inventory.';
+      emptyMessage.style.textAlign = 'center';
+      emptyMessage.style.color = '#666';
+      emptyMessage.style.fontSize = '18px';
+      emptyMessage.style.marginTop = '20px';
+      grid.appendChild(emptyMessage);
+      return;
+    }
+  
     itemList.forEach(item => {
       const box = document.createElement('div');
       box.className = 'item-box';
