@@ -153,18 +153,18 @@
             <input type="file" accept="image/*" id="logoInput" />
           </div>
     
-          <div class="form-container">
+          <form action="/edit_item" method="POST" enctype="multipart/form-data">
             <!-- Product Name -->
             <div class="form-group">
               <label for="productName">Product Name<span class="required-symbol">*</span></label>
-              <input type="text" id="productName" value="{{ item['Item name'] }}">
+              <input type="text" name="productName" id="productName" value="{{ item['Item name'] }}">
             </div>
     
             <!-- Item ID -->
             <div class="form-group">
               <label for="itemID">Item ID<span class="required-symbol">*</span></label>
               <div class="input-group">
-                <input type="text" id="itemID" value="{{ item['Item ID'] }}">
+                <input type="text" name=itemID id="itemID" value="{{ item['Item ID'] }}">
                 <button type="button" class="generate-id-btn" onclick="generateItemID()">Generate ID</button>
               </div>
             </div>
@@ -179,7 +179,7 @@
                 </label>
                 {% endfor %}
                 <label>
-                  <input type="checkbox" id="otherOriginCheckbox">
+                    <input type="checkbox" id="otherOriginCheckbox" name="otherOriginCheckbox">
                   <input type="text" id="otherOriginInput" placeholder="Enter custom origin" style="margin-left:5px;">
                 </label>
               </div>
@@ -194,34 +194,34 @@
             <!-- Price -->
             <div class="form-group">
               <label for="price">Price</label>
-              <input type="text" id="price" value="{{ item['Price'] }}">
+              <input type="text" name="price" id="price" value="{{ item['Price'] }}">
             </div>
     
             <!-- Weight -->
             <div class="form-group">
               <label for="weight">Weight</label>
-              <input type="text" id="weight" value="{{ item['Weight'] }}">
+              <input type="text" name="weight" id="weight" value="{{ item['Weight'] }}">
             </div>
     
             <!-- Description -->
             <div class="form-group">
               <label for="description">Description<span class="required-symbol">*</span></label>
-              <textarea id="description" rows="4">{{ item['Description'] }}</textarea>
+              <textarea id="description" name="description" rows="4">{{ item['Description'] }}</textarea>
             </div>
     
             <!-- Quantities -->
             <div class="form-group">
               <label for="availableQuantity">Available Quantity<span class="required-symbol">*</span></label>
-              <input type="number" id="availableQuantity" min="0" max="10000" value="{{ item['Available Quantity'] }}">
+              <input type="number" id="availableQuantity" name="availableQuantity" min="0" max="10000" value="{{ item['Available Quantity'] }}">
             </div>
     
             <div class="form-group">
               <label for="quantityLimit">Quantity Limit<span class="required-symbol">*</span></label>
-              <input type="number" id="quantityLimit" min="1" max="10000" value="{{ item['Quantity Limit'] }}">
+              <input type="number" id="quantityLimit" name="quantityLimit" min="1" max="10000" value="{{ item['Quantity Limit'] }}">
             </div>
     
             <div class="actions">
-              <button class="confirm" onclick="window.location.href='/staff'" id="confirmButton" disabled>Confirm</button>
+                <button type="submit" class="confirm enabled" id="confirmButton">Confirm</button>
               <button class="cancel" onclick="window.location.href='/staff'">Cancel</button>
             </div>
           </div>

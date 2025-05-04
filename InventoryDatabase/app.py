@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
-from crud import showInventory, getItemByID, itemIDExists, busyHoursAnalytics, popularItemsAnalytics, addNewItem
+from crud import showInventory, getItemByID, itemIDExists, busyHoursAnalytics, popularItemsAnalytics, addNewItem, removeItem, updateItem
 import plotly.io as pio
+from datetime import datetime
 
 import random
 
@@ -87,16 +88,37 @@ def add_item():
 
 
 @app.route('/edit')
-def edit_item():
+def edit_page():
     item_id = request.args.get('id')
-    if not item_id:
-        return "Item ID is required", 400
-
-    item = getItemByID(item_id)
+    item = getItemByID(item_id)  # This is your function to fetch the item from DB
     if not item:
-        return f"Item with ID {item_id} not found.", 404
+        return "Item not found", 404
+    return render_template("EditExistingItem.html", item=item)
 
-    return render_template('EditExistingItem.html', item=item)
+
+@app.route('/edit_item', methods=['POST'])
+def edit_item():
+    data = request.form
+
+    staff_id = request.cookies.get('staff_id')  # or however you track login
+    item_id = data['itemID']
+    item_name = data['productName']
+    weight = float(data.get('weight', 0))
+    price = float(data.get('price', 0))
+    description = data['description']
+    available_quantity = int(data['availableQuantity'])
+    quantity_limit = int(data['quantityLimit'])
+    origins = data.getlist('origin')
+    categories = data.getlist('category')
+    image_str = data.get('image_str', '')  # this could be base64 or filename
+
+    update_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+    result = updateItem(staff_id, item_id, update_datetime, item_name, weight,
+                        available_quantity, price, description, quantity_limit,
+                        origins, categories, image_str)
+
+    return render_template("StaffView.html", message=result)
 
 @app.route('/checkout')
 def checkout():
@@ -150,6 +172,19 @@ def api_popular_items():
 @app.route('/analytics')
 def analytics_page():
     return render_template('AnalyticsView.html')
+
+@app.route('/api/remove_item', methods=['POST'])
+def remove_item():
+    data = request.get_json()
+    item_id = data.get('item_id')
+
+    if not item_id:
+        return jsonify({'success': False, 'message': 'Missing item ID'}), 400
+
+    result = removeItem(item_id)
+    success = result.startswith("✅")
+
+    return jsonify({'success': success, 'message': result})
 
 if __name__ == '__main__':
     app.run(debug=True)
