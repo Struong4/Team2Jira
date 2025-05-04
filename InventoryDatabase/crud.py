@@ -647,7 +647,7 @@ def busyHoursAnalytics():
             order_datetimes.append(order_datetime)
 
         # converts it to pandas dataframe
-        df = pd.DataFrame({"datetime": pd.to_datetime(order_datetimes)})
+        df = pd.DataFrame({"datetime": pd.to_datetime(order_datetimes, format="%H:%M:%S")})
 
         # extracts the hour
         df["hour"] = df["datetime"].dt.hour
@@ -755,6 +755,8 @@ def itemIDExists(item_id):
     exists = cursor.fetchone() is not None
     conn.close()
     return exists
+
+
 
 # where we'll test the code to make sure it works
 if __name__ == "__main__":
@@ -1075,9 +1077,3 @@ if __name__ == "__main__":
     # print("AFTER TESTING REMOVE ITEMS")
 
     #displayAllTables()
-
-    
-
-
-
-    #runSQLScript(DROP_SCRIPT)
