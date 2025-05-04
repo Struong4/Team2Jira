@@ -30,8 +30,14 @@
     }    
     
     .main-header img {
-      height: 50px;
+      width: 75px;
+      height: 75px;
       object-fit: contain;
+      margin-right: 15px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      background-color: white; /* Makes the background white */
+      padding: 5px; /* Adds some space around the image */
     }
     
     .main-header h1 {
@@ -57,7 +63,6 @@
       padding: 20px;
       box-sizing: border-box;
     }
-    
 
     .cart-title {
       font-size: 22px;
@@ -65,7 +70,6 @@
       text-decoration: underline;
       margin-bottom: 10px;
     }
-    
 
     .cart-list {
       flex: 1;
@@ -215,9 +219,9 @@
     <h2 class="cart-title">Items in Cart</h2>
     <div class="cart-list" id="cartList">
       <!-- Cart items will go here -->
+      <div id="emptyCartMessage" style="display: none; text-align: center; color: #555;">Your cart is empty.</div>
     </div>
   </div>
-
 
   <div class="checkout-box">
     <h3>Total Count: <span id="totalCount">0</span></h3>
@@ -235,27 +239,34 @@
 
   async function populateCart() {
     cartList.querySelectorAll('.cart-item').forEach(el => el.remove()); // Clear old items
-
+  
+    // Check if cart is empty
+    if (cartItems.length === 0) {
+      document.getElementById('emptyCartMessage').style.display = 'block'; // Show empty cart message
+    } else {
+      document.getElementById('emptyCartMessage').style.display = 'none'; // Hide empty cart message
+    }
+  
     for (let index = 0; index < cartItems.length; index++) {
       const item = cartItems[index];
-
+  
       // Fetch item details based on itemID (assuming you have an endpoint for this)
       try {
         const response = await fetch(`/api/item/${item.itemID}`);
         const data = await response.json();
-
+  
         if (data.error) {
           console.warn(`Item ${item.itemID} not found.`);
           continue;
         }
-
+  
         // Get available quantity and quantity limit
         const availableQuantity = data["Available Quantity"];
         const quantityLimit = data["Quantity Limit"];
-
+  
         const div = document.createElement('div');
         div.className = 'cart-item';
-
+  
         div.innerHTML = `  
           <img src="${data.Image}" alt="${data["Item name"]}">
           <div class="item-details">
@@ -273,14 +284,15 @@
           </div>
         `;
         cartList.appendChild(div);
-
+  
       } catch (err) {
         console.error("Error fetching item:", err);
       }
     }
-
+  
     updateTotalCount();
   }
+  
 
   function updateQuantity(index, value, availableQuantity, quantityLimit) {
     let qty = Math.max(1, parseInt(value) || 1);
