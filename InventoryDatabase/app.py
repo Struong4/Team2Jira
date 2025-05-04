@@ -1,7 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
-from crud import showInventory, getItemByID, itemIDExists, busyHoursAnalytics, popularItemsAnalytics, addNewItem, removeItem, updateItem
+from crud import showInventory, getItemByID, itemIDExists, busyHoursAnalytics, popularItemsAnalytics, addNewItem, removeItem, updateItem, buyItem
 import plotly.io as pio
 from datetime import datetime
+import os
 
 import random
 
@@ -74,7 +75,7 @@ def add_item():
     #categories_str = ', '.join(categories)
 
     # Handle image upload
-    image_file = request.files.get('logoInput')
+    image_file = request.files.get('logoImage')
     image_path = 'static/Logos/default.png'  # fallback
     if image_file and image_file.filename:
         image_path = os.path.join('static', 'Logos', item_id + '_' + image_file.filename)
@@ -185,6 +186,38 @@ def remove_item():
     success = result.startswith("✅")
 
     return jsonify({'success': success, 'message': result})
+
+@app.route('/api/item/<item_id>')
+def get_item_api(item_id):
+    from crud import getItemByID
+    item = getItemByID(item_id)
+    if item:
+        return jsonify(item)
+    else:
+        return jsonify({"error": "Item not found"}), 404
+    
+@app.route("/api/checkout", methods=["POST"])
+def handle_checkout():
+    data = request.get_json()
+
+    if not data or "items" not in data:
+        return jsonify({"error": "Invalid data"}), 400
+
+    results = []
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    for item in data["items"]:
+        item_id = item.get("item_id")
+        quantity = item.get("quantity")
+
+        if not item_id or not isinstance(quantity, int):
+            results.append({"item_id": item_id, "result": "Invalid input"})
+            continue
+
+        result = buyItem(item_id, now, quantity)
+        results.append({"item_id": item_id, "result": result})
+
+    return jsonify(results)
 
 if __name__ == '__main__':
     app.run(debug=True)
