@@ -27,6 +27,9 @@
     }
 
     .sidebar {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
       width: 220px;
       background-color: #ffffff;
       border-right: 1px solid #ddd;
@@ -34,22 +37,36 @@
       box-shadow: 2px 0 5px rgba(0,0,0,0.05);
     }
 
+    .sidebar button, .sidebar a {
+        display: block;
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 15px;
+        font-size: 16px;
+        border-radius: 4px;
+        text-align: center;
+        text-decoration: none;
+        box-sizing: border-box;
+        border: none;
+        cursor: pointer;
+    }
+
     .sidebar button {
-      display: block;
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 15px;
-      border: none;
       background-color: #4a90e2;
       color: white;
-      font-size: 16px;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background-color 0.2s ease;
     }
 
     .sidebar button:hover {
       background-color: #357ab8;
+    }
+
+    .sidebar a.return-button {
+      background-color: #888;
+      color: white;
+    }
+
+    .sidebar a.return-button:hover {
+      background-color: #666;
     }
 
     .content {
@@ -70,8 +87,11 @@
   <h1>Inventory Analytics</h1>
   <div class="container">
     <div class="sidebar">
-      <button onclick="loadChart('/api/busy_hours')">📊 Busy Hours</button>
-      <button onclick="loadChart('/api/popular_items')">📦 Popular Items</button>
+      <div>
+        <button onclick="loadChart('/api/busy_hours')">📊 Busy Hours</button>
+        <button onclick="loadChart('/api/popular_items')">📦 Popular Items</button>
+      </div>
+      <a href="/staff" class="return-button">🔙 Return to Staff View</a>
     </div>
     <div class="content">
       <div id="chart-container">
@@ -88,7 +108,6 @@
           const container = document.getElementById('chart-container');
           container.innerHTML = data.plot_html;
 
-          // Re-run any script tags inside the loaded HTML
           const scripts = container.querySelectorAll('script');
           scripts.forEach(oldScript => {
             const newScript = document.createElement('script');
