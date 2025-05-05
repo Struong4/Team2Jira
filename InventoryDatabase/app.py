@@ -172,6 +172,7 @@ def get_items():
             'name': data["Item name"],
             'image': 'static/Logos/default.png',
             'available_quantity': data.get("Quantity", 0),
+            'quantity_limit': data.get("Quantity limit", 1),
             'categories': []
         }
         for item_id, data in inventory.items()

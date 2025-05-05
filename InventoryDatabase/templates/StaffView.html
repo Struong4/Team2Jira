@@ -182,6 +182,24 @@
     .sidebar button:hover {
       background-color: rgb(220, 150, 15);
     }
+    .out-of-stock-banner {
+      background-color: red;
+      color: white;
+      font-weight: bold;
+      padding: 4px 8px;
+      border-radius: 4px;
+      margin-bottom: 8px;
+      font-size: 12px;
+    }    
+    .low-stock-banner {
+      background-color: orange;
+      color: white;
+      font-weight: bold;
+      padding: 4px 8px;
+      border-radius: 4px;
+      margin-bottom: 8px;
+      font-size: 12px;
+    }    
   </style>
 </head>
 <body>
@@ -249,18 +267,31 @@
   function createItemBox(item) {
     const box = document.createElement('div');
     box.className = 'item-box';
+  
+    let stockBanner = '';
+    // Check for "Out of Stock"
+    if (item.available_quantity === 0) {
+      stockBanner = '<div class="out-of-stock-banner">OUT OF STOCK</div>';
+    } 
+    // Check for "Low Stock"
+    else if (item.available_quantity < 2 * item.quantity_limit) {
+      stockBanner = '<div class="low-stock-banner">LOW STOCK</div>';
+    }
+  
     box.innerHTML = `
       <h4>${item.name}</h4>
       <img src="${item.image || '/static/Logos/default.png'}" alt="">
+      ${stockBanner}
       <div class="button-container">
         <button class="editItemButton">Edit Item</button>
         <button class="removeItemButton">Remove Item</button>
       </div>
     `;
+  
     box.querySelector('.editItemButton').addEventListener('click', () => {
       window.location.assign(`/edit?id=${item.id}`);
-    });    
-      
+    });
+  
     box.querySelector('.removeItemButton').addEventListener('click', () => {
       if (confirm("Are you sure you want to remove this item?")) {
         fetch('/api/remove_item', {
@@ -274,7 +305,7 @@
         .then(data => {
           alert(data.message);
           if (data.success) {
-            box.remove(); // Remove item from UI if deleted from DB
+            box.remove();
           }
         })
         .catch(err => {
@@ -283,7 +314,7 @@
         });
       }
     });
-    
+  
     return box;
   }
 
