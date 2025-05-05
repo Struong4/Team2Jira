@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify, make_response
-from crud import showInventory, getItemByID, itemIDExists, busyHoursAnalytics, popularItemsAnalytics, addNewItem, removeItem, updateItem, buyItem, staffIDExists, addNewStaff
+from crud import showInventory, getItemByID, itemIDExists, busyHoursAnalytics, popularItemsAnalytics, addNewItem, removeItem, updateItem, buyItem, staffIDExists, addNewStaff, getItemOrigins, getItemCategories
 import plotly.io as pio
 from datetime import datetime
 import os
@@ -92,10 +92,24 @@ def add_item():
 @app.route('/edit')
 def edit_page():
     item_id = request.args.get('id')
-    item = getItemByID(item_id)  # This is your function to fetch the item from DB
+    item = getItemByID(item_id)
     if not item:
         return "Item not found", 404
-    return render_template("EditExistingItem.html", item=item)
+
+    origins = getItemOrigins(item_id)        # Create this helper to get list of origins
+    categories = getItemCategories(item_id)  # Create this helper to get list of categories
+
+    all_categories = []
+    all_origins = ['Patel Brothers', 'MD Food Bank', 'Donated']
+
+    return render_template(
+        "EditExistingItem.html",
+        item=item,
+        selected_origins=origins,
+        selected_categories=categories,
+        all_categories=all_categories,
+        all_origins=all_origins
+    )
 
 
 @app.route('/edit_item', methods=['POST'])

@@ -168,9 +168,10 @@
                 <div class="form-group checkbox-group">
                     <label class="checkbox-label">Origin<span class="required-symbol">*</span></label>
                     <div class="checkbox-options">
-                        {% for origin in ['Patel Brothers', 'MD Food Bank', 'Donated'] %}
+                        {% for origin in all_origins %}
                         <label>
-                            <input type="checkbox" class="origin-checkbox" name="origin" value="{{ origin }}" {% if origin in item['Origin'] %}checked{% endif %}> {{ origin }}
+                            <input type="checkbox" class="origin-checkbox" name="origin" value="{{ origin }}"
+                                {% if origin in selected_origins %}checked{% endif %}> {{ origin }}
                         </label>
                         {% endfor %}
                         <label>
