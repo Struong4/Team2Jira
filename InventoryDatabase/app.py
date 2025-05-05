@@ -240,5 +240,30 @@ def handle_checkout():
 
     return jsonify(results)
 
+@app.route('/register', methods=['GET', 'POST'])
+def staff_register():
+    if request.method == 'POST':
+        staff_id = request.form['staff_id']
+        username = request.form['username']
+        password = request.form['password']
+        confirm_password = request.form['confirm_password']
+        first_name = request.form['first_name']
+        last_name = request.form['last_name']
+
+        if password != confirm_password:
+            return render_template('StaffRegister.html', error="❌ Passwords do not match.")
+
+        if staffIDExists(staff_id):
+            return render_template('StaffRegister.html', error=f"⚠️ Staff ID '{staff_id}' already exists.")
+
+        result = addNewStaff(staff_id, first_name, last_name, username, password)
+
+        if result.startswith("✅"):
+            return redirect(url_for('staff_login'))
+        else:
+            return render_template('StaffRegister.html', error=result)
+
+    return render_template('StaffRegister.html')
+
 if __name__ == '__main__':
     app.run(debug=True)
