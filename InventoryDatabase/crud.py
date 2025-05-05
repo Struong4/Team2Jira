@@ -797,6 +797,36 @@ def getAllCategoryFilters():
     conn.close()
     return categories
 
+def staffIDExists(staff_id):
+    """Check if a staff ID exists in the staff table."""
+    conn = sqlite3.connect(INVENTORY)
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT 1 FROM staff WHERE staff_id = ?", (staff_id,))
+    exists = cursor.fetchone() is not None
+
+    cursor.close()
+    conn.close()
+    return exists
+
+def getItemOrigins(item_id):
+    conn = sqlite3.connect(INVENTORY)
+    cursor = conn.cursor()
+    cursor.execute("SELECT origin_name FROM origin WHERE item_id = ?", (item_id,))
+    origins = [row[0] for row in cursor.fetchall()]
+    cursor.close()
+    conn.close()
+    return origins
+
+def getItemCategories(item_id):
+    conn = sqlite3.connect(INVENTORY)
+    cursor = conn.cursor()
+    cursor.execute("SELECT category_name FROM category WHERE item_id = ?", (item_id,))
+    categories = [row[0] for row in cursor.fetchall()]
+    cursor.close()
+    conn.close()
+    return categories
+
 
 # where we'll test the code to make sure it works
 if __name__ == "__main__":
