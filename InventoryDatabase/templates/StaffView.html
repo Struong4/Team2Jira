@@ -230,6 +230,7 @@
       </select>
       <label for="availability">Availability:</label>
       <select id="availability">
+        <option>N/A</option>
         <option>In Stock</option>
         <option>Low Stock</option>
         <option>Out of Stock</option>
@@ -369,6 +370,8 @@
       filteredItems = filteredItems.filter(item => item.available_quantity > 0 && item.available_quantity < 2 * item.quantity_limit);
     } else if (availabilityValue === 'Out of Stock') {
       filteredItems = filteredItems.filter(item => item.available_quantity === 0);
+    } else if (availabilityValue === 'N/A') {
+      // No filtering applied – include all items
     }
   
     // Handle sorting options
