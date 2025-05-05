@@ -74,18 +74,19 @@
       background-color: rgb(253, 181, 21);
       color: rgb(255, 255, 255);
       flex-wrap: wrap;
-      gap: 10px; /* Add this line */
+      gap: 8px; /* Reduced gap between items */
     }
-    .toolbar input[type="text"] {
-      margin-right: 15px;
+    .toolbar input[type="text"],
+    .toolbar select {
+      margin-right: 10px; /* Reduced space between search and sort */
       padding: 5px;
-      width: 200px;
       border: 1px solid #ccc;
     }
     .toolbar select {
-      margin-right: auto;
-      padding: 5px;
-      border: 1px solid #ccc;
+      margin-right: 10px; /* Adjusted for even spacing */
+    }
+    .toolbar-spacer {
+      flex-grow: 1; /* This will push buttons to the far right */
     }
     .toolbar-button {
       display: flex;
@@ -113,7 +114,6 @@
       display: inline-block;
       vertical-align: middle;
     }
-    
     .content {
       flex: 1;
       overflow: auto;
@@ -182,6 +182,24 @@
     .sidebar button:hover {
       background-color: rgb(220, 150, 15);
     }
+    .out-of-stock-banner {
+      background-color: red;
+      color: white;
+      font-weight: bold;
+      padding: 4px 8px;
+      border-radius: 4px;
+      margin-bottom: 8px;
+      font-size: 12px;
+    }    
+    .low-stock-banner {
+      background-color: orange;
+      color: white;
+      font-weight: bold;
+      padding: 4px 8px;
+      border-radius: 4px;
+      margin-bottom: 8px;
+      font-size: 12px;
+    }    
   </style>
 </head>
 <body>
@@ -210,6 +228,14 @@
         <option>ID Ascending</option>
         <option>ID Descending</option>
       </select>
+      <label for="availability">Availability:</label>
+      <select id="availability">
+        <option>N/A</option>
+        <option>In Stock</option>
+        <option>Low Stock</option>
+        <option>Out of Stock</option>
+      </select>
+      <div class="toolbar-spacer"></div> <!-- Spacer between availability and buttons -->
       <button id="addItemButton" class="toolbar-button">
         <img src="/static/Logos/Add.png" alt="Cart"> Add New Item
       </button>
@@ -217,6 +243,7 @@
         Analytics View
       </button>
     </div>
+    
 
     <div class="content">
       <div class="grid" id="itemsGrid"></div>
@@ -229,6 +256,7 @@
   const sortSelect = document.getElementById('sortby');
   const filterDiv = document.getElementById('filterCategories');
   const searchInput = document.getElementById('searchInput');
+  const availabilitySelect = document.getElementById('availability');
 
   let filters = ['Canned', 'Produce', 'Grains'];
   let items = [];
@@ -249,18 +277,31 @@
   function createItemBox(item) {
     const box = document.createElement('div');
     box.className = 'item-box';
+  
+    let stockBanner = '';
+    // Check for "Out of Stock"
+    if (item.available_quantity === 0) {
+      stockBanner = '<div class="out-of-stock-banner">OUT OF STOCK</div>';
+    } 
+    // Check for "Low Stock"
+    else if (item.available_quantity < 2 * item.quantity_limit) {
+      stockBanner = '<div class="low-stock-banner">LOW STOCK</div>';
+    }
+  
     box.innerHTML = `
       <h4>${item.name}</h4>
       <img src="${item.image || '/static/Logos/default.png'}" alt="">
+      ${stockBanner}
       <div class="button-container">
         <button class="editItemButton">Edit Item</button>
         <button class="removeItemButton">Remove Item</button>
       </div>
     `;
+  
     box.querySelector('.editItemButton').addEventListener('click', () => {
       window.location.assign(`/edit?id=${item.id}`);
-    });    
-      
+    });
+  
     box.querySelector('.removeItemButton').addEventListener('click', () => {
       if (confirm("Are you sure you want to remove this item?")) {
         fetch('/api/remove_item', {
@@ -274,7 +315,7 @@
         .then(data => {
           alert(data.message);
           if (data.success) {
-            box.remove(); // Remove item from UI if deleted from DB
+            box.remove();
           }
         })
         .catch(err => {
@@ -283,7 +324,7 @@
         });
       }
     });
-    
+  
     return box;
   }
 
@@ -291,7 +332,7 @@
     grid.innerHTML = '';
     if (itemList.length === 0) {
       const emptyMessage = document.createElement('div');
-      emptyMessage.textContent = "No Items in Inventory";
+      emptyMessage.textContent = "No matching items in inventory";
       emptyMessage.style.textAlign = "center";
       emptyMessage.style.color = "#777";
       emptyMessage.style.fontSize = "20px";
@@ -306,19 +347,34 @@
     const searchText = searchInput.value.trim().toLowerCase();
     const selectedCategories = getSelectedCategories();
     let filteredItems = [...items];
-
+    
+    // Apply category filters
     if (selectedCategories.length > 0) {
       filteredItems = filteredItems.filter(item =>
         selectedCategories.every(cat => item.categories.includes(cat))
       );
     }
-
+  
+    // Apply search filter
     if (searchText) {
       filteredItems = filteredItems.filter(item =>
         item.name.toLowerCase().includes(searchText)
       );
     }
-
+  
+    // Handle Availability filtering (this is now its own separate filter)
+    const availabilityValue = document.getElementById('availability').value;
+    if (availabilityValue === 'In Stock') {
+      filteredItems = filteredItems.filter(item => item.available_quantity >= item.quantity_limit);
+    } else if (availabilityValue === 'Low Stock') {
+      filteredItems = filteredItems.filter(item => item.available_quantity > 0 && item.available_quantity < 2 * item.quantity_limit);
+    } else if (availabilityValue === 'Out of Stock') {
+      filteredItems = filteredItems.filter(item => item.available_quantity === 0);
+    } else if (availabilityValue === 'N/A') {
+      // No filtering applied – include all items
+    }
+  
+    // Handle sorting options
     const sortValue = sortSelect.value;
     if (sortValue === 'Name A-Z') {
       filteredItems.sort((a, b) => a.name.localeCompare(b.name));
@@ -329,7 +385,7 @@
     } else if (sortValue === 'ID Descending') {
       filteredItems.sort((a, b) => b.id - a.id);
     }
-
+  
     renderItems(filteredItems);
   }
 
@@ -408,6 +464,7 @@
   fetchItems();
   searchInput.addEventListener('input', applyFiltersAndSort);
   sortSelect.addEventListener('change', applyFiltersAndSort);
+  availabilitySelect.addEventListener('change', applyFiltersAndSort);
 </script>
 
 </body>
