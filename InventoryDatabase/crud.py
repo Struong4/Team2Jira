@@ -797,6 +797,18 @@ def getAllCategoryFilters():
     conn.close()
     return categories
 
+def staffIDExists(staff_id):
+    """Check if a staff ID exists in the staff table."""
+    conn = sqlite3.connect(INVENTORY)
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT 1 FROM staff WHERE staff_id = ?", (staff_id,))
+    exists = cursor.fetchone() is not None
+
+    cursor.close()
+    conn.close()
+    return exists
+
 
 # where we'll test the code to make sure it works
 if __name__ == "__main__":
