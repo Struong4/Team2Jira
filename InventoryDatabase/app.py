@@ -1,5 +1,5 @@
-from flask import Flask, render_template, request, redirect, url_for, session, jsonify
-from crud import showInventory, getItemByID, itemIDExists, busyHoursAnalytics, popularItemsAnalytics, addNewItem, removeItem, updateItem, buyItem
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify, make_response
+from crud import showInventory, getItemByID, itemIDExists, busyHoursAnalytics, popularItemsAnalytics, addNewItem, removeItem, updateItem, buyItem, staffIDExists, addNewStaff
 import plotly.io as pio
 from datetime import datetime
 import os
@@ -19,13 +19,16 @@ def staff_login():
         username = request.form['username']
         password = request.form['password']
 
-        # You can replace this with a real DB check later
-        if username == 'Staff2' and password == '1234':
+        if username == 'AB12345' and password == '1234':
             session['staff_logged_in'] = True
-            return redirect('/staff')
+
+            response = make_response(redirect('/staff'))
+            response.set_cookie('staff_id', 'AB12345')
+            if not staffIDExists(username):
+                addNewStaff(username, "Staff", "Two", username, password)
+            return response
         else:
             return render_template('StaffLogin.html', error="Invalid username or password.")
-
     return render_template('StaffLogin.html')
 
 @app.route('/staff')
@@ -68,11 +71,9 @@ def add_item():
     if 'otherOriginCheckbox' in request.form and request.form.get('otherOriginInput'):
         origins.append(request.form.get('otherOriginInput'))
 
-    #origin_str = ', '.join(origins)
 
     # Handle categories
     categories = request.form.getlist('category')  # if checkboxes have name="category"
-    #categories_str = ', '.join(categories)
 
     # Handle image upload
     image_file = request.files.get('logoImage')
@@ -99,6 +100,7 @@ def edit_page():
 
 @app.route('/edit_item', methods=['POST'])
 def edit_item():
+    print("calling edit item")
     data = request.form
 
     staff_id = request.cookies.get('staff_id')  # or however you track login
@@ -118,6 +120,9 @@ def edit_item():
     result = updateItem(staff_id, item_id, update_datetime, item_name, weight,
                         available_quantity, price, description, quantity_limit,
                         origins, categories, image_str)
+    
+    print(result)
+    print(f"staff id {staff_id}")
 
     return render_template("StaffView.html", message=result)
 

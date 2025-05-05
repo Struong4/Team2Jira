@@ -12,7 +12,7 @@
         }
         .container {
             display: flex;
-            flex-direction: column; /* Stack the content vertically */
+            flex-direction: column;
             align-items: center;
         }
         header {
@@ -28,12 +28,12 @@
             display: flex;
             justify-content: center;
             align-items: flex-start;
-            gap: 60px;  /* Increase space between columns */
+            gap: 60px;
             margin-top: 20px;
         }
         .logo-dropzone {
-            width: 300px;  /* Increase the width */
-            height: 200px;  /* Optionally increase the height to match the new width */
+            width: 300px;
+            height: 200px;
             border: 2px dashed #aaa;
             border-radius: 8px;
             background-color: transparent;
@@ -56,8 +56,8 @@
             display: none;
         }
         .form-container {
-            max-width: 900px; /* Increase the width */
-            width: 100%;  /* Ensure the form container adapts to available space */
+            max-width: 900px;
+            width: 100%;
             background: #fff;
             padding: 20px;
             border-radius: 8px;
@@ -88,10 +88,10 @@
         }
         .checkbox-options {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* Creates a responsive grid */
-            gap: 15px; /* Space between checkboxes */
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
             margin-top: 5px;
-        }        
+        }
         .checkbox-options label {
             font-weight: normal;
             display: inline-flex;
@@ -111,18 +111,13 @@
         .confirm {
             background-color: #00aa00;
             color: white;
-            cursor: not-allowed;
-            opacity: 0.5;
-        }
-        .confirm.enabled {
-            cursor: pointer;
             opacity: 1;
+            cursor: pointer;
         }
         .cancel {
             background-color: #ff0000;
             color: white;
         }
-        /* Styling for the new button */
         .generate-id-btn {
             padding: 8px 12px;
             border: 1px solid #ccc;
@@ -131,208 +126,107 @@
             cursor: pointer;
             margin-left: 10px;
         }
-        /* Align Item ID input and button horizontally */
         .input-group {
             display: flex;
             align-items: center;
         }
         .required-symbol {
             color: red;
-            font-size: 18px; /* Adjust size if needed */
-            margin-left: 5px; /* Space between label text and the asterisk */
-        }        
+            font-size: 18px;
+            margin-left: 5px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>Edit Inventory Object</header>
-    
         <div class="main-container">
-          <div class="logo-dropzone" id="logoDropzone">
-            <img id="logoPreview" src="{{ item['Image'] or '/static/Logos/Upload Image.png' }}" alt="Logo">
-            <input type="file" accept="image/*" id="logoInput" />
-          </div>
-    
-          <form action="/edit_item" method="POST" enctype="multipart/form-data">
-            <!-- Product Name -->
-            <div class="form-group">
-              <label for="productName">Product Name<span class="required-symbol">*</span></label>
-              <input type="text" name="productName" id="productName" value="{{ item['Item name'] }}">
+            <div class="logo-dropzone" id="logoDropzone">
+                <img id="logoPreview" src="{{ item['Image'] or '/static/Logos/Upload Image.png' }}" alt="Logo">
+                <input type="file" accept="image/*" id="logoInput" name="logoInput">
             </div>
-    
-            <!-- Item ID -->
-            <div class="form-group">
-              <label for="itemID">Item ID<span class="required-symbol">*</span></label>
-              <div class="input-group">
-                <input type="text" name=itemID id="itemID" value="{{ item['Item ID'] }}">
-                <button type="button" class="generate-id-btn" onclick="generateItemID()">Generate ID</button>
-              </div>
-            </div>
-    
-            <!-- Origin -->
-            <div class="form-group checkbox-group">
-              <label class="checkbox-label">Origin<span class="required-symbol">*</span></label>
-              <div class="checkbox-options">
-                {% for origin in ['Patel Brothers', 'MD Food Bank', 'Donated'] %}
-                <label>
-                  <input type="checkbox" class="origin-checkbox" {% if origin in item['Origin'] %}checked{% endif %}> {{ origin }}
-                </label>
-                {% endfor %}
-                <label>
-                    <input type="checkbox" id="otherOriginCheckbox" name="otherOriginCheckbox">
-                  <input type="text" id="otherOriginInput" placeholder="Enter custom origin" style="margin-left:5px;">
-                </label>
-              </div>
-            </div>
-    
-            <!-- Category -->
-            <div class="form-group checkbox-group">
-              <label class="checkbox-label">Category:</label>
-              <div class="checkbox-options" id="categoryOptions"></div>
-            </div>
-    
-            <!-- Price -->
-            <div class="form-group">
-              <label for="price">Price</label>
-              <input type="text" name="price" id="price" value="{{ item['Price'] }}">
-            </div>
-    
-            <!-- Weight -->
-            <div class="form-group">
-              <label for="weight">Weight</label>
-              <input type="text" name="weight" id="weight" value="{{ item['Weight'] }}">
-            </div>
-    
-            <!-- Description -->
-            <div class="form-group">
-              <label for="description">Description<span class="required-symbol">*</span></label>
-              <textarea id="description" name="description" rows="4">{{ item['Description'] }}</textarea>
-            </div>
-    
-            <!-- Quantities -->
-            <div class="form-group">
-              <label for="availableQuantity">Available Quantity<span class="required-symbol">*</span></label>
-              <input type="number" id="availableQuantity" name="availableQuantity" min="0" max="10000" value="{{ item['Available Quantity'] }}">
-            </div>
-    
-            <div class="form-group">
-              <label for="quantityLimit">Quantity Limit<span class="required-symbol">*</span></label>
-              <input type="number" id="quantityLimit" name="quantityLimit" min="1" max="10000" value="{{ item['Quantity Limit'] }}">
-            </div>
-    
-            <div class="actions">
-                <button type="submit" class="confirm enabled" id="confirmButton">Confirm</button>
-              <button class="cancel" onclick="window.location.href='/staff'">Cancel</button>
-            </div>
-          </div>
+            <form class="form-container" action="/edit_item" method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="productName">Product Name<span class="required-symbol">*</span></label>
+                    <input type="text" id="productName" name="productName" value="{{ item['Item name'] }}">
+                </div>
+                <div class="form-group">
+                    <label for="itemID">Item ID<span class="required-symbol">*</span></label>
+                    <div class="input-group">
+                        <input type="text" id="itemID" name="itemID" value="{{ item['Item ID'] }}">
+                        <button type="button" class="generate-id-btn" onclick="generateItemID()">Generate ID</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="price">Price</label>
+                    <input type="text" name="price" id="price" value="{{ item['Price'] }}">
+                </div>
+                <div class="form-group">
+                    <label for="weight">Weight</label>
+                    <input type="text" name="weight" id="weight" value="{{ item['Weight'] }}">
+                </div>
+                <div class="form-group checkbox-group">
+                    <label class="checkbox-label">Origin<span class="required-symbol">*</span></label>
+                    <div class="checkbox-options">
+                        {% for origin in ['Patel Brothers', 'MD Food Bank', 'Donated'] %}
+                        <label>
+                            <input type="checkbox" class="origin-checkbox" name="origin" value="{{ origin }}" {% if origin in item['Origin'] %}checked{% endif %}> {{ origin }}
+                        </label>
+                        {% endfor %}
+                        <label>
+                            <input type="checkbox" id="otherOriginCheckbox" name="otherOriginCheckbox">
+                            <input type="text" id="otherOriginInput" name="otherOriginInput" placeholder="Enter custom origin" style="margin-left:5px;">
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group checkbox-group">
+                    <label class="checkbox-label">Category:</label>
+                    <div class="checkbox-options" id="categoryOptions"></div>
+                </div>
+                <div class="form-group">
+                    <label for="description">Description<span class="required-symbol">*</span></label>
+                    <textarea id="description" name="description" rows="4">{{ item['Description'] }}</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="availableQuantity">Available Quantity<span class="required-symbol">*</span></label>
+                    <input type="number" id="availableQuantity" name="availableQuantity" min="0" max="10000" value="{{ item['Available Quantity'] }}">
+                </div>
+                <div class="form-group">
+                    <label for="quantityLimit">Quantity Limit<span class="required-symbol">*</span></label>
+                    <input type="number" id="quantityLimit" name="quantityLimit" min="1" max="10000" value="{{ item['Quantity Limit'] }}">
+                </div>
+                <div class="actions">
+                    <button type="submit" class="confirm" id="confirmButton">Confirm</button>
+                    <button type="button" class="cancel" onclick="window.location.href='/staff'">Cancel</button>
+                </div>
+            </form>
         </div>
-      </div>
-
+    </div>
     <script>
-        const dropzone = document.getElementById('logoDropzone');
-        const logoPreview = document.getElementById('logoPreview');
-        const logoInput = document.getElementById('logoInput');
-        const confirmButton = document.getElementById('confirmButton');
-        const originCheckboxes = document.querySelectorAll('.origin-checkbox');
-        const catContainer = document.getElementById('categoryOptions');
-        const storedCategories = JSON.parse(localStorage.getItem('inventoryCategories')) || [];
-
-        // Drag over effect
-        dropzone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropzone.classList.add('dragover');
+        document.addEventListener('DOMContentLoaded', () => {
+            const catContainer = document.getElementById('categoryOptions');
+            const storedCategories = JSON.parse(localStorage.getItem('inventoryCategories')) || [];
+            storedCategories.forEach(category => {
+                const label = document.createElement('label');
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.name = 'category';
+                checkbox.value = category;
+                label.appendChild(checkbox);
+                label.appendChild(document.createTextNode(' ' + category));
+                catContainer.appendChild(label);
+            });
         });
 
-        dropzone.addEventListener('dragleave', () => {
-            dropzone.classList.remove('dragover');
-        });
-
-        dropzone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropzone.classList.remove('dragover');
-            const file = e.dataTransfer.files[0];
-            if (file && file.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = () => logoPreview.src = reader.result;
-                reader.readAsDataURL(file);
-            } else {
-                alert('Please drop a valid image file.');
-            }
-        });
-
-        // Click to upload
-        dropzone.addEventListener('click', () => {
-            logoInput.click();
-        });
-
-        // Handle file input change
-        logoInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file && file.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = () => logoPreview.src = reader.result;
-                reader.readAsDataURL(file);
-            }
-        });
-
-        // Generate 10-digit item ID
         function generateItemID() {
             fetch('/generate_unique_id')
-            .then(res => res.json())
-            .then(data => {
-                document.getElementById('itemID').value = data.item_id;
-            })
-            .catch(err => {
-                alert("Failed to generate unique ID.");
-                console.error(err);
-            });
+                .then(res => res.json())
+                .then(data => document.getElementById('itemID').value = data.item_id)
+                .catch(err => {
+                    alert("Failed to generate unique ID.");
+                    console.error(err);
+                });
         }
-
-        // Enable Confirm button if all required fields are filled
-        function validateForm() {
-            const productName = document.getElementById('productName').value;
-            const itemID = document.getElementById('itemID').value;
-            const description = document.getElementById('description').value;
-            const availableQuantity = document.getElementById('availableQuantity').value;
-            const quantityLimit = document.getElementById('quantityLimit').value;
-            const isOriginSelected = Array.from(originCheckboxes).some(checkbox => checkbox.checked);
-            const isOtherOriginChecked = document.getElementById('otherOriginCheckbox').checked;
-            const otherOriginInput = document.getElementById('otherOriginInput').value.trim(); // Check if the input is filled
-        
-            // Check if at least one origin checkbox is selected or if "Other" is selected and the custom input is filled
-            const isValidOrigin = isOriginSelected || (isOtherOriginChecked && otherOriginInput !== '');
-        
-            if (productName && itemID && description && availableQuantity && quantityLimit && isValidOrigin) {
-                confirmButton.disabled = false;
-                confirmButton.classList.add('enabled');
-            } else {
-                confirmButton.disabled = true;
-                confirmButton.classList.remove('enabled');
-            }
-        }
-        
-        // Event listeners for real-time validation
-        document.getElementById('productName').addEventListener('input', validateForm);
-        document.getElementById('itemID').addEventListener('input', validateForm);
-        document.getElementById('description').addEventListener('input', validateForm);
-        document.getElementById('availableQuantity').addEventListener('input', validateForm);
-        document.getElementById('quantityLimit').addEventListener('input', validateForm);
-
-        // Listen for changes to checkboxes
-        originCheckboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', validateForm);
-        });
-
-        // Dynamically add category checkboxes
-        storedCategories.forEach(category => {
-            const label = document.createElement('label');
-            const checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.value = category;
-            label.appendChild(checkbox);
-            label.appendChild(document.createTextNode(' ' + category));
-            catContainer.appendChild(label);
-        });
     </script>
 </body>
 </html>
