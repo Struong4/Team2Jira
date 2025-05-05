@@ -140,6 +140,15 @@
     .item-box button:hover {
       background: rgb(220, 150, 15);
     }
+    .out-of-stock-banner {
+      margin-top: auto;
+      background-color: rgba(255, 0, 0, 0.85);
+      color: white;
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-weight: bold;
+      font-size: 14px;
+    }    
   </style>
 </head>
 <body>
@@ -260,7 +269,7 @@ function fetchItems() {
 
   function renderItems(itemList) {
     grid.innerHTML = '';
-    
+  
     if (itemList.length === 0) {
       const emptyMessage = document.createElement('div');
       emptyMessage.textContent = 'No items found in the inventory.';
@@ -275,22 +284,29 @@ function fetchItems() {
     itemList.forEach(item => {
       const box = document.createElement('div');
       box.className = 'item-box';
+  
       box.innerHTML = `
         <h4>${item.name}</h4>
         <img src="${item.image}" alt="">
-        <button data-id="${item.id}">Item Details</button>
       `;
-  
-      const button = box.querySelector('button');
-      button.addEventListener('click', () => {
-        // Navigate to ViewItem.html with item ID as a query parameter
-        window.location.href = `/view?id=${item.id}`;
-      });
+      if (item.available_quantity === 0) {
+        const banner = document.createElement('div');
+        banner.className = 'out-of-stock-banner';
+        banner.textContent = 'Out of Stock';
+        box.appendChild(banner);
+      } else {
+        const button = document.createElement('button');
+        button.textContent = 'Item Details';
+        button.setAttribute('data-id', item.id);
+        button.addEventListener('click', () => {
+          window.location.href = `/view?id=${item.id}`;
+        });
+        box.appendChild(button);
+      }
   
       grid.appendChild(box);
     });
   }
-  
 
   function updateDisplay() {
     const filtered = getFilteredItems();
