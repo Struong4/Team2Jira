@@ -827,36 +827,51 @@ def getItemCategories(item_id):
     conn.close()
     return categories
 
+def getStaffByCredentials(username, password):
+    conn = sqlite3.connect(INVENTORY)
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT staff_id FROM staff WHERE staff_username = ? AND staff_password = ?", (username, password))
+    row = cursor.fetchone()
+
+    conn.close()
+    return row[0] if row else None
+
 
 # where we'll test the code to make sure it works
 if __name__ == "__main__":
 
     # creates tables using the create_all.sql script
-    resetInventory(DROP_SCRIPT)
-    createInventory(CREATE_SCRIPT)
+    #resetInventory(DROP_SCRIPT)
+    #createInventory(CREATE_SCRIPT)
     #initializeCategoryDatabase()
     #populateDefaultCategoryFilters()
 
     print("BEFORE TESTING ADD NEW ITEMS")
     displayAllTables()
 
-    print("***** ADDING RANDOM ITEMS *****")
-    simulateAddingRandomItems(10)
+    print("HISTORY")
+    transactions = showHistory()
+    for transaction in transactions:
+        print(transaction)
 
-    print("***** BUYING RANDOM ITEMS *****")
-    simulateBuyingRandomItems(50)
+    # print("***** ADDING RANDOM ITEMS *****")
+    # simulateAddingRandomItems(10)
 
-    print("INVENTORY")
-    inventory = showInventory()
+    # print("***** BUYING RANDOM ITEMS *****")
+    # simulateBuyingRandomItems(50)
 
-    for item in inventory:
-        print(item, inventory[item])
+    # print("INVENTORY")
+    # inventory = showInventory()
 
-    print("***** TESTING POPULAR ITEMS *****")
-    popularItemsBarChart = popularItemsAnalytics()
+    # for item in inventory:
+    #     print(item, inventory[item])
 
-    if popularItemsBarChart:
-        popularItemsBarChart.show()
+    # print("***** TESTING POPULAR ITEMS *****")
+    # popularItemsBarChart = popularItemsAnalytics()
+
+    # if popularItemsBarChart:
+    #     popularItemsBarChart.show()
 
     # print("***** TESTING BUSY HOURS ANALYTICS *****")
     # busyHoursHistogram = busyHoursAnalytics()

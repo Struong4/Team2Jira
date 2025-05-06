@@ -1,65 +1,125 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Analytics</title>
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script> <!-- ✅ THIS IS THE FIX -->
-    <style>
-        .container {
-            display: flex;
-            flex-direction: row;
-            justify-content: flex-start;
-            padding: 20px;
-        }
-        .sidebar {
-            width: 200px;
-            padding: 10px;
-        }
-        .content {
-            flex-grow: 1;
-            padding: 10px;
-        }
-        button {
-            width: 100%;
-            margin-bottom: 10px;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <title>Inventory Analytics</title>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f4f9;
+    }
+
+    .header {
+      background-color: black;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 20px;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .header button {
+      background-color: rgb(253, 181, 21);
+      color: black;
+      border: none;
+      padding: 8px 16px;
+      font-size: 14px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .header button:hover {
+      background-color: white;
+    }
+
+    .analytics-container {
+      display: flex;
+      height: calc(100vh - 70px);
+    }
+
+    .sidebar {
+      width: 220px;
+      background: rgb(253, 181, 21);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .sidebar button {
+      background: white;
+      color: black;
+      border: none;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .sidebar button:hover {
+      background: #f0f0f0;
+    }
+
+    .content {
+      flex-grow: 1;
+      padding: 20px;
+      overflow-y: auto;
+      background-color: #ffffff;
+    }
+
+    .placeholder-text {
+      font-size: 18px;
+      color: #666;
+      text-align: center;
+      margin-top: 40px;
+    }
+  </style>
 </head>
 <body>
-    <h1 style="text-align: center;">Inventory Analytics</h1>
-    <div class="container">
-        <div class="sidebar">
-            <button onclick="loadChart('/api/busy_hours')">Show Busy Hours</button>
-            <button onclick="loadChart('/api/popular_items')">Show Popular Items</button>
-        </div>
-        <div class="content" id="chart-container">
-            <p>Select a chart to view analytics.</p>
-        </div>
+  <div class="header">
+    <span>Inventory Analytics</span>
+    <button onclick="window.location.href='/staff'">Back</button>
+  </div>
+
+  <div class="analytics-container">
+    <div class="sidebar">
+      <button onclick="loadChart('/api/busy_hours')">Show Busy Hours</button>
+      <button onclick="loadChart('/api/popular_items')">Show Popular Items</button>
     </div>
 
-    <script>
-        function loadChart(endpoint) {
-            fetch(endpoint)
-                .then(response => response.json())
-                .then(data => {
-                    const container = document.getElementById('chart-container');
-                    container.innerHTML = data.plot_html;
+    <div class="content" id="chart-container">
+      <p class="placeholder-text">Select a chart to view analytics.</p>
+    </div>
+  </div>
 
-                    // 🛠 Extract and run all <script> tags manually
-                    const scripts = container.querySelectorAll('script');
-                    scripts.forEach(oldScript => {
-                        const newScript = document.createElement('script');
-                        if (oldScript.src) {
-                            newScript.src = oldScript.src;
-                        } else {
-                            newScript.textContent = oldScript.textContent;
-                        }
-                        document.body.appendChild(newScript); // attach to body, not container
-                    });
-                })
-                .catch(error => {
-                    console.error('Error loading chart:', error);
-                });
-        }
-    </script>
+  <script>
+    function loadChart(endpoint) {
+      fetch(endpoint)
+        .then(response => response.json())
+        .then(data => {
+          const container = document.getElementById('chart-container');
+          container.innerHTML = data.plot_html;
+
+          const scripts = container.querySelectorAll('script');
+          scripts.forEach(oldScript => {
+            const newScript = document.createElement('script');
+            if (oldScript.src) {
+              newScript.src = oldScript.src;
+            } else {
+              newScript.textContent = oldScript.textContent;
+            }
+            document.body.appendChild(newScript);
+          });
+        })
+        .catch(error => {
+          console.error('Error loading chart:', error);
+        });
+    }
+  </script>
 </body>
 </html>
