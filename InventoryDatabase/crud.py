@@ -827,6 +827,16 @@ def getItemCategories(item_id):
     conn.close()
     return categories
 
+def getStaffByCredentials(username, password):
+    conn = sqlite3.connect(INVENTORY)
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT staff_id FROM staff WHERE staff_username = ? AND staff_password = ?", (username, password))
+    row = cursor.fetchone()
+
+    conn.close()
+    return row[0] if row else None
+
 
 # where we'll test the code to make sure it works
 if __name__ == "__main__":

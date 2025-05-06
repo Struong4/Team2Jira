@@ -242,6 +242,9 @@
       <button id="analyticsViewButton" class="toolbar-button">
         Analytics View
       </button>
+      <button id="registerStaffButton" class="toolbar-button">
+        Register Staff
+      </button>
     </div>
     
 
@@ -455,6 +458,10 @@
     if (confirm("Are you sure you want to log out?")) {
       window.location.assign("/logout");
     }
+  });
+
+  document.getElementById('registerStaffButton').addEventListener('click', () => {
+    window.location.assign('/register');
   });
 
   // Initialize
