@@ -216,9 +216,16 @@
   <div class="main">
     <div class="header">
       <span>Staff Inventory View</span>
-      <button id="logoutButton">Logout</button>
-    </div>
-
+      <div class="header-buttons" style="display: flex; gap: 10px;">
+        <button id="registerStaffButton" class="toolbar-button">
+          <img src="/static/Logos/Register.png" alt="Register"> Register Staff
+        </button>
+        <button id="logoutButton" class="toolbar-button">
+          <img src="/static/Logos/logout.png" alt="Logout"> Logout
+        </button>
+      </div>
+      
+    </div>    
     <div class="toolbar">
       <input type="text" id="searchInput" placeholder="Search...">
       <label for="sortby">Sort by:</label>
@@ -241,9 +248,6 @@
       </button>
       <button id="analyticsViewButton" class="toolbar-button">
         <img src="/static/Logos/Stats.png" alt="Analytics"> Analytics View
-      </button>
-      <button id="registerStaffButton" class="toolbar-button">
-        <img src="/static/Logos/Register.png" alt="Register"> Register Staff
       </button>
       <button id="showHistoryButton" class="toolbar-button">
         <img src="/static/Logos/history.png" alt="History"> Show History
