@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify, make_response
-from crud import showInventory, getItemByID, itemIDExists, busyHoursAnalytics, popularItemsAnalytics, addNewItem, removeItem, updateItem, buyItem, staffIDExists, addNewStaff, getItemOrigins, getItemCategories
+#from crud import showInventory, getItemByID, itemIDExists, busyHoursAnalytics, popularItemsAnalytics, addNewItem, removeItem, updateItem, buyItem, staffIDExists, addNewStaff, getItemOrigins, getItemCategories, getStaffByCredentials
+from crud import *
 import plotly.io as pio
 from datetime import datetime
 import os
@@ -19,16 +20,15 @@ def staff_login():
         username = request.form['username']
         password = request.form['password']
 
-        if username == 'AB12345' and password == '1234':
+        staff_id = getStaffByCredentials(username, password)
+        if staff_id:
             session['staff_logged_in'] = True
-
             response = make_response(redirect('/staff'))
-            response.set_cookie('staff_id', 'AB12345')
-            if not staffIDExists(username):
-                addNewStaff(username, "Staff", "Two", username, password)
+            response.set_cookie('staff_id', staff_id)
             return response
         else:
             return render_template('StaffLogin.html', error="Invalid username or password.")
+    
     return render_template('StaffLogin.html')
 
 @app.route('/staff')
@@ -264,6 +264,11 @@ def staff_register():
             return render_template('StaffRegister.html', error=result)
 
     return render_template('StaffRegister.html')
+
+@app.route('/history')
+def show_transaction_history():
+    transactions = showHistory()
+    return render_template('history.html', transactions=transactions)
 
 if __name__ == '__main__':
     app.run(debug=True)
