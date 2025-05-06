@@ -556,10 +556,10 @@ def simulateAddingRandomItems(num_items=50):
 
     for _ in range(num_items):
         # Create a random 10-digit item ID
-        item_id = "".join(random.choices(string.digits, k=10))
+        item_id = str(random.randint(1, 9)) + "".join(random.choices(string.digits, k=9))
 
         # Randomly choose an item name or create a new random one
-        item_name = random.choice(ITEM_NAMES) + ''.join(random.choices(string.ascii_lowercase, k=3))
+        item_name = random.choice(ITEM_NAMES)
 
         # Generate random weight between 0.5 and 20 lbs
         weight = round(random.uniform(0.5, 20.0), 2)
