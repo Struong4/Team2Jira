@@ -265,5 +265,10 @@ def staff_register():
 
     return render_template('StaffRegister.html')
 
+@app.route('/history')
+def show_transaction_history():
+    transactions = showHistory()
+    return render_template('history.html', transactions=transactions)
+
 if __name__ == '__main__':
     app.run(debug=True)

@@ -245,6 +245,9 @@
       <button id="registerStaffButton" class="toolbar-button">
         Register Staff
       </button>
+      <button id="showHistoryButton" class="toolbar-button">
+        Show History
+      </button>
     </div>
     
 
@@ -462,6 +465,10 @@
 
   document.getElementById('registerStaffButton').addEventListener('click', () => {
     window.location.assign('/register');
+  });
+
+  document.getElementById('showHistoryButton').addEventListener('click', () => {
+    window.location.assign("/history");
   });
 
   // Initialize
