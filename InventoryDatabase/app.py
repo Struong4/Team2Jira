@@ -277,10 +277,10 @@ def show_transaction_history():
 @app.route("/qrcode")
 def generate_qr():
     # Dynamically get local IP
-    hostname = socket.gethostname()
-    local_ip = socket.gethostbyname(hostname)
-    #url = "http://localhost:5000"  # Replace with your actual domain or IP
-    url = f"http://{local_ip}:5000/student"
+    # hostname = socket.gethostname()
+    # local_ip = socket.gethostbyname(hostname)
+    #url = "http://request.host:5000"  # Replace with your actual domain or IP
+    url = f"http://{request.host}/student"
     img = qrcode.make(url)
 
     buf = io.BytesIO()
