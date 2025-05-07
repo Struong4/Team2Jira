@@ -1,9 +1,12 @@
-from flask import Flask, render_template, request, redirect, url_for, session, jsonify, make_response
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify, make_response, send_file
 #from crud import showInventory, getItemByID, itemIDExists, busyHoursAnalytics, popularItemsAnalytics, addNewItem, removeItem, updateItem, buyItem, staffIDExists, addNewStaff, getItemOrigins, getItemCategories, getStaffByCredentials
 from crud import *
 import plotly.io as pio
 from datetime import datetime
 import os
+import io
+import qrcode
+import socket
 
 import random
 
@@ -92,6 +95,7 @@ def add_item():
 @app.route('/edit')
 def edit_page():
     item_id = request.args.get('id')
+    item_id = str(item_id).zfill(10)
     item = getItemByID(item_id)
     if not item:
         return "Item not found", 404
@@ -270,5 +274,23 @@ def show_transaction_history():
     transactions = showHistory()
     return render_template('history.html', transactions=transactions)
 
+@app.route("/qrcode")
+def generate_qr():
+    # Dynamically get local IP
+    # hostname = socket.gethostname()
+    # local_ip = socket.gethostbyname(hostname)
+    #url = "http://request.host:5000"  # Replace with your actual domain or IP
+    url = f"http://{request.host}/student"
+    img = qrcode.make(url)
+
+    buf = io.BytesIO()
+    img.save(buf, format='PNG')
+    buf.seek(0)
+
+    img.save(os.path.join("static", "Logos", "qr_code.png"))
+
+    return send_file(buf, mimetype='image/png')
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    #app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
