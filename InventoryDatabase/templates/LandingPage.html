@@ -14,14 +14,14 @@
       align-items: center;
       min-height: 100vh;
       text-align: center;
-      padding: 0; /* Removed excess padding */
+      padding: 0;
       box-sizing: border-box;
     }
 
     .header {
       width: 100%;
       padding: 10px 20px;
-      background-color: #000; /* Changed header color to black */
+      background-color: #000;
       text-align: right;
     }
 
@@ -47,7 +47,7 @@
       border: 1px solid #ccc;
       border-radius: 10px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      margin-top: 20px; /* Adjusted margin to remove extra space */
+      margin-top: 20px;
     }
 
     h1 {
@@ -63,8 +63,8 @@
     }
 
     .image-container img {
-      width: 60%;  /* Adjusted to make the image smaller */
-      max-width: 400px;  /* Max width for the image */
+      width: 60%;
+      max-width: 400px;
       border-radius: 10px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
@@ -120,10 +120,21 @@
       color: #555;
       margin-top: 20px;
     }
+
+    .qr-section {
+      margin: 40px auto 20px;
+    }
+
+    .qr-section img {
+      width: 200px;
+      height: auto;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
   </style>
 </head>
 <body>
-  <!-- Header with Staff Login button -->
   <div class="header">
     <a class="button" href="/login">Staff Login</a>
   </div>
@@ -131,38 +142,38 @@
   <div class="container">
     <h1>Welcome to Retriever Essentials</h1>
 
-    <!-- Image section -->
     <div class="image-container">
       <img src="/static/Logos/retriever_essential.png" alt="Retriever Essentials" />
     </div>
+
+    <div class="qr-section" id="qrCode">
+      <p>Scan to visit this page:</p>
+      <img src="/qrcode" alt="QR Code to Homepage" />
+    </div>
+
 
     <div class="button-row">
       <a class="button" href="/student">View Inventory</a>
     </div>
 
     <div class="info-grid">
-        <div class="info-box">
-            <strong>We Appreciate Donations – Thank you!</strong><br>
-            <br>
-            <a href="https://retrieveressentials.umbc.edu/services/donate-items/" target="_blank" style="display: inline-block; margin-top: 10px; color: #007b8f; text-decoration: underline; font-weight: normal;">Click Here to Donate Items</a>
-          </div>          
+      <div class="info-box">
+        <strong>We Appreciate Donations – Thank you!</strong><br><br>
+        <a href="https://retrieveressentials.umbc.edu/services/donate-items/" target="_blank" style="display: inline-block; margin-top: 10px; color: #007b8f; text-decoration: underline; font-weight: normal;">Click Here to Donate Items</a>
+      </div>
       <div class="info-box">
         <strong>The Essential Space</strong><br>
-        Our Free Grocery Store is located in The Commons!
-        <br>
+        Our Free Grocery Store is located in The Commons!<br>
         <a href=" https://retrieveressentials.umbc.edu/services/tes/" target="_blank" style="display: inline-block; margin-top: 10px; color: #007b8f; text-decoration: underline; font-weight: normal;">Click Here For More Information</a>
       </div>
       <div class="info-box">
         <strong>Winter Coat Closet</strong><br>
-        Thanks to our community, we have free clothes for the colder months!
-        <br> 
+        Thanks to our community, we have free clothes for the colder months!<br> 
         <a href="https://retrieveressentials.umbc.edu/winter-coat-closet/" target="_blank" style="display: inline-block; margin-top: 10px; color: #007b8f; text-decoration: underline; font-weight: normal;">Click Here For More Information</a>
       </div>
       <div class="info-box">
-        <strong>Follow us on Instagram</strong><br>
-        <br>
-        @umbcretrieveressentials<br>
-        <br>
+        <strong>Follow us on Instagram</strong><br><br>
+        @umbcretrieveressentials<br><br>
         For updates and a look into the RE community!
       </div>
       <div class="info-box">
@@ -170,8 +181,7 @@
         <img src="/static/Logos/GroupMe.png" alt="GroupMe" />
       </div>
       <div class="info-box">
-        <strong>Donate Meal Swipes until February 25th!</strong><br>
-        <br>
+        <strong>Donate Meal Swipes until February 25th!</strong><br><br>
         <a href="https://retrieveressentials.umbc.edu/services/save-a-swipe/" target="_blank" style="display: inline-block; margin-top: 10px; color: #007b8f; text-decoration: underline; font-weight: normal;">Click Here to Donate A Swipe</a>
       </div>
     </div>
