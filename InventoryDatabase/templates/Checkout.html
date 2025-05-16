@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Checkout</title>
+  <style>
+    .main-header {
+      background-color: rgb(253, 181, 21);
+      color: #000;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between; /* Align left and right sections */
+      font-size: 24px;
+      font-weight: bold;
+      border-bottom: 3px solid #222;
+    }
+    
+    .continue-btn {
+      background: white;
+      border: 2px solid black;
+      font-size: 16px;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    
+    .continue-btn:hover {
+      background: #f1f1f1;
+    }    
+    
+    .main-header img {
+      width: 75px;
+      height: 75px;
+      object-fit: contain;
+      margin-right: 15px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      background-color: white; /* Makes the background white */
+      padding: 5px; /* Adds some space around the image */
+    }
+    
+    .main-header h1 {
+      margin: 0; /* Remove default gap */
+    }
+    
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+    }
+    
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+    }
+
+    .container {
+      display: flex;
+      justify-content: space-between; 
+      height: 80vh;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .cart-title {
+      font-size: 22px;
+      font-weight: bold;
+      text-decoration: underline;
+      margin-bottom: 10px;
+    }
+
+    .cart-list {
+      flex: 1;
+      margin-right: 20px;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 10px;
+      overflow-y: auto;
+    }
+
+    .cart-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .cart-item img {
+      width: 75px;
+      height: 75px;
+      object-fit: contain;
+      margin-right: 15px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+    }
+
+    .item-details {
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+
+    .item-header {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 5px;
+    }
+
+    .item-controls {
+      display: flex;
+      align-items: center;
+      margin-top: 5px;
+    }
+
+    .item-controls input[type="number"] {
+      width: 60px;
+      padding: 5px;
+      font-size: 16px;
+    }
+
+    .item-controls button {
+      margin-left: 15px;
+      background-color: #ff4d4d;
+      color: white;
+      border: none;
+      padding: 6px 10px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .item-controls button:hover {
+      background-color: #cc0000;
+    }
+
+    .max-quantity-msg {
+      color: red;
+      font-size: 14px;
+      margin-top: 5px;
+    }
+
+    .checkout-box {
+      width: 300px;
+      background: rgb(253, 181, 21);
+      border: 5px solid #000;
+      padding: 20px;
+      border-radius: 8px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .button-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    
+    .button-group button + button {
+      margin-top: 0;
+      border-top: none;
+    }    
+
+    .checkout-box h3, .checkout-box p {
+      margin: 10px 0;
+      font-size: 18px;
+    }
+
+    .checkout-box button {
+      background-color: white;
+      border: 1px solid #000;
+      padding: 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .checkout-box button:hover {
+      background-color: #eee;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .header img {
+      height: 50px;
+    }
+    .cart-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+        padding: 10px;
+        border: 2px solid #ccc;
+        border-radius: 8px;
+        background-color: #fefefe;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      }
+      
+  </style>
+</head>
+<body>
+<div class="main-header">
+  <div style="display: flex; align-items: center; gap: 20px;">
+    <img src="/static/Logos/retriever_essential.png" alt="Logo">
+    <h1>My Cart</h1>
+  </div>
+  <button onclick="goBack()" class="continue-btn">Continue Shopping</button>
+</div>
+  
+<div class="container">
+  <div class="cart-section">
+    <h2 class="cart-title">Items in Cart</h2>
+    <div class="cart-list" id="cartList">
+      <!-- Cart items will go here -->
+      <div id="emptyCartMessage" style="display: none; text-align: center; color: #555;">Your cart is empty.</div>
+    </div>
+  </div>
+
+  <div class="checkout-box">
+    <h3>Total Count: <span id="totalCount">0</span></h3>
+    <div class="button-group">
+      <button onclick="checkout()">Checkout</button>
+      <button onclick="clearCart()">Clear Cart</button>
+    </div>    
+  </div>
+</div>
+
+<script>
+  let cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+  const cartList = document.getElementById('cartList');
+  const totalCountSpan = document.getElementById('totalCount');
+
+  async function populateCart() {
+    cartList.querySelectorAll('.cart-item').forEach(el => el.remove()); // Clear old items
+  
+    // Check if cart is empty
+    if (cartItems.length === 0) {
+      document.getElementById('emptyCartMessage').style.display = 'block'; // Show empty cart message
+    } else {
+      document.getElementById('emptyCartMessage').style.display = 'none'; // Hide empty cart message
+    }
+  
+    for (let index = 0; index < cartItems.length; index++) {
+      const item = cartItems[index];
+  
+      // Fetch item details based on itemID (assuming you have an endpoint for this)
+      try {
+        const response = await fetch(`/api/item/${item.itemID}`);
+        const data = await response.json();
+  
+        if (data.error) {
+          console.warn(`Item ${item.itemID} not found.`);
+          continue;
+        }
+  
+        // Get available quantity and quantity limit
+        const availableQuantity = data["Available Quantity"];
+        const quantityLimit = data["Quantity Limit"];
+  
+        const div = document.createElement('div');
+        div.className = 'cart-item';
+  
+        div.innerHTML = `  
+          <img src="${data.Image}" alt="${data["Item name"]}">
+          <div class="item-details">
+            <div class="item-header">
+              <strong>${data["Item name"]} - </strong>
+              <span>Weight:${data.Weight} lbs </span>
+            </div>
+            <div class="item-controls">
+              <input type="number" min="1" value="${item.quantity}" 
+                     max="${Math.min(availableQuantity, quantityLimit)}" 
+                     onchange="updateQuantity(${index}, this.value, ${availableQuantity}, ${quantityLimit})">
+              <button onclick="deleteItem(${index})">Delete</button>
+              <span id="maxQuantityMsg${index}" class="max-quantity-msg"></span>
+            </div>
+          </div>
+        `;
+        cartList.appendChild(div);
+  
+      } catch (err) {
+        console.error("Error fetching item:", err);
+      }
+    }
+  
+    updateTotalCount();
+  }
+  
+
+  function updateQuantity(index, value, availableQuantity, quantityLimit) {
+    let qty = Math.max(1, parseInt(value) || 1);
+    qty = Math.min(qty, availableQuantity, quantityLimit); // Ensure quantity does not exceed limits
+
+    cartItems[index].quantity = qty;
+    localStorage.setItem('cart', JSON.stringify(cartItems)); // update storage
+
+    // Display "Max quantity reached" message if the max limit is reached
+    const maxQuantityMsg = document.getElementById(`maxQuantityMsg${index}`);
+    if (qty === Math.min(availableQuantity, quantityLimit)) {
+        maxQuantityMsg.textContent = `Max quantity reached: ${Math.min(availableQuantity, quantityLimit)}`;
+    } else {
+        maxQuantityMsg.textContent = "";
+    }
+
+    populateCart(); // Re-populate the cart with updated quantities
+}
+
+  function deleteItem(index) {
+    cartItems.splice(index, 1);
+    localStorage.setItem('cart', JSON.stringify(cartItems)); // update storage
+    populateCart();
+  }
+
+  function updateTotalCount() {
+    const total = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+    totalCountSpan.textContent = total;
+  }
+
+  function goBack() {
+    window.location.href = "/student";
+  }
+
+  async function checkout() {
+    if (cartItems.length === 0) {
+      alert("Your cart is empty!");
+      return;
+    }
+  
+    const payload = {
+      items: cartItems.map(item => ({
+        item_id: item.itemID,
+        quantity: item.quantity
+      }))
+    };
+  
+    try {
+      const response = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+  
+      const result = await response.json();
+  
+      // Display the results in a popup or log
+      const messages = result.map(r => `${r.result}`).join('\n');
+      alert(messages);
+  
+      // If successful, clear cart and redirect
+      localStorage.removeItem('cart');
+      window.location.href = "/student";
+    } catch (error) {
+      console.error("Checkout error:", error);
+      alert("An error occurred during checkout.");
+    }
+  }
+
+  function clearCart() {
+    if (confirm("Are you sure you want to clear the cart?")) {
+      localStorage.removeItem('cart');
+      cartItems = [];
+      populateCart();
+    }
+  }
+
+  populateCart();
+</script>
+
+</body>
+</html>

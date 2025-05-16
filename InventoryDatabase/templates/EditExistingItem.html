@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Inventory Object</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f8f8f8;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        header {
+            width: 100%;
+            background-color: rgb(253, 181, 21);
+            color: rgb(0, 0, 0);
+            padding: 20px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .main-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 60px;
+            margin-top: 20px;
+        }
+        .logo-dropzone {
+            width: 300px;
+            height: 200px;
+            border: 2px dashed #aaa;
+            border-radius: 8px;
+            background-color: transparent;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+        .logo-dropzone.dragover {
+            background-color: #e0ffe0;
+            border-color: #00aa00;
+        }
+        .logo-dropzone img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+        .logo-dropzone input {
+            display: none;
+        }
+        .form-container {
+            max-width: 900px;
+            width: 100%;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], textarea, input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .checkbox-group {
+            margin-bottom: 15px;
+        }
+        .checkbox-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .checkbox-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 5px;
+        }
+        .checkbox-options label {
+            font-weight: normal;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .actions {
+            text-align: right;
+        }
+        .actions button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        .confirm {
+            background-color: #00aa00;
+            color: white;
+            opacity: 1;
+            cursor: pointer;
+        }
+        .cancel {
+            background-color: #ff0000;
+            color: white;
+        }
+        .generate-id-btn {
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #f0f0f0;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .input-group {
+            display: flex;
+            align-items: center;
+        }
+        .required-symbol {
+            color: red;
+            font-size: 18px;
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>Edit Inventory Object</header>
+        <div class="main-container">
+            <div class="logo-dropzone" id="logoDropzone">
+                <img id="logoPreview" src="{{ item['Image'] or '/static/Logos/Upload Image.png' }}" alt="Logo">
+                <input type="file" accept="image/*" id="logoInput" name="logoInput">
+            </div>
+            <form class="form-container" action="/edit_item" method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="productName">Product Name<span class="required-symbol">*</span></label>
+                    <input type="text" id="productName" name="productName" value="{{ item['Item name'] }}">
+                </div>
+                <div class="form-group">
+                    <label for="itemID">Item ID<span class="required-symbol">*</span></label>
+                    <div class="input-group">
+                        <input type="text" id="itemID" name="itemID" value="{{ item['Item ID'] }}">
+                        <button type="button" class="generate-id-btn" onclick="generateItemID()">Generate ID</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="price">Price</label>
+                    <input type="text" name="price" id="price" value="{{ item['Price'] }}">
+                </div>
+                <div class="form-group">
+                    <label for="weight">Weight</label>
+                    <input type="text" name="weight" id="weight" value="{{ item['Weight'] }}">
+                </div>
+                <div class="form-group checkbox-group">
+                    <label class="checkbox-label">Origin<span class="required-symbol">*</span></label>
+                    <div class="checkbox-options">
+                        {% for origin in all_origins %}
+                        <label>
+                            <input type="checkbox" class="origin-checkbox" name="origin" value="{{ origin }}"
+                                {% if origin in selected_origins %}checked{% endif %}> {{ origin }}
+                        </label>
+                        {% endfor %}
+                        <label>
+                            <input type="checkbox" id="otherOriginCheckbox" name="otherOriginCheckbox">
+                            <input type="text" id="otherOriginInput" name="otherOriginInput" placeholder="Enter custom origin" style="margin-left:5px;">
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group checkbox-group">
+                    <label class="checkbox-label">Category:</label>
+                    <div class="checkbox-options" id="categoryOptions"></div>
+                </div>
+                <div class="form-group">
+                    <label for="description">Description<span class="required-symbol">*</span></label>
+                    <textarea id="description" name="description" rows="4">{{ item['Description'] }}</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="availableQuantity">Available Quantity<span class="required-symbol">*</span></label>
+                    <input type="number" id="availableQuantity" name="availableQuantity" min="0" max="10000" value="{{ item['Available Quantity'] }}">
+                </div>
+                <div class="form-group">
+                    <label for="quantityLimit">Quantity Limit<span class="required-symbol">*</span></label>
+                    <input type="number" id="quantityLimit" name="quantityLimit" min="1" max="10000" value="{{ item['Quantity Limit'] }}">
+                </div>
+                <div class="actions">
+                    <button type="submit" class="confirm" id="confirmButton">Confirm</button>
+                    <button type="button" class="cancel" onclick="window.location.href='/staff'">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const catContainer = document.getElementById('categoryOptions');
+            const storedCategories = JSON.parse(localStorage.getItem('inventoryCategories')) || [];
+            storedCategories.forEach(category => {
+                const label = document.createElement('label');
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.name = 'category';
+                checkbox.value = category;
+                label.appendChild(checkbox);
+                label.appendChild(document.createTextNode(' ' + category));
+                catContainer.appendChild(label);
+            });
+        });
+
+        function generateItemID() {
+            fetch('/generate_unique_id')
+                .then(res => res.json())
+                .then(data => document.getElementById('itemID').value = data.item_id)
+                .catch(err => {
+                    alert("Failed to generate unique ID.");
+                    console.error(err);
+                });
+        }
+    </script>
+</body>
+</html>

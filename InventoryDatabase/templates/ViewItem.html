@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>View Inventory Object</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f8f8f8;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    header {
+      width: 100%;
+      background-color: rgb(253, 181, 21);
+      color: rgb(0, 0, 0);
+      padding: 20px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .main-container {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 60px;
+      margin-top: 20px;
+    }
+
+    .logo-dropzone {
+      width: 300px;
+      height: 200px;
+      border: 2px dashed #aaa;
+      border-radius: 8px;
+      background-color: transparent;
+      position: relative;
+      overflow: hidden;
+      cursor: default;
+    }
+
+    .logo-dropzone img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .form-container {
+      max-width: 900px;
+      width: 100%;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    input[readonly], textarea[readonly] {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background-color: #f5f5f5;
+      color: #333;
+      box-sizing: border-box;
+    }
+
+    .info-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 5px;
+    }
+
+    .info-box {
+      padding: 6px 12px;
+      background-color: #eee;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    .actions {
+      text-align: right;
+      margin-top: 20px;
+    }
+
+    .actions button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .addToCart {
+      background-color: #00aa00;
+      color: white;
+      margin-right: 10px;
+    }
+
+    .cancel {
+      background-color: #ff0000;
+      color: white;
+    }
+
+    .invalid-msg {
+      color: red;
+      font-size: 14px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>View Inventory Object</header>
+
+    <div class="main-container">
+      <!-- Image -->
+      <div class="logo-dropzone">
+        <img src="Logos/Upload Image.png" alt="Logo">
+      </div>
+
+      <!-- Info Form -->
+      <div class="form-container">
+        <div class="form-group">
+          <label>Product Name</label>
+          <input type="text" id="productName" value="{{ item['Item name'] }}" readonly>
+        </div>
+
+        <div class="form-group">
+          <label>Item ID</label>
+          <input type="text" id="itemID" value="{{ item['Item ID'] }}" readonly>
+        </div>
+
+        <div class="form-group">
+          <label>Category:</label>
+          <div class="info-group">
+            {% for cat in item['Categories'] %}
+              <div class="info-box">{{ cat }}</div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Weight</label>
+          <input type="text" id="weight" value="{{ item['Weight'] }}" readonly>
+        </div>
+
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="description" rows="4" readonly>{{ item['Description'] }}</textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Available Quantity</label>
+          <input type="number" id="availableQuantity" value="{{ item['Available Quantity'] }}" readonly>
+        </div>
+
+        <div class="form-group">
+          <label>Quantity Limit</label>
+          <input type="number" id="quantityLimit" value="{{ item['Quantity Limit'] }}" readonly>
+        </div>
+
+        <!-- Editable Quantity Box -->
+        <div class="form-group">
+          <label>Quantity to Add to Cart</label>
+          <input type="number" id="addQuantity" min="1" value="1">
+          <div class="invalid-msg" id="limitError">Exceeds quantity limit per user.</div>
+          <div class="invalid-msg" id="stockError">Not enough stock available.</div>
+        </div>
+
+        <div class="actions">
+          <button class="addToCart" onclick="validateAndAddToCart()">Add To Cart</button>
+          <button class="cancel" onclick="window.location.href='/student'">Back</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    function validateAndAddToCart() {
+      const qty = parseInt(document.getElementById('addQuantity').value);
+      const limit = parseInt(document.getElementById('quantityLimit').value);
+      const available = parseInt(document.getElementById('availableQuantity').value);
+      const limitError = document.getElementById('limitError');
+      const stockError = document.getElementById('stockError');
+    
+      // Hide both errors initially
+      limitError.style.display = "none";
+      stockError.style.display = "none";
+    
+      let valid = true;
+    
+      if (qty > limit) {
+        limitError.style.display = "block";
+        valid = false;
+      }
+    
+      if (qty > available) {
+        stockError.style.display = "block";
+        valid = false;
+      }
+    
+      if (qty < 1) {
+        alert("Quantity must be at least 1.");
+        valid = false;
+      }
+    
+      if (valid) {
+        const cartItem = {
+          itemID: document.getElementById('itemID').value,
+          quantity: qty
+        };
+      
+        // Retrieve existing cart or initialize new one
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+      
+        // Check if item already in cart
+        const existingItem = cart.find(item => item.itemID === cartItem.itemID);
+        if (existingItem) {
+          existingItem.quantity += qty;
+        } else {
+          cart.push(cartItem);
+        }
+      
+        // Save back to localStorage
+        localStorage.setItem('cart', JSON.stringify(cart));
+      
+        alert("Added " + qty + " items to cart!");
+        window.location.href = "/student";  // Redirect or change as needed
+      }
+      
+    }
+    
+  </script>
+  
+</body>
+</html>

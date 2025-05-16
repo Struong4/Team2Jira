@@ -1,0 +1,33 @@
+##ID,NAME,WEIGHT,PRICE,QUANTITY,DESCRIPTION,ORIGIN,CATEGORY,LIMIT
+
+1000000001,Sona Masoori Rice, 20, 25, 13, (No description), Patel Brothers, Category 1, 999
+1000000002,Toor Dahl (Red Lentils), 179, 1.25, 15, (No description), Patel Brothers, Category 1, 999
+1000000003,Black Chickpeas (Channa), 85, 1.25, 15, (No description), Patel Brothers, Category 1, 999
+1000000004,Maggi Noodles, 1, 0.50, 400, (No description), Patel Brothers, Category 1, 999
+1000000005,Parle Kreams Bourbon, 1, 0.49, 10, (No description), Patel Brothers, Category 1, 999
+1000000006,Parle Hide & Seek Black Bourbon, 1, 0.49, 10, (No description), Patel Brothers, Category 1, 999
+1000000007,SW MASL BANA, 1, 1.99, 10, (No description), Patel Brothers, Category 1, 999
+1000000008,GOP SNACK PE CHO, 1, 1.29, 10, (No description), Patel Brothers, Category 2, 999
+1000000009,AD BANGA MIX, 1, 1.99, 10, (No description), Patel Brothers, Category 2, 999
+1000000010,SW BHEL CUP, 1, 1.29, 10, (No description), Patel Brothers, Category 2, 999
+1000000011,MAGIC MAS UPMA, 1, 1.29, 10, (No description), Patel Brothers, Category 2, 999
+1000000012,KURKURE MSL, 1, 0.89, 10, (No description), Patel Brothers, Category 2, 999
+1000000013,Lays Chile Limon, 1, 0.89, 10, (No description), Patel Brothers, Category 2, 999
+1000000014,MTR Navaratan Korma, 1, 2.99, 10, (No description), Patel Brothers, Category 2, 999
+1000000015,MTR Alu Muttar, 1, 2.99, 10, (No description), Patel Brothers, Category 2, 999
+1000000016,MTR Mutter Paneer, 1, 2.99, 10, (No description), Patel Brothers, Category 2, 999
+1000000017,Mixed Vegetable Curry, 1, 2.99, 10, (No description), Patel Brothers, Category 3, 999
+1000000018,MTR Palak Paneer, 1, 2.99, 10, (No description), Patel Brothers, Category 3, 999
+1000000019,MTR Shahi Paneer, 1, 2.99, 10, (No description), Patel Brothers, Category 3, 999
+1000000020,MTR Bhindi Masala, 1, 2.99, 10, (No description), Patel Brothers, Category 3, 999
+1000000021,MTR Alu Methi, 1, 2.99, 10, (No description), Patel Brothers, Category 3, 999
+1000000022,MTR Chana Masala, 1, 2.99, 10, (No description), Patel Brothers, Category 3, 999
+1000000023,MTR Kadhi Pakora, 1, 2.99, 10, (No description), Patel Brothers, Category 4, 999
+1000000024,GITS Paneer Tikka Masala, 1, 2.99, 10, (No description), Patel Brothers, Category 4, 999
+1000000025,GITS Bhindi Masala, 1, 2.99, 10, (No description), Patel Brothers, Category 4, 999
+1000000026,GITS Pau Bhakti, 1, 2.99, 10, (No description), Patel Brothers, Category 4, 999
+1000000027,GITS Paneer Makhani, 1, 2.99, 10, (No description), Patel Brothers, Category 4, 999
+1000000028,GITS Aloo Raswala, 1, 2.99, 10, (No description), Patel Brothers, Category 4, 999
+1000000029,GITS Veg Biryani, 1, 2.99, 10, (No description), Patel Brothers, Category 4, 999
+1000000030,5 Minute Khana Aloo Mutter, 1, 2.99, 10, (No description), Patel Brothers, Category 4, 999
+1000000031,5 Minute Khana Pao Bhaji, 1, 2.99, 10, (No description), Patel Brothers, Category 4, 999
